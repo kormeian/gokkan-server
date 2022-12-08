@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.category.dto;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
+import com.sun.istack.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.NotFound;
 
 public class CategoryDto {
 
@@ -35,6 +37,24 @@ public class CategoryDto {
 		}
 	}
 
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@ToString
+	@Builder
+	public static class UpdateRequest {
+
+		@NotNull
+		private Long id;
+
+		@NonNull
+		private String name;
+
+		@NonNull
+		private String parent;
+
+	}
 
 	@Getter
 	@Setter

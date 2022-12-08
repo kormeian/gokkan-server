@@ -8,10 +8,12 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;
+import com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
 import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
 import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,8 +175,6 @@ class CategoryServiceTest {
 	public void test_03_00() {
 		//given
 		testInput();
-
-		//when
 		boolean deleted = categoryService.delete("의자");
 
 		//then
@@ -182,7 +182,72 @@ class CategoryServiceTest {
 		CategoryException categoryException = assertThrows(CategoryException.class,
 			() -> categoryService.read("의자1"));
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+   }
 
+
+	@DisplayName("04_00. update success")
+	@Test
+	public void test_04_00() {
+		//given
+		testInput();
+
+		//when
+		UpdateRequest request = UpdateRequest.builder()
+			.id(categoryRepository.findByName("의자1").get().getId())
+			.name("책상5")
+			.parent("책상")
+			.build();
+
+		Response update = categoryService.update(request);
+
+		//then
+		assertEquals(update.getName(), "책상5");
+		assertEquals(update.getParent(), "책상");
+		List<String> 의자 = categoryService.read("의자").getChildren();
+		System.out.println("의자 = " + 의자);
+		List<String> 책상 = categoryService.read("책상").getChildren();
+		System.out.println("책상 = " + 책상);
+		assertEquals(의자.size(), 2);
+		assertEquals(책상.size(), 5);
+
+	}
+
+	@DisplayName("04_01. update fail not found category")
+	@Test
+	public void test_04_01() {
+		//given
+
+		//when
+		UpdateRequest request = UpdateRequest.builder()
+			.id(9999999L)
+			.name("책상5")
+			.parent("책상")
+			.build();
+
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.update(request));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+	}
+
+	@DisplayName("04_02. update fail not found parent category")
+	@Test
+	public void test_04_02() {
+		//given
+		testInput();
+		//when
+		UpdateRequest request = UpdateRequest.builder()
+			.id(categoryRepository.findByName("의자").get().getId())
+			.name("test")
+			.parent("test")
+			.build();
+
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.update(request));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
 	}
 
 	private void testInput() {
