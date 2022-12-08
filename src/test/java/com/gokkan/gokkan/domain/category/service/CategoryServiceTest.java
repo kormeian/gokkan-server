@@ -14,6 +14,9 @@ import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ class CategoryServiceTest {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+
+	@PersistenceContext
+	private EntityManager em;
 
 
 	@DisplayName("01_00. create root category success")
@@ -175,14 +181,26 @@ class CategoryServiceTest {
 	public void test_03_00() {
 		//given
 		testInput();
+
+		//when
 		boolean deleted = categoryService.delete("의자");
 
 		//then
 		assertTrue(deleted);
-		CategoryException categoryException = assertThrows(CategoryException.class,
-			() -> categoryService.read("의자1"));
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
    }
+
+	@DisplayName("03_01. delete fail")
+	@Test
+	public void test_03_01() {
+		//given
+
+		//when
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.delete("의자"));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+	}
 
 
 	@DisplayName("04_00. update success")

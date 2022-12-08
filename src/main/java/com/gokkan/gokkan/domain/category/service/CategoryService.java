@@ -13,11 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
+	@Transactional
 	public CategoryDto.Response create(CategoryDto.CreateRequest request) {
 		Category parent;
 		Category category = request.toEntity();
@@ -40,17 +41,17 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
-	@Transactional(readOnly = true)
 	public CategoryDto.Response read(String name) {
 		return CategoryDto.Response.toResponse(getCategoryByName(name, false));
 	}
-  
-  public boolean delete(String name) {
-		categoryRepository.delete(getCategory(name, false));
+
+	@Transactional
+	public boolean delete(String name) {
+		categoryRepository.delete(getCategoryByName(name, false));
 		return true;
 	}
 
-
+	@Transactional
 	public CategoryDto.Response update(UpdateRequest request) {
 		Category category = getCategoryById(request.getId());
 		Category beforeParent = getCategoryByName(category.getParent().getName(), true);
