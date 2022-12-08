@@ -35,13 +35,8 @@ class CategoryServiceTest {
 	@Test
 	public void test_01_00() {
 		//given
-		CreateRequest request =
-			CreateRequest.builder()
-				.parent(null)
-				.name("의자")
-				.build();
 
-		System.out.println("===============================");
+		CreateRequest request = getCreateRequest("의자", null);
 
 		//when
 		Response response = categoryService.create(request);
@@ -65,13 +60,7 @@ class CategoryServiceTest {
 			.children(new ArrayList<>())
 			.build());
 
-		CreateRequest request =
-			CreateRequest.builder()
-				.parent(null)
-				.name("의자")
-				.build();
-
-		System.out.println("===============================");
+		CreateRequest request = getCreateRequest("의자", "root");
 
 		//when
 		Response response = categoryService.create(request);
@@ -95,13 +84,7 @@ class CategoryServiceTest {
 			.children(new ArrayList<>())
 			.build());
 
-		CreateRequest request =
-			CreateRequest.builder()
-				.parent("의자")
-				.name("좌식 의자")
-				.build();
-
-		System.out.println("===============================");
+		CreateRequest request = getCreateRequest("좌식 의자","의자");
 
 		//when
 		Response response = categoryService.create(request);
@@ -119,13 +102,7 @@ class CategoryServiceTest {
 	@Test
 	public void test_01_03() {
 		//given
-		CreateRequest request =
-			CreateRequest.builder()
-				.parent("의자")
-				.name("좌식 의자")
-				.build();
-
-		System.out.println("===============================");
+		CreateRequest request = getCreateRequest("좌식 의자","의자");
 
 		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
@@ -133,6 +110,21 @@ class CategoryServiceTest {
 
 		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
+	}
+
+	@DisplayName("01_04. create not root category fail duplicate category")
+	@Test
+	public void test_01_04() {
+		//given
+		categoryRepository.save(Category.builder().name("좌식 의자").build());
+		CreateRequest request = getCreateRequest("좌식 의자","의자");
+
+		//when
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.create(request));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
 	}
 
 	@DisplayName("02_00. read success")
@@ -175,14 +167,26 @@ class CategoryServiceTest {
 	public void test_03_00() {
 		//given
 		testInput();
+
+		//when
 		boolean deleted = categoryService.delete("의자");
 
 		//then
 		assertTrue(deleted);
+	}
+
+	@DisplayName("03_01. delete fail not found category")
+	@Test
+	public void test_03_01() {
+		//given
+
+		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
-			() -> categoryService.read("의자1"));
+			() -> categoryService.delete("의자"));
+
+		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
-   }
+	}
 
 
 	@DisplayName("04_00. update success")
@@ -295,5 +299,11 @@ class CategoryServiceTest {
 			.parent("책상")
 			.name("책상4")
 			.build());
+	}
+	private static CreateRequest getCreateRequest(String name, String parent) {
+		return CreateRequest.builder()
+			.parent(parent)
+			.name(name)
+			.build();
 	}
 }

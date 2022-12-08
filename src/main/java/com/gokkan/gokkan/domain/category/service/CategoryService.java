@@ -13,13 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
+	@Transactional
 	public CategoryDto.Response create(CategoryDto.CreateRequest request) {
 		Category parent;
+		duplicateCheck(request.getName());
+
 		Category category = request.toEntity();
 
 		if (request.getParent() == null) {
@@ -44,14 +46,17 @@ public class CategoryService {
 	public CategoryDto.Response read(String name) {
 		return CategoryDto.Response.toResponse(getCategoryByName(name, false));
 	}
-  
-  public boolean delete(String name) {
-		categoryRepository.delete(getCategory(name, false));
+
+	@Transactional
+	public boolean delete(String name) {
+		categoryRepository.delete(getCategoryByName(name, false));
 		return true;
 	}
 
 
+	@Transactional
 	public CategoryDto.Response update(UpdateRequest request) {
+		duplicateCheck(request.getName());
 		Category category = getCategoryById(request.getId());
 		Category beforeParent = getCategoryByName(category.getParent().getName(), true);
 		Category updateParent = getCategoryByName(request.getParent(), true);
@@ -67,6 +72,12 @@ public class CategoryService {
 		category.setName(request.getName());
 
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
+	}
+
+	private void duplicateCheck(String request) {
+		if (categoryRepository.existsByName(request)) {
+			throw new CategoryException(CategoryErrorCode.DUPLICATED_CATEGORY);
+		}
 	}
 
 	private Category getCategoryById(long id) {
