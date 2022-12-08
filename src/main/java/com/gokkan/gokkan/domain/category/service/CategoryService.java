@@ -40,11 +40,18 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
+	@Transactional(readOnly = true)
 	public CategoryDto.Response read(String name) {
-		Category category = categoryRepository.findByName(name)
-			.orElseThrow(() -> new CategoryException(CategoryErrorCode.NOT_FOUND_CATEGORY));
-
-		return CategoryDto.Response.toResponse(category);
+		return CategoryDto.Response.toResponse(getCategory(name));
 	}
 
+	public boolean delete(String name) {
+		categoryRepository.delete(getCategory(name));
+		return true;
+	}
+
+	private Category getCategory(String name) {
+		return categoryRepository.findByName(name)
+			.orElseThrow(() -> new CategoryException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+	}
 }

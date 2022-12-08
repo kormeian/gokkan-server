@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.category.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto;
@@ -165,6 +166,23 @@ class CategoryServiceTest {
 
 		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+	}
+
+	@DisplayName("03_00. delete success")
+	@Test
+	public void test_03_00() {
+		//given
+		testInput();
+
+		//when
+		boolean deleted = categoryService.delete("의자");
+
+		//then
+		assertTrue(deleted);
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.read("의자1"));
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+
 	}
 
 	private void testInput() {
