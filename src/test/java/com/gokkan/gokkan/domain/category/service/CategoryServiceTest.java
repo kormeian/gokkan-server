@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.category.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto;
@@ -169,9 +170,24 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
-	@DisplayName("03_00. update success")
+	@DisplayName("03_00. delete success")
 	@Test
 	public void test_03_00() {
+		//given
+		testInput();
+		boolean deleted = categoryService.delete("의자");
+
+		//then
+		assertTrue(deleted);
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.read("의자1"));
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+   }
+
+
+	@DisplayName("04_00. update success")
+	@Test
+	public void test_04_00() {
 		//given
 		testInput();
 
@@ -196,9 +212,9 @@ class CategoryServiceTest {
 
 	}
 
-	@DisplayName("03_01. update fail not found category")
+	@DisplayName("04_01. update fail not found category")
 	@Test
-	public void test_03_01() {
+	public void test_04_01() {
 		//given
 
 		//when
@@ -215,9 +231,9 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
-	@DisplayName("03_02. update fail not found parent category")
+	@DisplayName("04_02. update fail not found parent category")
 	@Test
-	public void test_03_02() {
+	public void test_04_02() {
 		//given
 		testInput();
 		//when

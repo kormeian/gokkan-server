@@ -40,8 +40,14 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
+	@Transactional(readOnly = true)
 	public CategoryDto.Response read(String name) {
 		return CategoryDto.Response.toResponse(getCategoryByName(name, false));
+	}
+  
+  public boolean delete(String name) {
+		categoryRepository.delete(getCategory(name, false));
+		return true;
 	}
 
 
