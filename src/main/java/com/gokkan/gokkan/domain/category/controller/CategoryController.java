@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,5 +28,10 @@ public class CategoryController {
 	@GetMapping("")
 	public ResponseEntity<?> read(@RequestParam String name) {
 		return ResponseEntity.ok(categoryService.read(name));
+	}
+
+	@DeleteMapping("")
+	public ResponseEntity<?> delete(@RequestParam String name) {
+		return ResponseEntity.ok(categoryService.delete(name));
 	}
 }
