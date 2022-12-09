@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StyleErrorCode {
 
-	;
+	NOT_FOUND_STYLE("존재하지 않는 스타일 입니다.");
 
 	private final String description;
 }
