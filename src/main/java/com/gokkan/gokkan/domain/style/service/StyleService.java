@@ -20,6 +20,7 @@ public class StyleService {
 	private final StyleRepository styleRepository;
 
 	public Response create(CreateRequest request) {
+		duplicateCheck(request);
 		return Response.toResponse(
 			styleRepository.save(
 				Style.builder()
@@ -52,5 +53,11 @@ public class StyleService {
 	private Style getStyleById(UpdateRequest request) {
 		return styleRepository.findById(request.getId()).orElseThrow(() -> new StyleException(
 			StyleErrorCode.NOT_FOUND_STYLE));
+	}
+
+	private void duplicateCheck(CreateRequest request) {
+		if (styleRepository.existsByName(request.getName())) {
+			throw new StyleException(StyleErrorCode.DUPLICATE_STYLE);
+		}
 	}
 }
