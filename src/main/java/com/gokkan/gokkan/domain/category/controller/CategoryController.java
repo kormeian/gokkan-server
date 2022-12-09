@@ -36,9 +36,9 @@ public class CategoryController {
 		return ResponseEntity.ok(categoryService.delete(name));
 
 	}
-  
-  @PutMapping("")
+
+	@PutMapping("")
 	public ResponseEntity<?> update(@RequestBody CategoryDto.UpdateRequest request) {
 		return ResponseEntity.status(HttpStatus.OK).body(categoryService.update(request));
-  }
+	}
 }

@@ -1,4 +1,4 @@
-package com.gokkan.gokkan.domain.category.exception;
+package com.gokkan.gokkan.domain.style.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,12 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Builder
-public class CategoryException extends RuntimeException {
+public class StyleException extends RuntimeException {
 
-	private CategoryErrorCode errorCode;
+	private StyleErrorCode errorCode;
 	private String errorMessage;
 
-	public CategoryException(CategoryErrorCode errorCode) {
+	public StyleException(StyleErrorCode errorCode) {
 		this.errorCode = errorCode;
 		this.errorMessage = errorCode.getDescription();
 	}
