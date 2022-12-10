@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.dto.CategoryDto;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
@@ -84,7 +83,7 @@ class CategoryServiceTest {
 			.children(new ArrayList<>())
 			.build());
 
-		CreateRequest request = getCreateRequest("좌식 의자","의자");
+		CreateRequest request = getCreateRequest("좌식 의자", "의자");
 
 		//when
 		Response response = categoryService.create(request);
@@ -102,7 +101,7 @@ class CategoryServiceTest {
 	@Test
 	public void test_01_03() {
 		//given
-		CreateRequest request = getCreateRequest("좌식 의자","의자");
+		CreateRequest request = getCreateRequest("좌식 의자", "의자");
 
 		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
@@ -117,7 +116,7 @@ class CategoryServiceTest {
 	public void test_01_04() {
 		//given
 		categoryRepository.save(Category.builder().name("좌식 의자").build());
-		CreateRequest request = getCreateRequest("좌식 의자","의자");
+		CreateRequest request = getCreateRequest("좌식 의자", "의자");
 
 		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
@@ -300,6 +299,7 @@ class CategoryServiceTest {
 			.name("책상4")
 			.build());
 	}
+
 	private static CreateRequest getCreateRequest(String name, String parent) {
 		return CreateRequest.builder()
 			.parent(parent)
