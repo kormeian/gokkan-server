@@ -28,6 +28,7 @@ public class ImageCheck {
 
 	private String url;
 
+	//TODO Item 생성 후
 //	@ManyToOne(fetch = FetchType.LAZY)
 //	@JoinColumn(name = "item_id")
 //	private Item item;
