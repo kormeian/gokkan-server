@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.image.service;
 
 import static com.gokkan.gokkan.domain.image.dto.ImageDto.CreateRequest;
-import static com.gokkan.gokkan.domain.image.dto.ImageDto.UpdateRequest;
 
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
@@ -19,15 +18,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class ImageItemService {
 
 	private final ImageItemRepository imageItemRepository;
-
+	//TODO Item 생성 후
+//	private final ItemRepository itemRepository;
+	private final AwsS3Service awsS3Service;
 
 	public List<ImageItem> save(CreateRequest request) {
+		//TODO Item 생성 후
+//		Item item = itemRepository.findById(request.getItemId())
+//			.orElseThrow(new ImageException(ImageErrorCode.NOT_FOUND_IMAGE_ITEM));
+
+		if (request.getUrls().size() == 0) {
+			throw new ImageException(ImageErrorCode.EMPTY_URL);
+		}
+
 		List<ImageItem> imageItems = new ArrayList<>();
 		for (String url : request.getUrls()) {
+			if (url == null || url.length() == 0) {
+				throw new ImageException(ImageErrorCode.INVALID_FORMAT_URL);
+			}
 			imageItems.add(imageItemRepository.save(
 				ImageItem.builder()
 					.url(url)
-//					.item(request.getItemId())
+//					.item(item)
 					.build()));
 		}
 
@@ -35,10 +47,15 @@ public class ImageItemService {
 	}
 
 	public boolean delete(Long imageItemId) {
-		imageItemRepository.delete(getImageItem(imageItemId));
+		ImageItem imageItem = getImageItem(imageItemId);
+		String url = imageItem.getUrl();
+		imageItemRepository.delete(imageItem);
+		awsS3Service.delete(url);
+
 		return true;
 	}
 
+	//TODO Item 생성 후
 //	public ImageItem update(UpdateRequest request) {
 //		ImageItem imageItem = getImageItem(request.getImageId());
 //		imageItem.setUrl(request.getUrl());

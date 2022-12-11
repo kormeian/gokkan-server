@@ -15,15 +15,29 @@ import org.springframework.stereotype.Service;
 public class ImageCheckService {
 
 	private final ImageCheckRepository imageCheckRepository;
+	//TODO Item 생성 후
+//	private final ItemRepository itemRepository;
+	private final AwsS3Service awsS3Service;
 
 
 	public List<ImageCheck> save(CreateRequest request) {
+		//TODO Item 생성 후
+//		Item item = itemRepository.findById(request.getItemId())
+//			.orElseThrow(new ImageException(ImageErrorCode.NOT_FOUND_IMAGE_ITEM));
+
+		if (request.getUrls().size() == 0) {
+			throw new ImageException(ImageErrorCode.EMPTY_URL);
+		}
+
 		List<ImageCheck> imageChecks = new ArrayList<>();
 		for (String url : request.getUrls()) {
+			if (url == null || url.length() == 0) {
+				throw new ImageException(ImageErrorCode.INVALID_FORMAT_URL);
+			}
 			imageChecks.add(imageCheckRepository.save(
 				ImageCheck.builder()
 					.url(url)
-//					.item(request.getItemId())
+//					.item(item)
 					.build()));
 		}
 
@@ -31,10 +45,15 @@ public class ImageCheckService {
 	}
 
 	public boolean delete(Long imageCheckId) {
-		imageCheckRepository.delete(getImageCheck(imageCheckId));
+		ImageCheck imageCheck = getImageCheck(imageCheckId);
+		String url = imageCheck.getUrl();
+		imageCheckRepository.delete(imageCheck);
+		awsS3Service.delete(url);
+
 		return true;
 	}
 
+	//TODO Item 생성 후
 //	public ImageCheck update(UpdateRequest request) {
 //		ImageCheck imageCheck = getImageCheck(request.getImageId());
 //		imageCheck.setUrl(request.getUrl());
@@ -43,7 +62,7 @@ public class ImageCheckService {
 
 	private ImageCheck getImageCheck(Long imageCheckId) {
 		return imageCheckRepository.findById(imageCheckId)
-			.orElseThrow(() -> new ImageException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
+				.orElseThrow(() -> new ImageException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
 	}
 
 }
