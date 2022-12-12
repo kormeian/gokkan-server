@@ -76,7 +76,7 @@ public class CategoryDto {
 				.id(category.getId())
 				.name(category.getName())
 				.parent(category.getParent() == null ?
-					"대분류" : category.getParent().getName())
+					"root" : category.getParent().getName())
 				.children(category.getChildren() == null ? new ArrayList<>() :
 					category.getChildren().stream().map(Category::getName)
 						.collect(Collectors.toList()))
