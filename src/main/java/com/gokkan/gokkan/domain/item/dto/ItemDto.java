@@ -96,7 +96,7 @@ public class ItemDto {
 	public static class UpdateRequest {
 
 		@NotNull
-		private Long id;
+		private Long itemId;
 		@NotNull
 		private String name;
 

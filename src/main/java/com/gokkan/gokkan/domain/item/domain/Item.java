@@ -7,6 +7,7 @@ import com.gokkan.gokkan.domain.item.type.State;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,7 +39,7 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(length = 10)
+	@Column(length = 100)
 	private String name;
 
 	@Column(length = 10)
@@ -84,11 +85,11 @@ public class Item {
 	private Category category;
 
 	@BatchSize(size = 11)
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageCheck> imageChecks = new ArrayList<>();
 
 	@BatchSize(size = 11)
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageItem> imageItems = new ArrayList<>();
 
 

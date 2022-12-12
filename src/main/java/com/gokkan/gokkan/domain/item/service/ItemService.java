@@ -47,7 +47,8 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public Response read(Long itemId) {
-		return Response.toResponse(getItem(itemId));
+		Item item = getItem(itemId);
+		return Response.toResponse(item);
 	}
 
 	@Transactional
@@ -69,7 +70,7 @@ public class ItemService {
 		List<ImageItem> imageItems,
 		List<ImageCheck> imageChecks) {
 
-		Item item = getItem(request.getId());
+		Item item = getItem(request.getItemId());
 		item = request.toItem(item);
 		item.setCategory(getCategory(request.getCategory()));
 

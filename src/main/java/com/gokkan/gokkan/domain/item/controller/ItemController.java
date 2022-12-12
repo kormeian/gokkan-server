@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,13 +34,15 @@ public class ItemController {
 	private final AwsS3Service awsS3Service;
 
 	@PostMapping("")
+	@Transactional
 	public ResponseEntity<?> create(
-		@RequestBody ItemDto.CreateRequest request,
+		@RequestPart ItemDto.CreateRequest request,
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@RequestPart List<MultipartFile> imageCheckFiles) {
 
 		checkBeforeSaveInS3(request.getCategory(), imageItemFiles, imageCheckFiles);
 
+		//TODO itemService create 매개변수로 awsS3Service.save(imageItemFiles) 전달
 		List<ImageItem> imageItems = imageItemService.save(awsS3Service.save(imageItemFiles));
 		List<ImageCheck> imageChecks = imageCheckService.save(awsS3Service.save(imageCheckFiles));
 
@@ -58,8 +61,9 @@ public class ItemController {
 	}
 
 	@PutMapping("")
+	@Transactional
 	public ResponseEntity<?> update(
-		@RequestBody ItemDto.UpdateRequest request,
+		@RequestPart ItemDto.UpdateRequest request,
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@RequestPart List<MultipartFile> imageCheckFiles) {
 
