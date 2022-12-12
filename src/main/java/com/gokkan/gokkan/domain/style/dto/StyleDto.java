@@ -2,7 +2,12 @@ package com.gokkan.gokkan.domain.style.dto;
 
 import com.gokkan.gokkan.domain.style.domain.Style;
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 
 public class StyleDto {

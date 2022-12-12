@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StyleRepository extends JpaRepository<Style, Long> {
+
 	Optional<Style> findByName(String name);
 
 	boolean existsByName(String name);

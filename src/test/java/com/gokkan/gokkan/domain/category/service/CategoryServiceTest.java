@@ -348,7 +348,6 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 	}
 
-
 	private static CreateRequest getCreateRequest(String name, String parent) {
 		return CreateRequest.builder()
 			.parent(parent)
