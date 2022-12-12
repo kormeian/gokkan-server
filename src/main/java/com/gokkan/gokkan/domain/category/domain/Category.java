@@ -36,6 +36,7 @@ public class Category {
 	@Column(length = 40)
 	private String name;
 
+	@Column(length = 3)
 	private int level;
 
 	@ManyToOne(fetch = FetchType.LAZY)
