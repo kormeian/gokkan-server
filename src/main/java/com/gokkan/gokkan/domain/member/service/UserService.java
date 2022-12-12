@@ -1,17 +1,18 @@
 package com.gokkan.gokkan.domain.member.service;
 
-import com.gokkan.gokkan.domain.member.domain.User;
-import com.gokkan.gokkan.domain.member.repository.UserRepository;
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-	private final UserRepository userRepository;
 
-	public User getUser(String userId) {
-		return userRepository.findByUserId(userId);
+	private final MemberRepository memberRepository;
+
+	public Member getUser(String userId) {
+		return memberRepository.findByUserId(userId);
 	}
 }
 

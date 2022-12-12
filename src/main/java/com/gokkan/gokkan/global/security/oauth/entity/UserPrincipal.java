@@ -1,6 +1,6 @@
 package com.gokkan.gokkan.global.security.oauth.entity;
 
-import com.gokkan.gokkan.domain.member.domain.User;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -21,12 +21,30 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
+
 	private final String userId;
 	private final String password;
 	private final ProviderType providerType;
 	private final RoleType roleType;
 	private final Collection<GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
+
+	public static UserPrincipal create(Member member) {
+		return new UserPrincipal(
+			member.getUserId(),
+			member.getPassword(),
+			member.getProviderType(),
+			RoleType.USER,
+			Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode()))
+		);
+	}
+
+	public static UserPrincipal create(Member member, Map<String, Object> attributes) {
+		UserPrincipal userPrincipal = create(member);
+		userPrincipal.setAttributes(attributes);
+
+		return userPrincipal;
+	}
 
 	@Override
 	public Map<String, Object> getAttributes() {
@@ -81,23 +99,6 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
 	@Override
 	public OidcIdToken getIdToken() {
 		return null;
-	}
-
-	public static UserPrincipal create(User user) {
-		return new UserPrincipal(
-			user.getUserId(),
-			user.getPassword(),
-			user.getProviderType(),
-			RoleType.USER,
-			Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode()))
-		);
-	}
-
-	public static UserPrincipal create(User user, Map<String, Object> attributes) {
-		UserPrincipal userPrincipal = create(user);
-		userPrincipal.setAttributes(attributes);
-
-		return userPrincipal;
 	}
 }
 

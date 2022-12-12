@@ -1,9 +1,8 @@
 package com.gokkan.gokkan.global.security.config.security;
 
-import com.gokkan.gokkan.domain.member.repository.UserRefreshTokenRepository;
+import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.config.properties.CorsProperties;
-import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
 import com.gokkan.gokkan.global.security.oauth.exception.RestAuthenticationEntryPoint;
 import com.gokkan.gokkan.global.security.oauth.filter.TokenAuthenticationFilter;
 import com.gokkan.gokkan.global.security.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -39,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private final CustomUserDetailsService userDetailsService;
 	private final CustomOAuth2UserService oAuth2UserService;
 	private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
-	private final UserRefreshTokenRepository userRefreshTokenRepository;
+	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
 	/*
 	 * UserDetailsService 설정
@@ -54,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.cors()
-			.and()
+			.and().headers().frameOptions().sameOrigin().and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
@@ -67,9 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.authorizeRequests()
 			.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-			.antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode())
-			.antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
-			.anyRequest().authenticated()
+//			.antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode())
+//			.antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
+			.anyRequest().permitAll()
 			.and()
 			.oauth2Login()
 			.authorizationEndpoint()
@@ -85,7 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.successHandler(oAuth2AuthenticationSuccessHandler())
 			.failureHandler(oAuth2AuthenticationFailureHandler());
 
-		http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(tokenAuthenticationFilter(),
+			UsernamePasswordAuthenticationFilter.class);
 	}
 
 	/*
@@ -130,7 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new OAuth2AuthenticationSuccessHandler(
 			tokenProvider,
 			appProperties,
-			userRefreshTokenRepository,
+			memberRefreshTokenRepository,
 			oAuth2AuthorizationRequestBasedOnCookieRepository()
 		);
 	}
@@ -140,7 +140,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 * */
 	@Bean
 	public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
-		return new OAuth2AuthenticationFailureHandler(oAuth2AuthorizationRequestBasedOnCookieRepository());
+		return new OAuth2AuthenticationFailureHandler(
+			oAuth2AuthorizationRequestBasedOnCookieRepository());
 	}
 
 	/*

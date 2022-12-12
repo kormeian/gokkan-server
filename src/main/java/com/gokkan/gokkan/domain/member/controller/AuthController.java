@@ -1,8 +1,8 @@
 package com.gokkan.gokkan.domain.member.controller;
 
 import com.gokkan.gokkan.domain.member.domain.AuthReqModel;
-import com.gokkan.gokkan.domain.member.domain.UserRefreshToken;
-import com.gokkan.gokkan.domain.member.repository.UserRefreshTokenRepository;
+import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
+import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.global.security.common.ApiResponse;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
@@ -32,13 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+	private final static long THREE_DAYS_MSEC = 259200000;
+	private final static String REFRESH_TOKEN = "refresh_token";
 	private final AppProperties appProperties;
 	private final AuthTokenProvider tokenProvider;
 	private final AuthenticationManager authenticationManager;
-	private final UserRefreshTokenRepository userRefreshTokenRepository;
-
-	private final static long THREE_DAYS_MSEC = 259200000;
-	private final static String REFRESH_TOKEN = "refresh_token";
+	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
 	@PostMapping("/login")
 	public ApiResponse login(
@@ -70,14 +69,14 @@ public class AuthController {
 		);
 
 		// userId refresh token 으로 DB 확인
-		UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(userId);
-		if (userRefreshToken == null) {
+		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByUserId(userId);
+		if (memberRefreshToken == null) {
 			// 없는 경우 새로 등록
-			userRefreshToken = new UserRefreshToken(userId, refreshToken.getToken());
-			userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+			memberRefreshToken = new MemberRefreshToken(userId, refreshToken.getToken());
+			memberRefreshTokenRepository.saveAndFlush(memberRefreshToken);
 		} else {
 			// DB에 refresh 토큰 업데이트
-			userRefreshToken.setRefreshToken(refreshToken.getToken());
+			memberRefreshToken.setRefreshToken(refreshToken.getToken());
 		}
 
 		int cookieMaxAge = (int) refreshTokenExpiry / 60;
@@ -88,7 +87,7 @@ public class AuthController {
 	}
 
 	@GetMapping("/refresh")
-	public ApiResponse refreshToken (HttpServletRequest request, HttpServletResponse response) {
+	public ApiResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
 		// access token 확인
 		String accessToken = HeaderUtil.getAccessToken(request);
 		AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
@@ -116,8 +115,9 @@ public class AuthController {
 		}
 
 		// userId refresh token 으로 DB 확인
-		UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserIdAndRefreshToken(userId, refreshToken);
-		if (userRefreshToken == null) {
+		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByUserIdAndRefreshToken(
+			userId, refreshToken);
+		if (memberRefreshToken == null) {
 			return ApiResponse.invalidRefreshToken();
 		}
 
@@ -128,7 +128,8 @@ public class AuthController {
 			new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
 		);
 
-		long validTime = authRefreshToken.getTokenClaims().getExpiration().getTime() - now.getTime();
+		long validTime =
+			authRefreshToken.getTokenClaims().getExpiration().getTime() - now.getTime();
 
 		// refresh 토큰 기간이 3일 이하로 남은 경우, refresh 토큰 갱신
 		if (validTime <= THREE_DAYS_MSEC) {
@@ -141,11 +142,12 @@ public class AuthController {
 			);
 
 			// DB에 refresh 토큰 업데이트
-			userRefreshToken.setRefreshToken(authRefreshToken.getToken());
+			memberRefreshToken.setRefreshToken(authRefreshToken.getToken());
 
 			int cookieMaxAge = (int) refreshTokenExpiry / 60;
 			CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-			CookieUtil.addCookie(response, REFRESH_TOKEN, authRefreshToken.getToken(), cookieMaxAge);
+			CookieUtil.addCookie(response, REFRESH_TOKEN, authRefreshToken.getToken(),
+				cookieMaxAge);
 		}
 
 		return ApiResponse.success("token", newAccessToken.getToken());

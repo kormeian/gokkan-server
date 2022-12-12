@@ -18,8 +18,8 @@ import org.springframework.security.core.userdetails.User;
 @Slf4j
 public class AuthTokenProvider {
 
-	private final Key key;
 	private static final String AUTHORITIES_KEY = "role";
+	private final Key key;
 
 	public AuthTokenProvider(String secret) {
 		this.key = Keys.hmacShaKeyFor(secret.getBytes());
@@ -39,7 +39,7 @@ public class AuthTokenProvider {
 
 	public Authentication getAuthentication(AuthToken authToken) {
 
-		if(authToken.validate()) {
+		if (authToken.validate()) {
 
 			Claims claims = authToken.getTokenClaims();
 			Collection<? extends GrantedAuthority> authorities =

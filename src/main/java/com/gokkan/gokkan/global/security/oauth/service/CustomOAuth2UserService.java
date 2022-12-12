@@ -1,7 +1,7 @@
 package com.gokkan.gokkan.global.security.oauth.service;
 
-import com.gokkan.gokkan.domain.member.domain.User;
-import com.gokkan.gokkan.domain.member.repository.UserRepository;
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
 import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
 import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-	private final UserRepository userRepository;
+	private final MemberRepository memberRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -39,33 +39,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	}
 
 	private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User user) {
-		ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
+		ProviderType providerType = ProviderType.valueOf(
+			userRequest.getClientRegistration().getRegistrationId().toUpperCase());
 
-		OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
-		User savedUser = userRepository.findByUserId(userInfo.getId());
+		OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType,
+			user.getAttributes());
+		Member savedMember = memberRepository.findByUserId(userInfo.getId());
 
-		if (savedUser != null) {
-			if (providerType != savedUser.getProviderType()) {
+		if (savedMember != null) {
+			if (providerType != savedMember.getProviderType()) {
 				throw new OAuthProviderMissMatchException(
 					"Looks like you're signed up with " + providerType +
-						" account. Please use your " + savedUser.getProviderType() + " account to login."
+						" account. Please use your " + savedMember.getProviderType()
+						+ " account to login."
 				);
 			}
-			updateUser(savedUser, userInfo);
+			updateUser(savedMember, userInfo);
 		} else {
-			savedUser = createUser(userInfo, providerType);
+			savedMember = createUser(userInfo, providerType);
 		}
 
-		return UserPrincipal.create(savedUser, user.getAttributes());
+		return UserPrincipal.create(savedMember, user.getAttributes());
 	}
 
-	private User createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
+	private Member createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
 		LocalDateTime now = LocalDateTime.now();
-		User user = new User(
+		Member member = new Member(
 			userInfo.getId(),
 			userInfo.getName(),
 			userInfo.getEmail(),
-			"Y",
 			userInfo.getImageUrl(),
 			providerType,
 			RoleType.USER,
@@ -73,19 +75,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			now
 		);
 
-		return userRepository.saveAndFlush(user);
+		return memberRepository.saveAndFlush(member);
 	}
 
-	private User updateUser(User user, OAuth2UserInfo userInfo) {
-		if (userInfo.getName() != null && !user.getUsername().equals(userInfo.getName())) {
-			user.setUsername(userInfo.getName());
+	private Member updateUser(Member member, OAuth2UserInfo userInfo) {
+		if (userInfo.getName() != null && !member.getName().equals(userInfo.getName())) {
+			member.setName(userInfo.getName());
 		}
 
-		if (userInfo.getImageUrl() != null && !user.getProfileImageUrl().equals(userInfo.getImageUrl())) {
-			user.setProfileImageUrl(userInfo.getImageUrl());
+		if (userInfo.getImageUrl() != null && !member.getProfileImageUrl()
+			.equals(userInfo.getImageUrl())) {
+			member.setProfileImageUrl(userInfo.getImageUrl());
 		}
 
-		return user;
+		return member;
 	}
 }
 

@@ -16,11 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AuthToken {
 
+	private static final String AUTHORITIES_KEY = "role";
 	@Getter
 	private final String token;
 	private final Key key;
-
-	private static final String AUTHORITIES_KEY = "role";
 
 	AuthToken(String id, Date expiry, Key key) {
 		this.key = key;

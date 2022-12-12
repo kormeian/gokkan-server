@@ -1,7 +1,7 @@
 package com.gokkan.gokkan.global.security.oauth.service;
 
-import com.gokkan.gokkan.domain.member.domain.User;
-import com.gokkan.gokkan.domain.member.repository.UserRepository;
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,15 +13,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-	private final UserRepository userRepository;
+	private final MemberRepository memberRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUserId(username);
-		if (user == null) {
+		Member member = memberRepository.findByUserId(username);
+		if (member == null) {
 			throw new UsernameNotFoundException("Can not find username.");
 		}
-		return UserPrincipal.create(user);
+		return UserPrincipal.create(member);
 	}
 }
 

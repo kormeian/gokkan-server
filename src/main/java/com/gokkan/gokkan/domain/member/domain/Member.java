@@ -11,7 +11,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -24,23 +23,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USER")
-public class User {
+public class Member {
+
 	@JsonIgnore
 	@Id
-	@Column(name = "USER_SEQ")
+	@Column(name = "member_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long userSeq;
+	private Long id;
 
 	@Column(name = "USER_ID", length = 64, unique = true)
 	@NotNull
 	@Size(max = 64)
 	private String userId;
 
-	@Column(name = "USERNAME", length = 100)
+	@Column(name = "name", length = 100)
 	@NotNull
 	@Size(max = 100)
-	private String username;
+	private String name;
 
 	@JsonIgnore
 	@Column(name = "PASSWORD", length = 128)
@@ -52,11 +51,6 @@ public class User {
 	@NotNull
 	@Size(max = 512)
 	private String email;
-
-	@Column(name = "EMAIL_VERIFIED_YN", length = 1)
-	@NotNull
-	@Size(min = 1, max = 1)
-	private String emailVerifiedYn;
 
 	@Column(name = "PROFILE_IMAGE_URL", length = 512)
 	@NotNull
@@ -81,11 +75,10 @@ public class User {
 	@NotNull
 	private LocalDateTime modifiedAt;
 
-	public User(
+	public Member(
 		@NotNull @Size(max = 64) String userId,
-		@NotNull @Size(max = 100) String username,
+		@NotNull @Size(max = 100) String name,
 		@NotNull @Size(max = 512) String email,
-		@NotNull @Size(max = 1) String emailVerifiedYn,
 		@NotNull @Size(max = 512) String profileImageUrl,
 		@NotNull ProviderType providerType,
 		@NotNull RoleType roleType,
@@ -93,10 +86,9 @@ public class User {
 		@NotNull LocalDateTime modifiedAt
 	) {
 		this.userId = userId;
-		this.username = username;
+		this.name = name;
 		this.password = "NO_PASS";
 		this.email = email != null ? email : "NO_EMAIL";
-		this.emailVerifiedYn = emailVerifiedYn;
 		this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
 		this.providerType = providerType;
 		this.roleType = roleType;

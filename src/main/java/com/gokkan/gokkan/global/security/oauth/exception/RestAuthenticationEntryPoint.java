@@ -10,6 +10,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Slf4j
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
 	@Override
 	public void commence(
 		HttpServletRequest request,

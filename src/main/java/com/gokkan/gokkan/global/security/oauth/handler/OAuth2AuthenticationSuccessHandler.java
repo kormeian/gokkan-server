@@ -3,8 +3,8 @@ package com.gokkan.gokkan.global.security.oauth.handler;
 import static com.gokkan.gokkan.global.security.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 import static com.gokkan.gokkan.global.security.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository.REFRESH_TOKEN;
 
-import com.gokkan.gokkan.domain.member.domain.UserRefreshToken;
-import com.gokkan.gokkan.domain.member.repository.UserRefreshTokenRepository;
+import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
+import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
 import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
@@ -38,11 +38,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 	private final AuthTokenProvider tokenProvider;
 	private final AppProperties appProperties;
-	private final UserRefreshTokenRepository userRefreshTokenRepository;
+	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 	private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
 
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+		Authentication authentication) throws IOException, ServletException {
 		String targetUrl = determineTargetUrl(request, response, authentication);
 
 		if (response.isCommitted()) {
@@ -54,24 +55,29 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 	}
 
-	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
+		Authentication authentication) {
 		Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
 			.map(Cookie::getValue);
 
-		if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-			throw new IllegalArgumentException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+		if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
+			throw new IllegalArgumentException(
+				"Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
 		}
 
 		String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
 		OAuth2AuthenticationToken authToken = (OAuth2AuthenticationToken) authentication;
-		ProviderType providerType = ProviderType.valueOf(authToken.getAuthorizedClientRegistrationId().toUpperCase());
+		ProviderType providerType = ProviderType.valueOf(
+			authToken.getAuthorizedClientRegistrationId().toUpperCase());
 
 		OidcUser user = ((OidcUser) authentication.getPrincipal());
-		OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, user.getAttributes());
+		OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType,
+			user.getAttributes());
 		Collection<? extends GrantedAuthority> authorities = ((OidcUser) authentication.getPrincipal()).getAuthorities();
 
-		RoleType roleType = hasAuthority(authorities, RoleType.ADMIN.getCode()) ? RoleType.ADMIN : RoleType.USER;
+		RoleType roleType =
+			hasAuthority(authorities, RoleType.ADMIN.getCode()) ? RoleType.ADMIN : RoleType.USER;
 
 		Date now = new Date();
 		AuthToken accessToken = tokenProvider.createAuthToken(
@@ -89,12 +95,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		);
 
 		// DB 저장
-		UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByUserId(userInfo.getId());
-		if (userRefreshToken != null) {
-			userRefreshToken.setRefreshToken(refreshToken.getToken());
+		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByUserId(
+			userInfo.getId());
+		if (memberRefreshToken != null) {
+			memberRefreshToken.setRefreshToken(refreshToken.getToken());
 		} else {
-			userRefreshToken = new UserRefreshToken(userInfo.getId(), refreshToken.getToken());
-			userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+			memberRefreshToken = new MemberRefreshToken(userInfo.getId(), refreshToken.getToken());
+			memberRefreshTokenRepository.saveAndFlush(memberRefreshToken);
 		}
 
 		int cookieMaxAge = (int) refreshTokenExpiry / 60;
@@ -107,12 +114,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			.build().toUriString();
 	}
 
-	protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+	protected void clearAuthenticationAttributes(HttpServletRequest request,
+		HttpServletResponse response) {
 		super.clearAuthenticationAttributes(request);
 		authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 	}
 
-	private boolean hasAuthority(Collection<? extends GrantedAuthority> authorities, String authority) {
+	private boolean hasAuthority(Collection<? extends GrantedAuthority> authorities,
+		String authority) {
 		if (authorities == null) {
 			return false;
 		}
@@ -133,7 +142,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			.anyMatch(authorizedRedirectUri -> {
 				// Only validate host and port. Let the clients use different paths if they want to
 				URI authorizedURI = URI.create(authorizedRedirectUri);
-				if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+				if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
 					&& authorizedURI.getPort() == clientRedirectUri.getPort()) {
 					return true;
 				}

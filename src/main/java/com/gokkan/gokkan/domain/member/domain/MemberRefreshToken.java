@@ -20,7 +20,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "USER_REFRESH_TOKEN")
-public class UserRefreshToken {
+public class MemberRefreshToken {
+
 	@JsonIgnore
 	@Id
 	@Column(name = "REFRESH_TOKEN_SEQ")
@@ -37,7 +38,7 @@ public class UserRefreshToken {
 	@Size(max = 256)
 	private String refreshToken;
 
-	public UserRefreshToken(
+	public MemberRefreshToken(
 		@NotNull @Size(max = 64) String userId,
 		@NotNull @Size(max = 256) String refreshToken
 	) {
