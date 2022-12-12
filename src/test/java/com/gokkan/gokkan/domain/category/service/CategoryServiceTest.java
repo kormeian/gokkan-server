@@ -217,7 +217,6 @@ class CategoryServiceTest {
 
 		//then
 		Category category = categoryCaptor.getValue();
-		System.out.println(category);
 		assertTrue(deleted);
 		assertEquals(category.getName(), categoryName1);
 	}
