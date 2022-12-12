@@ -80,6 +80,32 @@ public class AwsS3Service {
 		} catch (StringIndexOutOfBoundsException e) {
 			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
 		}
+	}
 
+	public void check(List<MultipartFile> multipartFiles) {
+		if (multipartFiles.isEmpty()) {
+			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+		}
+
+		multipartFiles.forEach(file -> {
+			String filename = file.getOriginalFilename();
+			if (filename != null) {
+				checkName(filename);
+			} else {
+				throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+			}
+		});
+	}
+
+	private void checkName(String fileName) {
+		try {
+			String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
+				return;
+			}
+			throw new ImageException(ImageErrorCode.INVALID_FORMAT_FILE);
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+		}
 	}
 }
