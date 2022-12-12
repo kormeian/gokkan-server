@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
@@ -36,8 +34,6 @@ class ImageCheckServiceTest {
 	@Mock
 	private AwsS3Service awsS3Service;
 
-//	@Mock
-//	private ItemRepository itemRepository;
 
 	@InjectMocks
 	private ImageCheckService imageCheckService;
@@ -50,15 +46,13 @@ class ImageCheckServiceTest {
 	@Test
 	public void test_01_00() {
 		//given
-		//TODO Item 생성 후
-//		given(itemRepository.findById(any())).willReturn(Optional.of(getItem()));
 		for (String url : urls) {
 			ImageCheck imageCheck = getImageCheck(url);
 			lenient().when(imageCheckRepository.save(imageCheck)).thenReturn(imageCheck);
 		}
 
 		//when
-		imageCheckService.save(getCreateRequest(urls));
+		imageCheckService.save(urls);
 		verify(imageCheckRepository, times(3)).save(imageCheckCaptor.capture());
 
 		//then
@@ -68,30 +62,14 @@ class ImageCheckServiceTest {
 		}
 	}
 
-	//TODO Item 생성 후
-//	@DisplayName("01_01. save fail not found item")
-//	@Test
-//	public void test_01_01() {
-//		//given
-////		given(itemRepository.findById(any())).willReturn(Optional.empty());
-//
-//		//when
-//		ImageException imageException = assertThrows(ImageException.class,
-//			() -> imageCheckService.save(getCreateRequest(urls)));
-//
-//		//then
-//		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
-//	}
-
 	@DisplayName("01_02. save fail empty url")
 	@Test
 	public void test_01_02() {
 		//given
-//		given(itemRepository.findById(any())).willReturn(Optional.empty());
 
 		//when
 		ImageException imageException = assertThrows(ImageException.class,
-			() -> imageCheckService.save(getCreateRequest(new ArrayList<>())));
+			() -> imageCheckService.save(new ArrayList<>()));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.EMPTY_URL);
@@ -101,12 +79,10 @@ class ImageCheckServiceTest {
 	@Test
 	public void test_01_03() {
 		//given
-		//TODO Item 생성 후
-//		given(itemRepository.findById(any())).willReturn(Optional.empty());
 
 		//when
 		ImageException imageException = assertThrows(ImageException.class,
-			() -> imageCheckService.save(getCreateRequest(new ArrayList<>(List.of("", "")))));
+			() -> imageCheckService.save(new ArrayList<>(List.of("", ""))));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.INVALID_FORMAT_URL);
