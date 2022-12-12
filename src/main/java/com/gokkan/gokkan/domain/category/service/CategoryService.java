@@ -19,9 +19,9 @@ public class CategoryService {
 
 	@Transactional
 	public CategoryDto.Response create(CategoryDto.CreateRequest request) {
-		Category parent;
+		checkParentNameAndChildName(request.getName(), request.getParent());
 		duplicateCheck(request.getName());
-
+		Category parent;
 		Category category = request.toEntity();
 
 		if (request.getParent() == null) {
@@ -56,13 +56,12 @@ public class CategoryService {
 
 	@Transactional
 	public CategoryDto.Response update(UpdateRequest request) {
+		checkParentNameAndChildName(request.getName(), request.getParent());
 		duplicateCheck(request.getName());
 		Category category = getCategoryById(request.getId());
-		Category beforeParent = getCategoryByName(category.getParent().getName(), true);
-		Category updateParent = getCategoryByName(request.getParent(), true);
 
-		if (!category.getParent().getName().equals(updateParent.getName())) {
-			beforeParent.getChildren().remove(category);
+		if (!category.getParent().getName().equals(request.getParent())) {
+			Category updateParent = getCategoryByName(request.getParent(), true);
 
 			category.setParent(updateParent);
 			category.setLevel(updateParent.getLevel() + 1);
@@ -72,6 +71,12 @@ public class CategoryService {
 		category.setName(request.getName());
 
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
+	}
+
+	private static void checkParentNameAndChildName(String name, String parent) {
+		if (name.equals(parent)) {
+			throw new CategoryException(CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+		}
 	}
 
 	private void duplicateCheck(String request) {

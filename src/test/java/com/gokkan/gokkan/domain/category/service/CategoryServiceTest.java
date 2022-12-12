@@ -3,6 +3,10 @@ package com.gokkan.gokkan.domain.category.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
@@ -13,97 +17,103 @@ import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @Transactional
 class CategoryServiceTest {
 
-	@Autowired
-	private CategoryService categoryService;
-
-	@Autowired
+	@Mock
 	private CategoryRepository categoryRepository;
 
+	@InjectMocks
+	private CategoryService categoryService;
 
-	@DisplayName("01_00. create root category success")
-	@Test
-	public void test_01_00() {
-		//given
+	String categoryName1 = "c1";
+	String categoryName11 = "c11";
+	String categoryName12 = "c12";
 
-		CreateRequest request = getCreateRequest("의자", null);
+	String categoryName2 = "c2";
+	String categoryName21 = "c21";
 
-		//when
-		Response response = categoryService.create(request);
+	Category root = Category.builder()
+		.id(0L)
+		.parent(null)
+		.level(0)
+		.name("root")
+		.children(new ArrayList<>())
+		.build();
 
-		//then
-		Category savedCategory = categoryRepository.findById(response.getId()).get();
-
-		assertEquals(response.getName(), request.getName());
-		assertEquals(savedCategory.getParent().getName(), "root");
-		assertEquals(savedCategory.getParent().getChildren().size(), 1);
-		assertEquals(savedCategory.getLevel(), savedCategory.getParent().getLevel() + 1);
-	}
+	ArgumentCaptor<Category> categoryCaptor = ArgumentCaptor.forClass(Category.class);
 
 	@DisplayName("01_01. create root category success already exist root")
 	@Test
 	public void test_01_01() {
 		//given
-		Category root = categoryRepository.save(Category.builder()
-			.level(0)
-			.name("root")
-			.children(new ArrayList<>())
-			.build());
-
-		CreateRequest request = getCreateRequest("의자", "root");
+		given(categoryRepository.existsByName(categoryName1)).willReturn(false);
+		given(categoryRepository.findByName("root")).willReturn(Optional.of(root));
+		given(categoryRepository.save(any())).willReturn(getCategory(categoryName1, root));
 
 		//when
-		Response response = categoryService.create(request);
+		CreateRequest request = getCreateRequest(categoryName1, null);
+		categoryService.create(request);
+
+		verify(categoryRepository, times(1)).save(categoryCaptor.capture());
 
 		//then
-		Category savedCategory = categoryRepository.findById(response.getId()).get();
+		Category category = categoryCaptor.getValue();
 
-		assertEquals(response.getName(), request.getName());
-		assertEquals(savedCategory.getParent().getName(), "root");
-		assertEquals(savedCategory.getParent().getChildren().size(), 1);
-		assertEquals(savedCategory.getLevel(), root.getLevel() + 1);
+		assertEquals(category.getName(), categoryName1);
+		assertEquals(category.getParent().getName(), "root");
+		assertEquals(category.getParent().getLevel(), 0);
+		assertEquals(category.getLevel(), 1);
 	}
 
 	@DisplayName("01_02. create not root category success")
 	@Test
 	public void test_01_02() {
 		//given
-		Category parent = categoryRepository.save(Category.builder()
-			.level(1)
-			.name("의자")
-			.children(new ArrayList<>())
-			.build());
-
-		CreateRequest request = getCreateRequest("좌식 의자", "의자");
+		Category parent = getCategory(categoryName1, root);
+		given(categoryRepository.existsByName(categoryName11)).willReturn(false);
+		given(categoryRepository.findByName(categoryName1))
+			.willReturn(Optional.of(parent));
+		given(categoryRepository.save(any()))
+			.willReturn(getCategory(categoryName11, parent));
 
 		//when
-		Response response = categoryService.create(request);
+		CreateRequest request = getCreateRequest(categoryName11, parent.getName());
+		categoryService.create(request);
+
+		verify(categoryRepository, times(1)).save(categoryCaptor.capture());
 
 		//then
-		Category savedCategory = categoryRepository.findById(response.getId()).get();
+		Category category = categoryCaptor.getValue();
 
-		assertEquals(response.getName(), request.getName());
-		assertEquals(savedCategory.getParent().getName(), "의자");
-		assertEquals(savedCategory.getParent().getChildren().size(), 1);
-		assertEquals(savedCategory.getLevel(), parent.getLevel() + 1);
+		assertEquals(category.getName(), categoryName11);
+		assertEquals(category.getParent().getName(), categoryName1);
+		assertEquals(category.getParent().getLevel(), 1);
+		assertEquals(category.getLevel(), 2);
 	}
 
 	@DisplayName("01_03. create not root category fail not found parent")
 	@Test
 	public void test_01_03() {
 		//given
-		CreateRequest request = getCreateRequest("좌식 의자", "의자");
+		Category parent = getCategory(categoryName1, root);
+		given(categoryRepository.existsByName(categoryName11)).willReturn(false);
+		given(categoryRepository.findByName(categoryName1))
+			.willReturn(Optional.empty());
 
 		//when
+		CreateRequest request = getCreateRequest(categoryName11, parent.getName());
 		CategoryException categoryException = assertThrows(CategoryException.class,
 			() -> categoryService.create(request));
 
@@ -115,10 +125,11 @@ class CategoryServiceTest {
 	@Test
 	public void test_01_04() {
 		//given
-		categoryRepository.save(Category.builder().name("좌식 의자").build());
-		CreateRequest request = getCreateRequest("좌식 의자", "의자");
+		Category parent = getCategory(categoryName1, root);
+		given(categoryRepository.existsByName(categoryName11)).willReturn(true);
 
 		//when
+		CreateRequest request = getCreateRequest(categoryName11, parent.getName());
 		CategoryException categoryException = assertThrows(CategoryException.class,
 			() -> categoryService.create(request));
 
@@ -126,36 +137,68 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
 	}
 
-	@DisplayName("02_00. read success")
+	@DisplayName("01_05. create fail fail same parent and child")
+	@Test
+	public void test_01_05() {
+		//given
+
+		//when
+		CreateRequest request = getCreateRequest(categoryName1, categoryName1);
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.create(request));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+	}
+
+	@DisplayName("02_00. read success root")
 	@Test
 	public void test_02_00() {
 		//given
-		testInput();
+		Category category = getCategory(categoryName1, root);
+		List<Category> children = category.getChildren();
+		children.add(getCategory(categoryName11, category));
+		children.add(getCategory(categoryName12, category));
 
-		System.out.println("=======================");
+		given(categoryRepository.findByName(any()))
+			.willReturn(Optional.of(category));
+
 		//when
-		Response response1 = categoryService.read("의자");
-		Response response2 = categoryService.read("책상");
-		Response response3 = categoryService.read("root");
+		Response response = categoryService.read(categoryName1);
 
 		//then
-		assertEquals(response1.getChildren().size(), 3);
-		assertEquals(response1.getName(), "의자");
-		assertEquals(response2.getChildren().size(), 4);
-		assertEquals(response2.getName(), "책상");
-		assertEquals(response3.getChildren().size(), 2);
-		assertEquals(response3.getName(), "root");
+		assertEquals(response.getName(), categoryName1);
+		assertEquals(response.getParent(), "root");
+		assertEquals(response.getChildren().size(), 2);
 	}
 
-	@DisplayName("02_01. read fail not found category")
+	@DisplayName("02_01. read success no children")
 	@Test
 	public void test_02_01() {
 		//given
+		Category parent = getCategory(categoryName1, root);
+		Category category = getCategory(categoryName11, parent);
+		given(categoryRepository.findByName(any()))
+			.willReturn(Optional.of(category));
 
-		System.out.println("=======================");
+		//when
+		Response response = categoryService.read(categoryName11);
+
+		//then
+		assertEquals(response.getName(), categoryName11);
+		assertEquals(response.getParent(), categoryName1);
+		assertEquals(response.getChildren().size(), 0);
+	}
+
+	@DisplayName("02_02. read fail not found category")
+	@Test
+	public void test_02_02() {
+		//given
+		given(categoryRepository.findByName(any())).willReturn(Optional.empty());
+
 		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
-			() -> categoryService.read("의자"));
+			() -> categoryService.read(categoryName11));
 
 		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
@@ -165,68 +208,106 @@ class CategoryServiceTest {
 	@Test
 	public void test_03_00() {
 		//given
-		testInput();
+		given(categoryRepository.findByName(any()))
+			.willReturn(Optional.of(getCategory(categoryName1, root)));
 
 		//when
-		boolean deleted = categoryService.delete("의자");
+		boolean deleted = categoryService.delete(categoryName1);
+		verify(categoryRepository, times(1)).delete(categoryCaptor.capture());
 
 		//then
+		Category category = categoryCaptor.getValue();
+		System.out.println(category);
 		assertTrue(deleted);
+		assertEquals(category.getName(), categoryName1);
 	}
 
 	@DisplayName("03_01. delete fail not found category")
 	@Test
 	public void test_03_01() {
 		//given
+		given(categoryRepository.findByName(any())).willReturn(Optional.empty());
 
 		//when
 		CategoryException categoryException = assertThrows(CategoryException.class,
-			() -> categoryService.delete("의자"));
+			() -> categoryService.delete(categoryName1));
 
 		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 
-	@DisplayName("04_00. update success")
+	@DisplayName("04_00. update success same parent")
 	@Test
 	public void test_04_00() {
 		//given
-		testInput();
+		given(categoryRepository.existsByName(categoryName2)).willReturn(false);
+		given(categoryRepository.findById(any()))
+			.willReturn(Optional.of(getCategory(categoryName1, root)));
+		given(categoryRepository.save(any())).willReturn(getCategory(categoryName2, root));
 
 		//when
-		UpdateRequest request = UpdateRequest.builder()
-			.id(categoryRepository.findByName("의자1").get().getId())
-			.name("책상5")
-			.parent("책상")
-			.build();
+		UpdateRequest request = getUpdateRequest(categoryName2, "root", 1L);
+		categoryService.update(request);
 
-		Response update = categoryService.update(request);
+		verify(categoryRepository, times(1)).save(categoryCaptor.capture());
 
 		//then
-		assertEquals(update.getName(), "책상5");
-		assertEquals(update.getParent(), "책상");
-		List<String> 의자 = categoryService.read("의자").getChildren();
-		System.out.println("의자 = " + 의자);
-		List<String> 책상 = categoryService.read("책상").getChildren();
-		System.out.println("책상 = " + 책상);
-		assertEquals(의자.size(), 2);
-		assertEquals(책상.size(), 5);
+		Category category = categoryCaptor.getValue();
 
+		assertEquals(category.getName(), categoryName2);
+		assertEquals(category.getParent().getName(), "root");
 	}
 
-	@DisplayName("04_01. update fail not found category")
+	@DisplayName("04_01. update success different parent")
 	@Test
 	public void test_04_01() {
 		//given
+		given(categoryRepository.existsByName(categoryName21)).willReturn(false);
+		given(categoryRepository.findById(any()))
+			.willReturn(Optional.of(getCategory(categoryName12, getCategory(categoryName1, root))));
+		given(categoryRepository.findByName(categoryName2))
+			.willReturn(Optional.of(getCategory(categoryName2, root)));
+		given(categoryRepository.save(any()))
+			.willReturn(getCategory(categoryName21, getCategory(categoryName2, root)));
 
 		//when
-		UpdateRequest request = UpdateRequest.builder()
-			.id(9999999L)
-			.name("책상5")
-			.parent("책상")
-			.build();
+		UpdateRequest request = getUpdateRequest(categoryName21, categoryName2, 1L);
+		categoryService.update(request);
 
+		verify(categoryRepository, times(1)).save(categoryCaptor.capture());
+
+		//then
+		Category category = categoryCaptor.getValue();
+
+		assertEquals(category.getName(), categoryName21);
+		assertEquals(category.getParent().getName(), categoryName2);
+	}
+
+	@DisplayName("04_02. update fail duplicate category")
+	@Test
+	public void test_04_02() {
+		//given
+		given(categoryRepository.existsByName(categoryName2)).willReturn(true);
+
+		//when
+		UpdateRequest request = getUpdateRequest(categoryName2, "root", 1L);
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.update(request));
+
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
+	}
+
+	@DisplayName("04_03. update fail not found category")
+	@Test
+	public void test_04_03() {
+		//given
+		given(categoryRepository.existsByName(categoryName2)).willReturn(false);
+		given(categoryRepository.findById(any())).willReturn(Optional.empty());
+
+		//when
+		UpdateRequest request = getUpdateRequest(categoryName2, "root", 1L);
 		CategoryException categoryException = assertThrows(CategoryException.class,
 			() -> categoryService.update(request));
 
@@ -234,18 +315,18 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
-	@DisplayName("04_02. update fail not found parent category")
+	@DisplayName("04_04. update fail not found parent category")
 	@Test
-	public void test_04_02() {
+	public void test_04_04() {
 		//given
-		testInput();
-		//when
-		UpdateRequest request = UpdateRequest.builder()
-			.id(categoryRepository.findByName("의자").get().getId())
-			.name("test")
-			.parent("test")
-			.build();
+		given(categoryRepository.existsByName(categoryName21)).willReturn(false);
+		given(categoryRepository.findById(any()))
+			.willReturn(Optional.of(getCategory(categoryName12, getCategory(categoryName1, root))));
+		given(categoryRepository.findByName(categoryName2))
+			.willReturn(Optional.empty());
 
+		//when
+		UpdateRequest request = getUpdateRequest(categoryName21, categoryName2, 1L);
 		CategoryException categoryException = assertThrows(CategoryException.class,
 			() -> categoryService.update(request));
 
@@ -253,57 +334,41 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
 	}
 
-	private void testInput() {
-		categoryService.create(CreateRequest.builder()
-			.name("의자")
-			.parent(null)
-			.build());
+	@DisplayName("04_05. update fail same parent and child")
+	@Test
+	public void test_04_05() {
+		//given
 
-		categoryService.create(CreateRequest.builder()
-			.parent("의자")
-			.name("의자1")
-			.build());
+		//when
+		UpdateRequest request = getUpdateRequest(categoryName2, categoryName2, 1L);
+		CategoryException categoryException = assertThrows(CategoryException.class,
+			() -> categoryService.update(request));
 
-		categoryService.create(CreateRequest.builder()
-			.parent("의자")
-			.name("의자2")
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.parent("의자")
-			.name("의자3")
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.name("책상")
-			.parent(null)
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.parent("책상")
-			.name("책상1")
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.parent("책상")
-			.name("책상2")
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.parent("책상")
-			.name("책상3")
-			.build());
-
-		categoryService.create(CreateRequest.builder()
-			.parent("책상")
-			.name("책상4")
-			.build());
+		//then
+		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 	}
 
 	private static CreateRequest getCreateRequest(String name, String parent) {
 		return CreateRequest.builder()
 			.parent(parent)
 			.name(name)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+		return UpdateRequest.builder()
+			.id(id)
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
+	private Category getCategory(String name, Category parent) {
+		return Category.builder()
+			.name(name)
+			.parent(parent)
+			.children(new ArrayList<>())
+			.level(parent.getLevel() + 1)
 			.build();
 	}
 }
