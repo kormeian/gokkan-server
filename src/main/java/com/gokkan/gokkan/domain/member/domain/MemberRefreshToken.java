@@ -19,12 +19,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USER_REFRESH_TOKEN")
+@Table(name = "MEMBER_REFRESH_TOKEN")
 public class MemberRefreshToken {
 
 	@JsonIgnore
 	@Id
-	@Column(name = "REFRESH_TOKEN_SEQ")
+	@Column(name = "REFRESH_TOKEN_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long refreshTokenSeq;
 

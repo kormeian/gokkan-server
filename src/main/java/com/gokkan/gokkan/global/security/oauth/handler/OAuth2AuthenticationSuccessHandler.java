@@ -19,7 +19,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-		Authentication authentication) throws IOException, ServletException {
+		Authentication authentication) throws IOException {
 		String targetUrl = determineTargetUrl(request, response, authentication);
 
 		if (response.isCommitted()) {
@@ -55,6 +54,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 	}
 
+	@Override
 	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) {
 		Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
@@ -142,11 +142,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			.anyMatch(authorizedRedirectUri -> {
 				// Only validate host and port. Let the clients use different paths if they want to
 				URI authorizedURI = URI.create(authorizedRedirectUri);
-				if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-					&& authorizedURI.getPort() == clientRedirectUri.getPort()) {
-					return true;
-				}
-				return false;
+				return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+					&& authorizedURI.getPort() == clientRedirectUri.getPort();
 			});
 	}
 }

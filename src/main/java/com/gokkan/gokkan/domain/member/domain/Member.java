@@ -3,7 +3,6 @@ package com.gokkan.gokkan.domain.member.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
 import com.gokkan.gokkan.global.security.oauth.entity.Role;
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,7 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member {
 
@@ -51,6 +49,10 @@ public class Member {
 	@NotNull
 	@Size(max = 512)
 	private String profileImageUrl;
+
+	private String phoneNumber;
+	private String cardNumber;
+	private String address;
 
 	@Column(name = "PROVIDER_TYPE", length = 20)
 	@Enumerated(EnumType.STRING)

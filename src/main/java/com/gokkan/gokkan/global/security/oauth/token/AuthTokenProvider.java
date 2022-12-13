@@ -2,8 +2,6 @@ package com.gokkan.gokkan.global.security.oauth.token;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.MemberAdapter;
-import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
 import com.gokkan.gokkan.global.security.oauth.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
@@ -12,14 +10,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Slf4j
 public class AuthTokenProvider {

@@ -26,14 +26,16 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
 		this.userId = member.getUserId();
 		this.providerType = member.getProviderType();
 		this.role = Role.USER;
-		this.authorities = Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getCode()));
+		this.authorities = Collections.singletonList(
+			new SimpleGrantedAuthority(Role.USER.getCode()));
 	}
 
 	public UserPrincipal(Member member, Map<String, Object> attributes) {
 		this.userId = member.getUserId();
 		this.providerType = member.getProviderType();
 		this.role = Role.USER;
-		this.authorities = Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getCode()));
+		this.authorities = Collections.singletonList(
+			new SimpleGrantedAuthority(Role.USER.getCode()));
 		this.attributes = attributes;
 	}
 

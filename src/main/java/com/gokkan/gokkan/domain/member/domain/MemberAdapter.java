@@ -8,10 +8,12 @@ import org.springframework.security.core.userdetails.User;
 
 @Getter
 public class MemberAdapter extends User {
-	private Member member;
+
+	private final Member member;
 
 	public MemberAdapter(Member member) {
-		super(member.getUserId(), "", Collections.singleton(new SimpleGrantedAuthority(Role.USER.getCode())));
+		super(member.getUserId(), "",
+			Collections.singleton(new SimpleGrantedAuthority(Role.USER.getCode())));
 		this.member = member;
 	}
 }

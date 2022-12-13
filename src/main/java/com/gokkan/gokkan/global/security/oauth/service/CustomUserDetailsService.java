@@ -3,7 +3,6 @@ package com.gokkan.gokkan.global.security.oauth.service;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.MemberAdapter;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
