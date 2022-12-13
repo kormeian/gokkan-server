@@ -5,7 +5,7 @@ import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
 import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.global.security.common.ApiResponse;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
-import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
+import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
@@ -58,7 +58,7 @@ public class AuthController {
 		Date now = new Date();
 		AuthToken accessToken = tokenProvider.createAuthToken(
 			userId,
-			((UserPrincipal) authentication.getPrincipal()).getRoleType().getCode(),
+			((UserPrincipal) authentication.getPrincipal()).getRole().getCode(),
 			new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
 		);
 
@@ -102,7 +102,7 @@ public class AuthController {
 		}
 
 		String userId = claims.getSubject();
-		RoleType roleType = RoleType.of(claims.get("role", String.class));
+		Role role = Role.of(claims.get("role", String.class));
 
 		// refresh token
 		String refreshToken = CookieUtil.getCookie(request, REFRESH_TOKEN)
@@ -124,7 +124,7 @@ public class AuthController {
 		Date now = new Date();
 		AuthToken newAccessToken = tokenProvider.createAuthToken(
 			userId,
-			roleType.getCode(),
+			role.getCode(),
 			new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
 		);
 

@@ -4,10 +4,7 @@ import com.gokkan.gokkan.domain.member.domain.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,33 +14,27 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
 
 	private final String userId;
-	private final String password;
 	private final ProviderType providerType;
-	private final RoleType roleType;
+	private final Role role;
 	private final Collection<GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
-	public static UserPrincipal create(Member member) {
-		return new UserPrincipal(
-			member.getUserId(),
-			member.getPassword(),
-			member.getProviderType(),
-			RoleType.USER,
-			Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode()))
-		);
+	public UserPrincipal(Member member) {
+		this.userId = member.getUserId();
+		this.providerType = member.getProviderType();
+		this.role = Role.USER;
+		this.authorities = Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getCode()));
 	}
 
-	public static UserPrincipal create(Member member, Map<String, Object> attributes) {
-		UserPrincipal userPrincipal = create(member);
-		userPrincipal.setAttributes(attributes);
-
-		return userPrincipal;
+	public UserPrincipal(Member member, Map<String, Object> attributes) {
+		this.userId = member.getUserId();
+		this.providerType = member.getProviderType();
+		this.role = Role.USER;
+		this.authorities = Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getCode()));
+		this.attributes = attributes;
 	}
 
 	@Override
@@ -54,6 +45,11 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
+	}
+
+	@Override
+	public String getPassword() {
+		return null;
 	}
 
 	@Override

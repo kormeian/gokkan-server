@@ -1,5 +1,7 @@
 package com.gokkan.gokkan.global.security.oauth.filter;
 
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import com.gokkan.gokkan.infra.utils.HeaderUtil;
@@ -19,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 	private final AuthTokenProvider tokenProvider;
+	private final MemberRepository memberRepository;
 
 	@Override
 	protected void doFilterInternal(
@@ -30,7 +33,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 		AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
 		if (token.validate()) {
-			Authentication authentication = tokenProvider.getAuthentication(token);
+			Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
+			Authentication authentication = tokenProvider.getAuthentication(token, member);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
 

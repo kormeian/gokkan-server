@@ -3,7 +3,7 @@ package com.gokkan.gokkan.global.security.oauth.service;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
-import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
+import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import com.gokkan.gokkan.global.security.oauth.entity.UserPrincipal;
 import com.gokkan.gokkan.global.security.oauth.exception.OAuthProviderMissMatchException;
 import com.gokkan.gokkan.global.security.oauth.info.OAuth2UserInfo;
@@ -59,7 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			savedMember = createUser(userInfo, providerType);
 		}
 
-		return UserPrincipal.create(savedMember, user.getAttributes());
+		return new UserPrincipal(savedMember, user.getAttributes());
 	}
 
 	private Member createUser(OAuth2UserInfo userInfo, ProviderType providerType) {
@@ -70,10 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			userInfo.getEmail(),
 			userInfo.getImageUrl(),
 			providerType,
-			RoleType.USER,
-			now,
-			now
-		);
+			Role.USER);
 
 		return memberRepository.saveAndFlush(member);
 	}

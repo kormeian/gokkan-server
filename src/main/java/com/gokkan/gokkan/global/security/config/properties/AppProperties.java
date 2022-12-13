@@ -6,9 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
-//@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
 	private final Auth auth = new Auth();

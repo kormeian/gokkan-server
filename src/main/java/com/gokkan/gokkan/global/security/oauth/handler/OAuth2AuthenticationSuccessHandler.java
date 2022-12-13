@@ -7,7 +7,7 @@ import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
 import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
-import com.gokkan.gokkan.global.security.oauth.entity.RoleType;
+import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import com.gokkan.gokkan.global.security.oauth.info.OAuth2UserInfo;
 import com.gokkan.gokkan.global.security.oauth.info.OAuth2UserInfoFactory;
 import com.gokkan.gokkan.global.security.oauth.repository.OAuth2AuthorizationRequestBasedOnCookieRepository;
@@ -76,13 +76,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			user.getAttributes());
 		Collection<? extends GrantedAuthority> authorities = ((OidcUser) authentication.getPrincipal()).getAuthorities();
 
-		RoleType roleType =
-			hasAuthority(authorities, RoleType.ADMIN.getCode()) ? RoleType.ADMIN : RoleType.USER;
+		Role role =
+			hasAuthority(authorities, Role.ADMIN.getCode()) ? Role.ADMIN : Role.USER;
 
 		Date now = new Date();
 		AuthToken accessToken = tokenProvider.createAuthToken(
 			userInfo.getId(),
-			roleType.getCode(),
+			role.getCode(),
 			new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
 		);
 
