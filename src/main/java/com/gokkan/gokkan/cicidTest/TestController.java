@@ -8,6 +8,6 @@ public class TestController {
 
 	@GetMapping("")
 	public static String hello() {
-		return "hello gokkan";
+		return "web hook test gokkan";
 	}
 }
