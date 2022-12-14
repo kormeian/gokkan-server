@@ -2,7 +2,12 @@ package com.gokkan.gokkan.domain.image.dto;
 
 import com.sun.istack.NotNull;
 import java.util.List;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 public class ImageDto {
 

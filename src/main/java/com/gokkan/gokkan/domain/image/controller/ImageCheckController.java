@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.domain.image.controller;
 
-import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import java.util.List;
@@ -25,16 +24,9 @@ public class ImageCheckController {
 
 	@PostMapping("")
 	public ResponseEntity<?> save(
-		@RequestPart List<MultipartFile> multipartFiles,
-		@RequestParam Long itemId) {
+		@RequestPart List<MultipartFile> multipartFiles) {
 		return ResponseEntity.ok(
-			imageCheckService.save(
-				ImageDto.CreateRequest.builder()
-					.itemId(itemId)
-					.urls(awsS3Service.save(multipartFiles))
-					.build()
-			)
-		);
+			imageCheckService.save(awsS3Service.save(multipartFiles)));
 	}
 
 	@DeleteMapping("")

@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
-import com.gokkan.gokkan.domain.image.dto.ImageDto.CreateRequest;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.exception.ImageException;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
@@ -34,9 +33,6 @@ class ImageItemServiceTest {
 	@Mock
 	private AwsS3Service awsS3Service;
 
-//	@Mock
-//	private ItemRepository itemRepository;
-
 	@InjectMocks
 	private ImageItemService imageItemService;
 
@@ -48,15 +44,13 @@ class ImageItemServiceTest {
 	@Test
 	public void test_01_00() {
 		//given
-		//TODO Item 생성 후
-//		given(itemRepository.findById(any())).willReturn(Optional.of(getItem()));
 		for (String url : urls) {
 			ImageItem imageItem = getImageItem(url);
 			lenient().when(imageItemRepository.save(imageItem)).thenReturn(imageItem);
 		}
 
 		//when
-		imageItemService.save(getCreateRequest(urls));
+		imageItemService.save(urls);
 		verify(imageItemRepository, times(3)).save(imageItemCaptor.capture());
 
 		//then
@@ -66,30 +60,14 @@ class ImageItemServiceTest {
 		}
 	}
 
-	//TODO Item 생성 후
-//	@DisplayName("01_01. save fail not found item")
-//	@Test
-//	public void test_01_01() {
-//		//given
-////		given(itemRepository.findById(any())).willReturn(Optional.empty());
-//
-//		//when
-//		ImageException imageException = assertThrows(ImageException.class,
-//			() -> imageItemService.save(getCreateRequest(urls)));
-//
-//		//then
-//		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
-//	}
-
 	@DisplayName("01_02. save fail empty url")
 	@Test
 	public void test_01_02() {
 		//given
-//		given(itemRepository.findById(any())).willReturn(Optional.empty());
 
 		//when
 		ImageException imageException = assertThrows(ImageException.class,
-			() -> imageItemService.save(getCreateRequest(new ArrayList<>())));
+			() -> imageItemService.save(new ArrayList<>()));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.EMPTY_URL);
@@ -99,12 +77,10 @@ class ImageItemServiceTest {
 	@Test
 	public void test_01_03() {
 		//given
-		//TODO Item 생성 후
-//		given(itemRepository.findById(any())).willReturn(Optional.empty());
 
 		//when
 		ImageException imageException = assertThrows(ImageException.class,
-			() -> imageItemService.save(getCreateRequest(new ArrayList<>(List.of("", "")))));
+			() -> imageItemService.save(new ArrayList<>(List.of("", ""))));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.INVALID_FORMAT_URL);
@@ -141,14 +117,6 @@ class ImageItemServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
-	}
-
-
-	private static CreateRequest getCreateRequest(List<String> urls) {
-		return CreateRequest.builder()
-			.urls(urls)
-			.itemId(1L)
-			.build();
 	}
 
 	private static ImageItem getImageItem(String url) {
