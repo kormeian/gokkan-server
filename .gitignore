@@ -1,6 +1,8 @@
 
 HELP.md
 .gradle
+src/main/resources/database.yml
+src/main/resources/security.yml
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
