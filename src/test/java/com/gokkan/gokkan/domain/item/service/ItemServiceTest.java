@@ -315,7 +315,7 @@ class ItemServiceTest {
 
 	private static UpdateRequest getUpdateRequest() {
 		return ItemDto.UpdateRequest.builder()
-			.id(1L)
+			.itemId(1L)
 			.name("update name")
 			.category("update category")
 			.startPrice(200)

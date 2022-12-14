@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.category.dto;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.sun.istack.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "카테고리 생성시 필요한 request")
 	public static class CreateRequest {
 
 		@NonNull
@@ -42,6 +44,7 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "카테고리 수정시 필요한 request")
 	public static class UpdateRequest {
 
 		@NotNull
@@ -61,6 +64,7 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "카테고리 response")
 	public static class Response {
 
 		private Long id;
