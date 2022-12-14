@@ -35,7 +35,7 @@ public class MemberController {
 		return ResponseEntity.ok(member);
 	}
 
-	@PatchMapping("/update")
+	@PatchMapping
 	public ResponseEntity<Void> updateMember(@CurrentMember Member member,
 		@RequestBody RequestUpdateDto requestUpdateDto,
 		@RequestPart MultipartFile profileImage) {
@@ -43,14 +43,14 @@ public class MemberController {
 		return memberService.updateMember(member, requestUpdateDto, profileImage);
 	}
 
-	@PatchMapping("/update/card")
+	@PatchMapping("/card")
 	public ResponseEntity<Void> updateCard(@CurrentMember Member member,
 		@RequestParam String cardNumber) {
 
 		return memberService.updateCard(member, cardNumber);
 	}
 
-	@PatchMapping("/update/address")
+	@PatchMapping("/address")
 	public ResponseEntity<Void> updateAddress(@CurrentMember Member member,
 		@RequestParam String address) {
 
