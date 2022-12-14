@@ -3,6 +3,10 @@ spring:
     import:
       - classpath:database.yml
       - classpath:security.yml
+      
+      - classpath:awsS3.yml
+      - classpath:db-connection.yml
 
-
-
+springdoc:
+  swagger-ui:
+    path: /api-doc.html

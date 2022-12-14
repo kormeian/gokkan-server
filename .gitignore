@@ -1,3 +1,4 @@
+
 HELP.md
 .gradle
 src/main/resources/database.yml
@@ -6,8 +7,19 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-/src/main/resources/my-application.yml
+
+/src/main/resources/awsS3.yml
+/src/main/resources/application-dev.yml
+/src/main/resources/db-connection.yml
+/src/main/resources/mail.yml
+/src/main/resources/oauth2.yml
+
 /src/test/resources/application.yml
+/src/test/resources/awsS3.yml
+/src/test/resources/application-dev.yml
+/src/test/resources/db-connection.yml
+/src/test/resources/mail.yml
+/src/test/resources/oauth2.yml
 /dbConfig/**
 ### STS ###
 .apt_generated
