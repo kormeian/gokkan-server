@@ -27,18 +27,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ImageItemServiceTest {
 
+	static List<String> urls = List.of("u1", "u2", "u3");
+	static ArgumentCaptor<ImageItem> imageItemCaptor = ArgumentCaptor.forClass(ImageItem.class);
 	@Mock
 	private ImageItemRepository imageItemRepository;
-
 	@Mock
 	private AwsS3Service awsS3Service;
-
 	@InjectMocks
 	private ImageItemService imageItemService;
 
-	static List<String> urls = List.of("u1", "u2", "u3");
-
-	static ArgumentCaptor<ImageItem> imageItemCaptor = ArgumentCaptor.forClass(ImageItem.class);
+	private static ImageItem getImageItem(String url) {
+		return ImageItem.builder()
+			.url(url)
+			.build();
+	}
 
 	@DisplayName("01_00. save success")
 	@Test
@@ -117,12 +119,6 @@ class ImageItemServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
-	}
-
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
 	}
 
 }

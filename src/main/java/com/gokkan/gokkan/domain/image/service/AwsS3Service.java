@@ -30,6 +30,41 @@ public class AwsS3Service {
 	private String baseUrl;
 
 
+	public String save(MultipartFile multipartFile) {
+		if (multipartFile.isEmpty()) {
+			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+		}
+
+		String fileName = createFileName(multipartFile.getOriginalFilename());
+		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setContentLength(multipartFile.getSize());
+		objectMetadata.setContentType(multipartFile.getContentType());
+
+		try (InputStream inputStream = multipartFile.getInputStream()) {
+			amazonS3.putObject(
+				new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+					.withCannedAcl(CannedAccessControlList.PublicRead));
+		} catch (IOException e) {
+			throw new ImageException(ImageErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		return baseUrl + fileName;
+	}
+
+	public void check(MultipartFile multipartFiles) {
+		if (multipartFiles.isEmpty()) {
+			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+		}
+
+		String filename = multipartFiles.getOriginalFilename();
+		if (filename != null) {
+			checkName(filename);
+		} else {
+			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+		}
+	}
+
+
 	public List<String> save(List<MultipartFile> multipartFiles) {
 		List<String> urls = new ArrayList<>();
 

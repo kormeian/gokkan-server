@@ -3,6 +3,8 @@ HELP.md
 .gradle
 src/main/resources/database.yml
 src/main/resources/security.yml
+src/main/resources/awsS3.yml
+
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
