@@ -2,9 +2,9 @@ package com.gokkan.gokkan.domain.image.service;
 
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
-import com.gokkan.gokkan.domain.image.exception.ImageException;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,13 @@ public class ImageCheckService {
 
 	public List<ImageCheck> save(List<String> urls) {
 		if (urls.size() == 0) {
-			throw new ImageException(ImageErrorCode.EMPTY_URL);
+			throw new RestApiException(ImageErrorCode.EMPTY_URL);
 		}
 
 		List<ImageCheck> imageChecks = new ArrayList<>();
 		for (String url : urls) {
 			if (url == null || url.length() == 0) {
-				throw new ImageException(ImageErrorCode.INVALID_FORMAT_URL);
+				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
 			}
 
 			imageChecks.add(imageCheckRepository.save(
@@ -59,7 +59,7 @@ public class ImageCheckService {
 
 	private ImageCheck getImageCheck(Long imageCheckId) {
 		return imageCheckRepository.findById(imageCheckId)
-			.orElseThrow(() -> new ImageException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
+			.orElseThrow(() -> new RestApiException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
 	}
 
 }

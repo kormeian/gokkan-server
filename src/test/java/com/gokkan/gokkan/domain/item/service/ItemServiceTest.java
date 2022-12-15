@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
@@ -24,9 +23,9 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
-import com.gokkan.gokkan.domain.item.exception.ItemException;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +114,7 @@ class ItemServiceTest {
 
 		//when
 		CreateRequest createRequest = getCreateRequest();
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException categoryException = assertThrows(RestApiException.class,
 			() -> itemService.create(createRequest, imageItems, imageChecks));
 
 		//then
@@ -163,7 +162,7 @@ class ItemServiceTest {
 			Optional.empty());
 
 		//when
-		ItemException itemException = assertThrows(ItemException.class, () -> itemService.read(1L));
+		RestApiException itemException = assertThrows(RestApiException.class, () -> itemService.read(1L));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
@@ -192,7 +191,7 @@ class ItemServiceTest {
 			Optional.empty());
 
 		//when
-		ItemException itemException = assertThrows(ItemException.class,
+		RestApiException itemException = assertThrows(RestApiException.class,
 			() -> itemService.delete(1L));
 		verify(itemRepository, times(0)).delete(itemCaptor.capture());
 
@@ -260,7 +259,7 @@ class ItemServiceTest {
 
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
-		ItemException itemException = assertThrows(ItemException.class,
+		RestApiException itemException = assertThrows(RestApiException.class,
 			() -> itemService.update(updateRequest, imageItems, imageChecks));
 
 		//then
@@ -279,7 +278,7 @@ class ItemServiceTest {
 
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException categoryException = assertThrows(RestApiException.class,
 			() -> itemService.update(updateRequest, imageItems, imageChecks));
 
 		//then

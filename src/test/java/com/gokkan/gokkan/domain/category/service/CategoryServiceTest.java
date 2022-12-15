@@ -13,8 +13,8 @@ import com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
 import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -124,11 +124,11 @@ class CategoryServiceTest {
 
 		//when
 		CreateRequest request = getCreateRequest(categoryName11, parent.getName());
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.create(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
 	}
 
 	@DisplayName("01_04. create not root category fail duplicate category")
@@ -140,11 +140,11 @@ class CategoryServiceTest {
 
 		//when
 		CreateRequest request = getCreateRequest(categoryName11, parent.getName());
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.create(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
 	}
 
 	@DisplayName("01_05. create fail fail same parent and child")
@@ -154,11 +154,11 @@ class CategoryServiceTest {
 
 		//when
 		CreateRequest request = getCreateRequest(categoryName1, categoryName1);
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.create(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 	}
 
 	@DisplayName("02_00. read success root")
@@ -207,11 +207,11 @@ class CategoryServiceTest {
 		given(categoryRepository.findByName(any())).willReturn(Optional.empty());
 
 		//when
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.read(categoryName11));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	@DisplayName("03_00. delete success")
@@ -238,11 +238,11 @@ class CategoryServiceTest {
 		given(categoryRepository.findByName(any())).willReturn(Optional.empty());
 
 		//when
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.delete(categoryName1));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	@DisplayName("04_00. update success same parent")
@@ -300,11 +300,11 @@ class CategoryServiceTest {
 
 		//when
 		UpdateRequest request = getUpdateRequest(categoryName2, "root", 1L);
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.update(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.DUPLICATED_CATEGORY);
 	}
 
 	@DisplayName("04_03. update fail not found category")
@@ -316,11 +316,11 @@ class CategoryServiceTest {
 
 		//when
 		UpdateRequest request = getUpdateRequest(categoryName2, "root", 1L);
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.update(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	@DisplayName("04_04. update fail not found parent category")
@@ -335,11 +335,11 @@ class CategoryServiceTest {
 
 		//when
 		UpdateRequest request = getUpdateRequest(categoryName21, categoryName2, 1L);
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.update(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY);
 	}
 
 	@DisplayName("04_05. update fail same parent and child")
@@ -349,11 +349,11 @@ class CategoryServiceTest {
 
 		//when
 		UpdateRequest request = getUpdateRequest(categoryName2, categoryName2, 1L);
-		CategoryException categoryException = assertThrows(CategoryException.class,
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> categoryService.update(request));
 
 		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 	}
 
 	private Category getCategory(String name, Category parent) {
