@@ -11,8 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
@@ -25,6 +23,8 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.style.domain.Style;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,25 +54,27 @@ class ItemServiceTest {
 	@Mock
 	private ItemRepository itemRepository;
 	@Mock
-	private CategoryRepository categoryRepository;
-	@Mock
 	private ImageItemService imageItemService;
 	@Mock
 	private ImageCheckService imageCheckService;
 	@InjectMocks
 	private ItemService itemService;
 
-	@DisplayName("01_00. creat success")
+	@DisplayName("01_00. create success")
 	@Test
 	public void test_01_00() {
 		//given
 		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
-		given((categoryRepository.findByName(any()))).willReturn(
-			Optional.of(getCategory("test category", root)));
 
 		//when
 		CreateRequest createRequest = getCreateRequest();
-		itemService.create(createRequest, imageItems, imageChecks);
+		itemService.create(
+			createRequest,
+			getCategory("test category", root),
+			getStyleItems(),
+			imageItems,
+			imageChecks);
+
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
 
 		//then
@@ -82,6 +84,12 @@ class ItemServiceTest {
 		assertEquals(item.getStartPrice(), createRequest.getStartPrice());
 		assertEquals(item.getState(), State.ASSESSING);
 		assertEquals(item.getCategory().getName(), createRequest.getCategory());
+		assertEquals(item.getStyleItems().get(0).getStyle().getName(),
+			createRequest.getStyles().get(0));
+		assertEquals(item.getStyleItems().get(0).getItem().getName(), createRequest.getName());
+		assertEquals(item.getStyleItems().get(1).getStyle().getName(),
+			createRequest.getStyles().get(1));
+		assertEquals(item.getStyleItems().get(1).getItem().getName(), createRequest.getName());
 
 		assertEquals(item.getLength(), createRequest.getLength());
 		assertEquals(item.getWidth(), createRequest.getWidth());
@@ -103,22 +111,6 @@ class ItemServiceTest {
 
 		assertEquals(item.getImageItems().size(), 1);
 		assertEquals(item.getImageItems().get(0).getUrl(), imageItems.get(0).getUrl());
-	}
-
-	@DisplayName("01_01. creat fail not found category")
-	@Test
-	public void test_01_01() {
-		//given
-		given((categoryRepository.findByName(any()))).willReturn(
-			Optional.empty());
-
-		//when
-		CreateRequest createRequest = getCreateRequest();
-		RestApiException categoryException = assertThrows(RestApiException.class,
-			() -> itemService.create(createRequest, imageItems, imageChecks));
-
-		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	@DisplayName("02_00. read success")
@@ -162,7 +154,8 @@ class ItemServiceTest {
 			Optional.empty());
 
 		//when
-		RestApiException itemException = assertThrows(RestApiException.class, () -> itemService.read(1L));
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.read(1L));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
@@ -206,8 +199,6 @@ class ItemServiceTest {
 		Item save = getItem(imageItems, imageChecks);
 		given(itemRepository.findById(anyLong())).willReturn(
 			Optional.of(save));
-		given(categoryRepository.findByName(any())).willReturn(
-			Optional.of(getCategory("update category", root)));
 		given(itemRepository.save(any())).willReturn(save);
 
 		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
@@ -215,7 +206,12 @@ class ItemServiceTest {
 
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
-		itemService.update(updateRequest, imageItems, imageChecks);
+		itemService.update(
+			updateRequest,
+			getCategory("update category", root),
+			getStyleItems(),
+			imageItems,
+			imageChecks);
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
 		verify(imageItemService, times(1)).delete(any(ImageItem.class));
 		verify(imageCheckService, times(2)).delete(any(ImageCheck.class));
@@ -260,35 +256,22 @@ class ItemServiceTest {
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, imageItems, imageChecks));
+			() -> itemService.update(
+				updateRequest,
+				getCategory("update category", root),
+				getStyleItems(),
+				imageItems,
+				imageChecks));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
-	}
-
-	@DisplayName("04_02. update fail not found category")
-	@Test
-	public void test_04_02() {
-		//given
-		Item save = getItem(imageItems, imageChecks);
-		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(save));
-		given(categoryRepository.findByName(any())).willReturn(
-			Optional.empty());
-
-		//when
-		UpdateRequest updateRequest = getUpdateRequest();
-		RestApiException categoryException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, imageItems, imageChecks));
-
-		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	private static CreateRequest getCreateRequest() {
 		return ItemDto.CreateRequest.builder()
 			.name("test name")
 			.category("test category")
+			.styles(List.of("st1", "st2"))
 			.startPrice(100)
 			.length(100L)
 			.width(100L)
@@ -310,6 +293,7 @@ class ItemServiceTest {
 			.itemId(1L)
 			.name("update name")
 			.category("update category")
+			.styles(List.of("st3", "st4"))
 			.startPrice(200)
 			.length(200L)
 			.width(200L)
@@ -371,5 +355,25 @@ class ItemServiceTest {
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
 			.build();
+	}
+
+
+	private List<StyleItem> getStyleItems() {
+		List<StyleItem> styleItems = new ArrayList<>();
+		styleItems.add(
+			StyleItem.builder().style(
+					Style.builder()
+						.name("st1")
+						.build())
+				.item(null).build());
+
+		styleItems.add(
+			StyleItem.builder().style(
+					Style.builder()
+						.name("st2")
+						.build())
+				.item(null).build());
+
+		return styleItems;
 	}
 }
