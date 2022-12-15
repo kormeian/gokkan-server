@@ -4,6 +4,7 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +87,10 @@ public class Item {
 
 	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
+	private List<StyleItem> styleItems = new ArrayList<>();
+
+	@BatchSize(size = 11)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageCheck> imageChecks = new ArrayList<>();
 
 	@BatchSize(size = 11)
@@ -106,4 +111,12 @@ public class Item {
 		}
 		this.setImageChecks(imageChecks);
 	}
+
+	public void addStyleItem(List<StyleItem> styleItems) {
+		for (StyleItem styleItem : styleItems) {
+			styleItem.setItem(this);
+		}
+		this.setStyleItems(styleItems);
+	}
+
 }
