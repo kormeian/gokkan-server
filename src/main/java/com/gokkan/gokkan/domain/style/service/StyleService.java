@@ -6,8 +6,8 @@ import com.gokkan.gokkan.domain.style.domain.Style;
 import com.gokkan.gokkan.domain.style.dto.StyleDto.CreateRequest;
 import com.gokkan.gokkan.domain.style.dto.StyleDto.UpdateRequest;
 import com.gokkan.gokkan.domain.style.exception.StyleErrorCode;
-import com.gokkan.gokkan.domain.style.exception.StyleException;
 import com.gokkan.gokkan.domain.style.repository.StyleRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,18 +46,18 @@ public class StyleService {
 	}
 
 	private Style getStyleByName(String name) {
-		return styleRepository.findByName(name).orElseThrow(() -> new StyleException(
+		return styleRepository.findByName(name).orElseThrow(() -> new RestApiException(
 			StyleErrorCode.NOT_FOUND_STYLE));
 	}
 
 	private Style getStyleById(UpdateRequest request) {
-		return styleRepository.findById(request.getId()).orElseThrow(() -> new StyleException(
+		return styleRepository.findById(request.getId()).orElseThrow(() -> new RestApiException(
 			StyleErrorCode.NOT_FOUND_STYLE));
 	}
 
 	private void duplicateCheck(CreateRequest request) {
 		if (styleRepository.existsByName(request.getName())) {
-			throw new StyleException(StyleErrorCode.DUPLICATE_STYLE);
+			throw new RestApiException(StyleErrorCode.DUPLICATE_STYLE);
 		}
 	}
 }
