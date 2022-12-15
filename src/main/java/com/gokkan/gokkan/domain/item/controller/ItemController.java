@@ -1,5 +1,7 @@
 package com.gokkan.gokkan.domain.item.controller;
 
+import com.gokkan.gokkan.domain.category.domain.Category;
+import com.gokkan.gokkan.domain.category.service.CategoryService;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.service.AwsS3Service;
@@ -7,11 +9,14 @@ import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.dto.ItemDto;
 import com.gokkan.gokkan.domain.item.service.ItemService;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
+import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +38,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ItemController {
 
 	private final ItemService itemService;
+	private final CategoryService categoryService;
+	private final StyleItemService styleItemService;
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
@@ -49,14 +56,23 @@ public class ItemController {
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageCheckFiles) {
 
-		checkBeforeSaveInS3(request.getCategory(), imageItemFiles, imageCheckFiles);
+		checkBeforeSaveS3(imageItemFiles, imageCheckFiles);
 
-		//TODO itemService create 매개변수로 awsS3Service.save(imageItemFiles) 전달
+		Category category = categoryService.getCategory(request.getCategory());
+		List<StyleItem> styleItems = getStyleItems(request.getStyles());
 		List<ImageItem> imageItems = imageItemService.save(awsS3Service.save(imageItemFiles));
 		List<ImageCheck> imageChecks = imageCheckService.save(awsS3Service.save(imageCheckFiles));
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(itemService.create(request, imageItems, imageChecks));
+			.body(itemService.create(request, category, styleItems, imageItems, imageChecks));
+	}
+
+	private List<StyleItem> getStyleItems(List<String> styles) {
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (String styleName : styles) {
+			styleItems.add(styleItemService.create(styleName));
+		}
+		return styleItems;
 	}
 
 	@Operation(summary = "상품 조회", description = "itemId에 해당하는 상품 조회")
@@ -87,17 +103,20 @@ public class ItemController {
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageCheckFiles) {
 
-		checkBeforeSaveInS3(request.getCategory(), imageItemFiles, imageCheckFiles);
+		checkBeforeSaveS3(imageItemFiles, imageCheckFiles);
 
+		Category category = categoryService.getCategory(request.getCategory());
+		List<StyleItem> styleItems = getStyleItems(request.getStyles());
 		List<ImageItem> imageItems = imageItemService.save(awsS3Service.save(imageItemFiles));
 		List<ImageCheck> imageChecks = imageCheckService.save(awsS3Service.save(imageCheckFiles));
 
-		return ResponseEntity.ok(itemService.update(request, imageItems, imageChecks));
+		return ResponseEntity.ok(
+			itemService.update(request, category, styleItems, imageItems, imageChecks));
 	}
 
-	private void checkBeforeSaveInS3(String request, List<MultipartFile> imageItemFiles,
+	private void checkBeforeSaveS3(
+		List<MultipartFile> imageItemFiles,
 		List<MultipartFile> imageCheckFiles) {
-		itemService.checked(request);
 		awsS3Service.check(imageItemFiles);
 		awsS3Service.check(imageCheckFiles);
 	}

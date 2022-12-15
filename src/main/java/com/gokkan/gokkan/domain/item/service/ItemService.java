@@ -3,8 +3,6 @@ package com.gokkan.gokkan.domain.item.service;
 import static com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
@@ -14,6 +12,7 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItemService {
 
 	private final ItemRepository itemRepository;
-	private final CategoryRepository categoryRepository;
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 
@@ -33,13 +31,16 @@ public class ItemService {
 	@Transactional
 	public Response create(
 		CreateRequest request,
+		Category category,
+		List<StyleItem> styleItems,
 		List<ImageItem> imageItemUrls,
 		List<ImageCheck> imageCheckUrls) {
 
 		Item item = request.toItem();
-		item.setCategory(getCategory(request.getCategory()));
+		item.setCategory(category);
 		item.addImageItems(imageItemUrls);
 		item.addImageChecks(imageCheckUrls);
+		item.addStyleItem(styleItems);
 
 		return Response.toResponse(itemRepository.save(item));
 	}
@@ -66,12 +67,14 @@ public class ItemService {
 	@Transactional
 	public Response update(
 		UpdateRequest request,
+		Category category,
+		List<StyleItem> styleItems,
 		List<ImageItem> imageItems,
 		List<ImageCheck> imageChecks) {
 
 		Item item = getItem(request.getItemId());
 		item = request.toItem(item);
-		item.setCategory(getCategory(request.getCategory()));
+		item.setCategory(category);
 
 		for (ImageItem imageItem : item.getImageItems()) {
 			imageItemService.delete(imageItem);
@@ -83,23 +86,13 @@ public class ItemService {
 
 		item.addImageItems(imageItems);
 		item.addImageChecks(imageChecks);
+		item.addStyleItem(styleItems);
 
 		return Response.toResponse(itemRepository.save(item));
-	}
-
-	public void checked(String categoryName) {
-		if (!categoryRepository.existsByName(categoryName)) {
-			throw new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY);
-		}
 	}
 
 	private Item getItem(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
-	}
-
-	private Category getCategory(String categoryName) {
-		return categoryRepository.findByName(categoryName).orElseThrow(
-			() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 }

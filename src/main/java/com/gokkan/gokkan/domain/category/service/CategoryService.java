@@ -78,6 +78,11 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
+	@Transactional
+	public Category getCategory(String name) {
+		return getCategoryByName(name, false);
+	}
+
 	private void duplicateCheck(String request) {
 		if (categoryRepository.existsByName(request)) {
 			throw new RestApiException(CategoryErrorCode.DUPLICATED_CATEGORY);
