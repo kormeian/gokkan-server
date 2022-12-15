@@ -14,8 +14,8 @@ import com.gokkan.gokkan.domain.style.dto.StyleDto.CreateRequest;
 import com.gokkan.gokkan.domain.style.dto.StyleDto.Response;
 import com.gokkan.gokkan.domain.style.dto.StyleDto.UpdateRequest;
 import com.gokkan.gokkan.domain.style.exception.StyleErrorCode;
-import com.gokkan.gokkan.domain.style.exception.StyleException;
 import com.gokkan.gokkan.domain.style.repository.StyleRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +82,7 @@ class StyleServiceTest {
 
 		//when
 		CreateRequest createRequest = getCreateRequest(name);
-		StyleException styleException = assertThrows(StyleException.class,
+		RestApiException styleException = assertThrows(RestApiException.class,
 			() -> styleService.create(createRequest));
 
 		//then
@@ -110,7 +110,7 @@ class StyleServiceTest {
 		given(styleRepository.findByName(any())).willReturn(Optional.empty());
 
 		//when
-		StyleException styleException = assertThrows(StyleException.class,
+		RestApiException styleException = assertThrows(RestApiException.class,
 			() -> styleService.read(name));
 
 		//then
@@ -138,7 +138,7 @@ class StyleServiceTest {
 		given(styleRepository.findByName(any())).willReturn(Optional.empty());
 
 		//when
-		StyleException styleException = assertThrows(StyleException.class,
+		RestApiException styleException = assertThrows(RestApiException.class,
 			() -> styleService.delete(name));
 
 		//then
@@ -171,7 +171,7 @@ class StyleServiceTest {
 		given(styleRepository.findById(any())).willReturn(Optional.empty());
 
 		//when
-		StyleException styleException = assertThrows(StyleException.class,
+		RestApiException styleException = assertThrows(RestApiException.class,
 			() -> styleService.update(getUpdateRequest(updatedName, id)));
 
 		//then

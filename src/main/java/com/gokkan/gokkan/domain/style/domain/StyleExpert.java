@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.style.domain;
 
+import com.gokkan.gokkan.domain.item.domain.Item;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,18 +23,18 @@ import lombok.ToString;
 @ToString
 @Builder
 @Entity
-public class ExpertStyle {
+public class StyleExpert {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ecpert_style_id")
+	@Column(name = "style_ecpert_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "style_id")
 	private Style style;
 
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "item_id")
-//	private Item item;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "item_id")
+	private Item item;
 }

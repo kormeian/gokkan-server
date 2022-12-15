@@ -1,12 +1,12 @@
 package com.gokkan.gokkan.domain.style.service;
 
-import com.gokkan.gokkan.domain.style.repository.ItemStyleRepository;
+import com.gokkan.gokkan.domain.style.repository.StyleExpertRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ItemStyleService {
+public class StyleExpertService {
 
-	private final ItemStyleRepository itemStyleRepository;
+	private final StyleExpertRepository styleExpertRepository;
 }
