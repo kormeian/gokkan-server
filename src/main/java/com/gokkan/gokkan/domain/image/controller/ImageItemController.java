@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ImageItems")
+@RequestMapping("/api/v1/ImageItems")
 public class ImageItemController {
 
 	private final ImageItemService imageItemService;

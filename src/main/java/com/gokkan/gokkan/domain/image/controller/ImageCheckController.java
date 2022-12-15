@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("ImageChecks")
+@RequestMapping("/api/v1/ImageChecks")
 public class ImageCheckController {
 
 	private final ImageCheckService imageCheckService;
