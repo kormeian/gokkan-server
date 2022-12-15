@@ -8,18 +8,17 @@ import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
-import com.gokkan.gokkan.infra.utils.CookieUtil;
-import com.gokkan.gokkan.infra.utils.HeaderUtil;
-import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Auth Controller", description = "인증 API")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -32,21 +31,17 @@ public class AuthController {
 	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 
 	@GetMapping("/refresh")
-	public ResponseEntity<String> refreshToken(HttpServletRequest request,
-		HttpServletResponse response) {
+	public ResponseEntity<String> refreshToken() {
 		// access token 확인
-		String accessToken = HeaderUtil.getAccessToken(request);
-		AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		AuthToken authToken = (AuthToken) authentication.getCredentials();
+		String accessToken = authToken.getToken();
+
 		if (!authToken.validate()) {
 			throw new RestApiException(AuthErrorCode.ACCESS_TOKEN_INVALID);
 		}
-
-		// expired access token 인지 확인
-		Claims claims = authToken.getExpiredTokenClaims();
-
-		String userId = claims.getSubject();
-		Role roleType = Role.of(claims.get("role", String.class));
-
+		String userId = authToken.getTokenClaims().getSubject();
+		Role role = Role.of(authToken.getTokenClaims().get("role", String.class));
 		// userId refresh token 으로 DB 확인
 		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByUserId(userId);
 		if (memberRefreshToken == null) {
@@ -58,7 +53,7 @@ public class AuthController {
 		Date now = new Date();
 		AuthToken newAccessToken = tokenProvider.createAuthToken(
 			userId,
-			roleType.getCode(),
+			role.getCode(),
 			new Date(now.getTime() + appProperties.getAuth().getTokenExpiry())
 		);
 
@@ -77,11 +72,6 @@ public class AuthController {
 
 			// DB에 refresh 토큰 업데이트
 			memberRefreshToken.setRefreshToken(authRefreshToken.getToken());
-
-			int cookieMaxAge = (int) refreshTokenExpiry / 60;
-			CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-			CookieUtil.addCookie(response, REFRESH_TOKEN, authRefreshToken.getToken(),
-				cookieMaxAge);
 		}
 
 		return ResponseEntity.ok(newAccessToken.getToken());

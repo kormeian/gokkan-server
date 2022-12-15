@@ -28,19 +28,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ImageCheckServiceTest {
 
+	static List<String> urls = List.of("u1", "u2", "u3");
+	static ArgumentCaptor<ImageCheck> imageCheckCaptor = ArgumentCaptor.forClass(ImageCheck.class);
 	@Mock
 	private ImageCheckRepository imageCheckRepository;
-
 	@Mock
 	private AwsS3Service awsS3Service;
-
-
 	@InjectMocks
 	private ImageCheckService imageCheckService;
 
-	static List<String> urls = List.of("u1", "u2", "u3");
+	private static CreateRequest getCreateRequest(List<String> urls) {
+		return CreateRequest.builder()
+			.urls(urls)
+			.itemId(1L)
+			.build();
+	}
 
-	static ArgumentCaptor<ImageCheck> imageCheckCaptor = ArgumentCaptor.forClass(ImageCheck.class);
+	private static ImageCheck getImageCheck(String url) {
+		return ImageCheck.builder()
+			.url(url)
+			.build();
+	}
 
 	@DisplayName("01_00. save success")
 	@Test
@@ -119,20 +127,6 @@ class ImageCheckServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_CHECK);
-	}
-
-
-	private static CreateRequest getCreateRequest(List<String> urls) {
-		return CreateRequest.builder()
-			.urls(urls)
-			.itemId(1L)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(String url) {
-		return ImageCheck.builder()
-			.url(url)
-			.build();
 	}
 
 }

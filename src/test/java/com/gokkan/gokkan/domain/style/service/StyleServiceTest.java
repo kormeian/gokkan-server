@@ -28,16 +28,33 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleServiceTest {
 
+	static String name = "test";
+	static Long id = 1L;
+	ArgumentCaptor<Style> styleCaptor = ArgumentCaptor.forClass(Style.class);
 	@Mock
 	private StyleRepository styleRepository;
-
 	@InjectMocks
 	private StyleService styleService;
 
-	static String name = "test";
-	static Long id = 1L;
+	private static UpdateRequest getUpdateRequest(String name, Long id) {
+		return StyleDto.UpdateRequest.builder()
+			.id(id)
+			.name(name)
+			.build();
+	}
 
-	ArgumentCaptor<Style> styleCaptor = ArgumentCaptor.forClass(Style.class);
+	private static CreateRequest getCreateRequest(String name) {
+		return StyleDto.CreateRequest.builder()
+			.name(name)
+			.build();
+	}
+
+	private static Style getStyle(String name, Long id) {
+		return Style.builder()
+			.id(id)
+			.name(name)
+			.build();
+	}
 
 	@DisplayName("01_00. create success")
 	@Test
@@ -159,26 +176,6 @@ class StyleServiceTest {
 
 		//then
 		assertEquals(styleException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE);
-	}
-
-	private static UpdateRequest getUpdateRequest(String name, Long id) {
-		return StyleDto.UpdateRequest.builder()
-			.id(id)
-			.name(name)
-			.build();
-	}
-
-	private static CreateRequest getCreateRequest(String name) {
-		return StyleDto.CreateRequest.builder()
-			.name(name)
-			.build();
-	}
-
-	private static Style getStyle(String name, Long id) {
-		return Style.builder()
-			.id(id)
-			.name(name)
-			.build();
 	}
 
 }

@@ -3,8 +3,15 @@ package com.gokkan.gokkan.domain.member.controller;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.MemberAdapter;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
+import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseDto;
 import com.gokkan.gokkan.domain.member.service.MemberService;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "회원 컨트롤러", description = "회원 컨트롤러")
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -25,36 +33,57 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@GetMapping
-	public ResponseEntity<Member> getUser() {
+	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
+	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+	public ResponseEntity<ResponseDto> getUser() {
 		MemberAdapter principal = (MemberAdapter) SecurityContextHolder.getContext()
 			.getAuthentication()
 			.getPrincipal();
 
 		Member member = principal.getMember();
 
-		return ResponseEntity.ok(member);
+		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
 
 	@PatchMapping
-	public ResponseEntity<Void> updateMember(@CurrentMember Member member,
+	@Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
+	public ResponseEntity<Void> updateMember(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(content = @Content(schema = @Schema(implementation = RequestUpdateDto.class)))
 		@RequestBody RequestUpdateDto requestUpdateDto,
+		@Parameter(description = "프로필 이미지 MultipartFile")
 		@RequestPart MultipartFile profileImage) {
 
-		return memberService.updateMember(member, requestUpdateDto, profileImage);
+		memberService.updateMember(member, requestUpdateDto, profileImage);
+		return ResponseEntity.ok().build();
 	}
 
 	@PatchMapping("/card")
-	public ResponseEntity<Void> updateCard(@CurrentMember Member member,
+	@Operation(summary = "카드 정보 수정", description = "카드 정보 수정")
+	public ResponseEntity<Void> updateCard(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(description = "카드 번호")
 		@RequestParam String cardNumber) {
-
-		return memberService.updateCard(member, cardNumber);
+		memberService.updateCard(member, cardNumber);
+		return ResponseEntity.ok().build();
 	}
 
 	@PatchMapping("/address")
-	public ResponseEntity<Void> updateAddress(@CurrentMember Member member,
+	@Operation(summary = "주소 정보 수정", description = "주소 정보 수정")
+	public ResponseEntity<Void> updateAddress(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(description = "주소")
 		@RequestParam String address) {
+		memberService.updateAddress(member, address);
+		return ResponseEntity.ok().build();
+	}
 
-		return memberService.updateAddress(member, address);
+	@GetMapping("/nickName/duplicate")
+	@Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크")
+	public ResponseEntity<Boolean> checkDuplicateNickName(
+		@Parameter(description = "닉네임")
+		@RequestParam String nickName) {
+		return ResponseEntity.ok(memberService.checkDuplicateNickName(nickName));
 	}
 }
 

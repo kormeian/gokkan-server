@@ -4,7 +4,6 @@ import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.config.properties.CorsProperties;
-import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import com.gokkan.gokkan.global.security.oauth.exception.RestAuthenticationEntryPoint;
 import com.gokkan.gokkan.global.security.oauth.filter.TokenAuthenticationFilter;
 import com.gokkan.gokkan.global.security.oauth.handler.OAuth2AuthenticationFailureHandler;
@@ -69,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.authorizeRequests()
 			.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-			.antMatchers("/api/**").hasAnyAuthority(Role.USER.getCode())
+//			.antMatchers("/api/**").hasAnyAuthority(Role.USER.getCode())
 //			.antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode())
 			.anyRequest().permitAll()
 			.and()
@@ -89,6 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.addFilterBefore(tokenAuthenticationFilter(),
 			UsernamePasswordAuthenticationFilter.class);
+
 	}
 
 	/*

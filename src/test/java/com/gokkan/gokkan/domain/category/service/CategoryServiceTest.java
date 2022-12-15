@@ -31,19 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class CategoryServiceTest {
 
-	@Mock
-	private CategoryRepository categoryRepository;
-
-	@InjectMocks
-	private CategoryService categoryService;
-
 	String categoryName1 = "c1";
 	String categoryName11 = "c11";
 	String categoryName12 = "c12";
-
 	String categoryName2 = "c2";
 	String categoryName21 = "c21";
-
 	Category root = Category.builder()
 		.id(0L)
 		.parent(null)
@@ -51,8 +43,26 @@ class CategoryServiceTest {
 		.name("root")
 		.children(new ArrayList<>())
 		.build();
-
 	ArgumentCaptor<Category> categoryCaptor = ArgumentCaptor.forClass(Category.class);
+	@Mock
+	private CategoryRepository categoryRepository;
+	@InjectMocks
+	private CategoryService categoryService;
+
+	private static CreateRequest getCreateRequest(String name, String parent) {
+		return CreateRequest.builder()
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+		return UpdateRequest.builder()
+			.id(id)
+			.parent(parent)
+			.name(name)
+			.build();
+	}
 
 	@DisplayName("01_01. create root category success already exist root")
 	@Test
@@ -235,7 +245,6 @@ class CategoryServiceTest {
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
-
 	@DisplayName("04_00. update success same parent")
 	@Test
 	public void test_04_00() {
@@ -345,21 +354,6 @@ class CategoryServiceTest {
 
 		//then
 		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
-	}
-
-	private static CreateRequest getCreateRequest(String name, String parent) {
-		return CreateRequest.builder()
-			.parent(parent)
-			.name(name)
-			.build();
-	}
-
-	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
-		return UpdateRequest.builder()
-			.id(id)
-			.parent(parent)
-			.name(name)
-			.build();
 	}
 
 	private Category getCategory(String name, Category parent) {
