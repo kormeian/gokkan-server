@@ -11,8 +11,8 @@ import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
-import com.gokkan.gokkan.domain.image.exception.ImageException;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +68,7 @@ class ImageItemServiceTest {
 		//given
 
 		//when
-		ImageException imageException = assertThrows(ImageException.class,
+		RestApiException imageException = assertThrows(RestApiException.class,
 			() -> imageItemService.save(new ArrayList<>()));
 
 		//then
@@ -81,7 +81,7 @@ class ImageItemServiceTest {
 		//given
 
 		//when
-		ImageException imageException = assertThrows(ImageException.class,
+		RestApiException imageException = assertThrows(RestApiException.class,
 			() -> imageItemService.save(new ArrayList<>(List.of("", ""))));
 
 		//then
@@ -112,7 +112,7 @@ class ImageItemServiceTest {
 			.willReturn(Optional.empty());
 
 		//when
-		ImageException imageException = assertThrows(ImageException.class,
+		RestApiException imageException = assertThrows(RestApiException.class,
 			() -> imageItemService.delete(1L));
 		verify(imageItemRepository, times(0)).delete(any());
 		verify(awsS3Service, times(0)).delete(any());

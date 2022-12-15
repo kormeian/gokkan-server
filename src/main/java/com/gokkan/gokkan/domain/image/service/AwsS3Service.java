@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
-import com.gokkan.gokkan.domain.image.exception.ImageException;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class AwsS3Service {
 
 	public String save(MultipartFile multipartFile) {
 		if (multipartFile.isEmpty()) {
-			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
 		}
 
 		String fileName = createFileName(multipartFile.getOriginalFilename());
@@ -45,7 +45,7 @@ public class AwsS3Service {
 				new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
 					.withCannedAcl(CannedAccessControlList.PublicRead));
 		} catch (IOException e) {
-			throw new ImageException(ImageErrorCode.INTERNAL_SERVER_ERROR);
+			throw new RestApiException(ImageErrorCode.INTERNAL_SERVER_ERROR);
 		}
 
 		return baseUrl + fileName;
@@ -53,14 +53,14 @@ public class AwsS3Service {
 
 	public void check(MultipartFile multipartFiles) {
 		if (multipartFiles.isEmpty()) {
-			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
 		}
 
 		String filename = multipartFiles.getOriginalFilename();
 		if (filename != null) {
 			checkName(filename);
 		} else {
-			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+			throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class AwsS3Service {
 		List<String> urls = new ArrayList<>();
 
 		if (multipartFiles.isEmpty()) {
-			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
 		}
 
 		multipartFiles.forEach(file -> {
@@ -83,7 +83,7 @@ public class AwsS3Service {
 					new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
 						.withCannedAcl(CannedAccessControlList.PublicRead));
 			} catch (IOException e) {
-				throw new ImageException(ImageErrorCode.INTERNAL_SERVER_ERROR);
+				throw new RestApiException(ImageErrorCode.INTERNAL_SERVER_ERROR);
 			}
 
 			urls.add(baseUrl + fileName);
@@ -96,7 +96,7 @@ public class AwsS3Service {
 		try {
 			amazonS3.deleteObject(new DeleteObjectRequest(bucket, url.replaceAll(baseUrl, "")));
 		} catch (Error e) {
-			throw new ImageException(ImageErrorCode.NOT_DELETED_IMAGE);
+			throw new RestApiException(ImageErrorCode.NOT_DELETED_IMAGE);
 		}
 		return true;
 	}
@@ -111,15 +111,15 @@ public class AwsS3Service {
 			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
 				return extension;
 			}
-			throw new ImageException(ImageErrorCode.INVALID_FORMAT_FILE);
+			throw new RestApiException(ImageErrorCode.INVALID_FORMAT_FILE);
 		} catch (StringIndexOutOfBoundsException e) {
-			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+			throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
 		}
 	}
 
 	public void check(List<MultipartFile> multipartFiles) {
 		if (multipartFiles.isEmpty()) {
-			throw new ImageException(ImageErrorCode.EMPTY_FILE);
+			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
 		}
 
 		multipartFiles.forEach(file -> {
@@ -127,7 +127,7 @@ public class AwsS3Service {
 			if (filename != null) {
 				checkName(filename);
 			} else {
-				throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+				throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
 			}
 		});
 	}
@@ -138,9 +138,9 @@ public class AwsS3Service {
 			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
 				return;
 			}
-			throw new ImageException(ImageErrorCode.INVALID_FORMAT_FILE);
+			throw new RestApiException(ImageErrorCode.INVALID_FORMAT_FILE);
 		} catch (StringIndexOutOfBoundsException e) {
-			throw new ImageException(ImageErrorCode.MISMATCH_FILE_TYPE);
+			throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
 		}
 	}
 }

@@ -4,8 +4,8 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
 import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.exception.CategoryException;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class CategoryService {
 
 	private static void checkParentNameAndChildName(String name, String parent) {
 		if (name.equals(parent)) {
-			throw new CategoryException(CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+			throw new RestApiException(CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 		}
 	}
 
@@ -80,22 +80,22 @@ public class CategoryService {
 
 	private void duplicateCheck(String request) {
 		if (categoryRepository.existsByName(request)) {
-			throw new CategoryException(CategoryErrorCode.DUPLICATED_CATEGORY);
+			throw new RestApiException(CategoryErrorCode.DUPLICATED_CATEGORY);
 		}
 	}
 
 	private Category getCategoryById(long id) {
 		return categoryRepository.findById(id)
-			.orElseThrow(() -> new CategoryException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+			.orElseThrow(() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 
 	private Category getCategoryByName(String name, boolean parent) {
 		return parent ?
 			categoryRepository.findByName(name)
 				.orElseThrow(
-					() -> new CategoryException(CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY))
+					() -> new RestApiException(CategoryErrorCode.NOT_FOUND_PARENT_CATEGORY))
 			: categoryRepository.findByName(name)
 				.orElseThrow(
-					() -> new CategoryException(CategoryErrorCode.NOT_FOUND_CATEGORY));
+					() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 }
