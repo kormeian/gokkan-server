@@ -1,9 +1,9 @@
 spring:
   config:
     import:
-      - classpath:database.yml
       - classpath:security.yml
       - classpath:awsS3.yml
+      - classpath:database.yml
 
 springdoc:
   swagger-ui:

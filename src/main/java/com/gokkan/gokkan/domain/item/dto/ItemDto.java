@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.sun.istack.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "상품 생성 request")
 	public static class CreateRequest {
 
 		@NotNull
@@ -93,6 +95,7 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "상품 수정 request")
 	public static class UpdateRequest {
 
 		@NotNull
@@ -166,6 +169,7 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "상품 response")
 	public static class Response {
 
 		private Long id;
