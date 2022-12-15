@@ -39,6 +39,9 @@ public class ItemDto {
 		private String category;
 
 		@NotNull
+		private List<String> styles;
+
+		@NotNull
 		private Long length;
 		@NotNull
 		private Long width;
@@ -108,6 +111,9 @@ public class ItemDto {
 
 		@NotNull
 		private String category;
+
+		@NotNull
+		private List<String> styles;
 
 		@NotNull
 		private Long length;
