@@ -3,7 +3,6 @@ package com.gokkan.gokkan.domain.image.service;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
-import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ImageItemService {
 
 	private final ImageItemRepository imageItemRepository;
-	private final ItemRepository itemRepository;
 	private final AwsS3Service awsS3Service;
 
 	public List<ImageItem> save(List<String> urls) {
