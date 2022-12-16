@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +57,7 @@ public class MemberController {
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
 
-	@PatchMapping
+	@PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	@Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
 	public ResponseEntity<Void> updateMember(
 		@Parameter(hidden = true) @CurrentMember Member member,
