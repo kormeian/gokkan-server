@@ -32,15 +32,24 @@ public class MemberController {
 
 	private final MemberService memberService;
 
+//	@GetMapping
+//	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
+//	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+//	public ResponseEntity<ResponseDto> getUser() {
+//		MemberAdapter principal = (MemberAdapter) SecurityContextHolder.getContext()
+//			.getAuthentication()
+//			.getPrincipal();
+//
+//		Member member = principal.getMember();
+//
+//		return ResponseEntity.ok(ResponseDto.fromEntity(member));
+//	}
+
 	@GetMapping
 	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
 	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-	public ResponseEntity<ResponseDto> getUser() {
-		MemberAdapter principal = (MemberAdapter) SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
+	public ResponseEntity<ResponseDto> getUser(@CurrentMember Member member) {
 
-		Member member = principal.getMember();
 
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
