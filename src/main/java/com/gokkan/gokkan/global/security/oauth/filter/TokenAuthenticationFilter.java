@@ -33,6 +33,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 		AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
 		if (token.validate()) {
+			log.info("토큰 유효 멤버 조회");
 			Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
 			Authentication authentication = tokenProvider.getAuthentication(token, member);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
