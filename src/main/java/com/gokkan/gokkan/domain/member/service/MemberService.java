@@ -6,6 +6,7 @@ import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class MemberService {
 
 	@Transactional
 	public void updateMember(Member member, RequestUpdateDto requestUpdateDto,
-		MultipartFile profileImage) {
+		List<MultipartFile> profileImage) {
 		log.info("멤버 수정 시작");
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
@@ -38,7 +39,7 @@ public class MemberService {
 		member.setAddress(requestUpdateDto.getAddress());
 		member.setCardNumber(requestUpdateDto.getCardNumber());
 		if (profileImage != null) {
-			String saveImage = awsS3Service.save(profileImage);
+			String saveImage = awsS3Service.save(profileImage.get(0));
 			member.setProfileImageUrl(saveImage);
 		} else {
 			member.setProfileImageUrl(member.getProfileImageUrl());

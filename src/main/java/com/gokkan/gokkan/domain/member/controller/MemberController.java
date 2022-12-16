@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -62,9 +63,9 @@ public class MemberController {
 	@Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
 	public ResponseEntity<Void> updateMember(
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestUpdateDto.class)))
-		@RequestBody RequestUpdateDto requestUpdateDto,
+		@RequestPart RequestUpdateDto requestUpdateDto,
 		@Parameter(description = "프로필 이미지 MultipartFile")
-		@RequestPart MultipartFile profileImage,
+		@RequestPart List<MultipartFile> profileImage,
 		@Parameter(hidden = true) @CurrentMember Member member) {
 		log.info("멤버 수정 요청 이름 : " + member.getName());
 		memberService.updateMember(member, requestUpdateDto, profileImage);
