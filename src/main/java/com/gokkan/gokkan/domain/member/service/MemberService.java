@@ -7,11 +7,13 @@ import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -26,6 +28,7 @@ public class MemberService {
 	@Transactional
 	public void updateMember(Member member, RequestUpdateDto requestUpdateDto,
 		MultipartFile profileImage) {
+		log.info("멤버 수정 시작");
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
@@ -42,6 +45,7 @@ public class MemberService {
 		}
 
 		memberRepository.save(member);
+		log.info("멤버 수정 완료");
 	}
 
 	@Transactional

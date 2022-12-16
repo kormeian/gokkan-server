@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "회원 컨트롤러", description = "회원 컨트롤러")
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class MemberController {
@@ -49,7 +51,7 @@ public class MemberController {
 	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
 	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
 	public ResponseEntity<ResponseDto> getUser(@CurrentMember Member member) {
-
+		log.info("멤버 조회 요청 이름 : " + member.getName());
 
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
