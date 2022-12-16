@@ -67,7 +67,6 @@ public class MemberController {
 		@Parameter(description = "프로필 이미지 MultipartFile")
 		@RequestPart List<MultipartFile> profileImage,
 		@Parameter(hidden = true) @CurrentMember Member member) {
-		log.info("멤버 수정 요청 이름 : " + member.getName());
 		memberService.updateMember(member, requestUpdateDto, profileImage);
 		return ResponseEntity.ok().build();
 	}

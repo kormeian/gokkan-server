@@ -21,19 +21,13 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final AwsS3Service awsS3Service;
 
-	@Transactional(readOnly = true)
-	public Member getUser(String userId) {
-		return memberRepository.findByUserId(userId);
-	}
-
 	@Transactional
 	public void updateMember(Member member, RequestUpdateDto requestUpdateDto,
 		List<MultipartFile> profileImage) {
-		log.info("멤버 수정 시작");
+		log.info("멤버 수정 시작 이름 : " + member.getName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
-		member.setEmail(requestUpdateDto.getEmail());
 		member.setName(requestUpdateDto.getName());
 		member.setPhoneNumber(requestUpdateDto.getPhoneNumber());
 		member.setAddress(requestUpdateDto.getAddress());
@@ -51,24 +45,28 @@ public class MemberService {
 
 	@Transactional
 	public void updateCard(Member member, String cardNumber) {
+		log.info("카드 수정 시작 이름 : " + member.getName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		member.setCardNumber(cardNumber);
 		memberRepository.save(member);
-
+		log.info("카드 수정 완료");
 	}
 
 	@Transactional
 	public void updateAddress(Member member, String address) {
+		log.info("주소 수정 시작 이름 : " + member.getName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		member.setAddress(address);
 		memberRepository.save(member);
+		log.info("주소 수정 완료");
 	}
 
 	public boolean checkDuplicateNickName(String nickName) {
+		log.info("닉네임 중복 체크");
 		return memberRepository.existsByName(nickName);
 	}
 }
