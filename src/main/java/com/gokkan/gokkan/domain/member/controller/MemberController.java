@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,15 +58,15 @@ public class MemberController {
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
 
-	@PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+	@PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	@Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
 	public ResponseEntity<Void> updateMember(
-		@Parameter(hidden = true) @CurrentMember Member member,
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestUpdateDto.class)))
 		@RequestBody RequestUpdateDto requestUpdateDto,
 		@Parameter(description = "프로필 이미지 MultipartFile")
-		@RequestPart MultipartFile profileImage) {
-
+		@RequestPart MultipartFile profileImage,
+		@Parameter(hidden = true) @CurrentMember Member member) {
+		log.info("멤버 수정 요청 이름 : " + member.getName());
 		memberService.updateMember(member, requestUpdateDto, profileImage);
 		return ResponseEntity.ok().build();
 	}
