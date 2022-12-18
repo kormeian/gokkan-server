@@ -24,11 +24,11 @@ public class MemberService {
 	@Transactional
 	public void updateMember(Member member, RequestUpdateDto requestUpdateDto,
 		List<MultipartFile> profileImage) {
-		log.info("멤버 수정 시작 이름 : " + member.getName());
+		log.info("멤버 수정 시작 이름 : " + member.getNickName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
-		member.setName(requestUpdateDto.getName());
+		member.setNickName(requestUpdateDto.getName());
 		member.setPhoneNumber(requestUpdateDto.getPhoneNumber());
 		member.setAddress(requestUpdateDto.getAddress());
 		member.setCardNumber(requestUpdateDto.getCardNumber());
@@ -45,7 +45,7 @@ public class MemberService {
 
 	@Transactional
 	public void updateCard(Member member, String cardNumber) {
-		log.info("카드 수정 시작 이름 : " + member.getName());
+		log.info("카드 수정 시작 이름 : " + member.getNickName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
@@ -56,7 +56,7 @@ public class MemberService {
 
 	@Transactional
 	public void updateAddress(Member member, String address) {
-		log.info("주소 수정 시작 이름 : " + member.getName());
+		log.info("주소 수정 시작 이름 : " + member.getNickName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
@@ -67,7 +67,7 @@ public class MemberService {
 
 	public boolean checkDuplicateNickName(String nickName) {
 		log.info("닉네임 중복 체크");
-		return memberRepository.existsByName(nickName);
+		return memberRepository.existsByNickName(nickName);
 	}
 }
 
