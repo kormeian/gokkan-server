@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.style.dto;
 
 import com.gokkan.gokkan.domain.style.domain.Style;
 import com.sun.istack.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "스타일 생성 request")
 	public static class CreateRequest {
 
 		@NotNull
@@ -31,6 +33,7 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "스타일 수정 request")
 	public static class UpdateRequest {
 
 		@NotNull
@@ -46,6 +49,7 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "스타일 response")
 	public static class Response {
 
 		private Long id;
