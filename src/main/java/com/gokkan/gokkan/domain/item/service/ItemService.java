@@ -14,6 +14,8 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
+import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItemService {
 
 	private final ItemRepository itemRepository;
-	private final CategoryRepository categoryRepository;
+	private final StyleItemRepository styleItemRepository;
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 
@@ -34,10 +36,13 @@ public class ItemService {
 	public Response create(
 		CreateRequest request,
 		List<ImageItem> imageItemUrls,
-		List<ImageCheck> imageCheckUrls) {
+		List<ImageCheck> imageCheckUrls,
+		Category category,
+		List<StyleItem> styleItems) {
 
 		Item item = request.toItem();
-		item.setCategory(getCategory(request.getCategory()));
+		item.setCategory(category);
+		item.addStyleItem(styleItems);
 		item.addImageItems(imageItemUrls);
 		item.addImageChecks(imageCheckUrls);
 
@@ -67,18 +72,33 @@ public class ItemService {
 	public Response update(
 		UpdateRequest request,
 		List<ImageItem> imageItems,
-		List<ImageCheck> imageChecks) {
+		List<ImageCheck> imageChecks,
+		Category category,
+		List<StyleItem> styleItems) {
 
 		Item item = getItem(request.getItemId());
 		item = request.toItem(item);
-		item.setCategory(getCategory(request.getCategory()));
 
-		for (ImageItem imageItem : item.getImageItems()) {
-			imageItemService.delete(imageItem);
+		item.setCategory(category);
+
+		List<StyleItem> styleItemsSaved = item.getStyleItems();
+		if (styleItemsSaved != null && styleItemsSaved.size() != 0) {
+			styleItemRepository.deleteAll(styleItemsSaved);
+		}
+		item.addStyleItem(styleItems);
+
+		List<ImageItem> imageItemsSaved = item.getImageItems();
+		if (imageItemsSaved != null && imageItemsSaved.size() != 0) {
+			for (ImageItem imageItem : imageItemsSaved) {
+				imageItemService.delete(imageItem);
+			}
 		}
 
-		for (ImageCheck imageCheck : item.getImageChecks()) {
-			imageCheckService.delete(imageCheck);
+		List<ImageCheck> imageChecksSaved = item.getImageChecks();
+		if (imageChecksSaved != null && imageChecksSaved.size() != 0) {
+			for (ImageCheck imageCheck : imageChecksSaved) {
+				imageCheckService.delete(imageCheck);
+			}
 		}
 
 		item.addImageItems(imageItems);
@@ -87,19 +107,8 @@ public class ItemService {
 		return Response.toResponse(itemRepository.save(item));
 	}
 
-	public void checked(String categoryName) {
-		if (!categoryRepository.existsByName(categoryName)) {
-			throw new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY);
-		}
-	}
-
 	private Item getItem(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
-	}
-
-	private Category getCategory(String categoryName) {
-		return categoryRepository.findByName(categoryName).orElseThrow(
-			() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
 	}
 }

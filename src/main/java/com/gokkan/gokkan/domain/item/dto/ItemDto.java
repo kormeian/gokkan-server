@@ -4,6 +4,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -64,6 +65,8 @@ public class ItemDto {
 		private String brand;
 		@NotNull
 		private int productionYear;
+		@NotNull
+		private List<String> styles = new ArrayList<>();
 
 		public Item toItem() {
 			return Item.builder()
@@ -135,6 +138,8 @@ public class ItemDto {
 		private String brand;
 		@NotNull
 		private int productionYear;
+		@NotNull
+		private List<String> styles = new ArrayList<>();
 
 		public Item toItem(Item item) {
 			return Item.builder()
@@ -159,6 +164,7 @@ public class ItemDto {
 				.updated(LocalDateTime.now())
 				.imageItems(item.getImageItems())
 				.imageChecks(item.getImageChecks())
+				.styleItems(item.getStyleItems())
 				.build();
 		}
 	}
@@ -199,6 +205,7 @@ public class ItemDto {
 
 		private List<String> imageItemUrls = new ArrayList<>();
 		private List<String> imageCheckUrls = new ArrayList<>();
+		private List<String> styles = new ArrayList<>();
 
 		private LocalDateTime created;
 		private LocalDateTime updated;
@@ -206,6 +213,7 @@ public class ItemDto {
 		public static Response toResponse(Item item) {
 			List<ImageItem> imageItems = item.getImageItems();
 			List<ImageCheck> imageChecks = item.getImageChecks();
+			List<StyleItem> styleItems = item.getStyleItems();
 			return Response.builder()
 				.id(item.getId())
 				.name(item.getName())
@@ -224,12 +232,14 @@ public class ItemDto {
 				.brand(item.getBrand())
 				.productionYear(item.getProductionYear())
 				.created(item.getCreated())
-				.imageItemUrls(
-					imageItems == null ? new ArrayList<>() :
-						item.getImageItems().stream().map(ImageItem::getUrl)
-							.collect(Collectors.toList()))
+				.imageItemUrls(imageItems == null ? new ArrayList<>() :
+					imageItems.stream().map(ImageItem::getUrl)
+						.collect(Collectors.toList()))
 				.imageCheckUrls(imageChecks == null ? new ArrayList<>() :
 					imageChecks.stream().map(ImageCheck::getUrl)
+						.collect(Collectors.toList()))
+				.styles(styleItems == null ? new ArrayList<>() :
+					styleItems.stream().map(x -> x.getStyle().getName())
 						.collect(Collectors.toList()))
 				.build();
 

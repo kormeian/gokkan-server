@@ -11,8 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
@@ -25,6 +23,8 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.style.domain.Style;
+import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,11 +50,10 @@ class ItemServiceTest {
 		.build();
 	List<ImageItem> imageItems = List.of(getImageItem("item1"));
 	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
+	static List<String> styleNames = List.of("style1", "style2");
 	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
 	@Mock
 	private ItemRepository itemRepository;
-	@Mock
-	private CategoryRepository categoryRepository;
 	@Mock
 	private ImageItemService imageItemService;
 	@Mock
@@ -67,12 +66,11 @@ class ItemServiceTest {
 	public void test_01_00() {
 		//given
 		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
-		given((categoryRepository.findByName(any()))).willReturn(
-			Optional.of(getCategory("test category", root)));
 
 		//when
 		CreateRequest createRequest = getCreateRequest();
-		itemService.create(createRequest, imageItems, imageChecks);
+		itemService.create(createRequest, imageItems, imageChecks,
+			getCategory("test category", root), getStyleItems(styleNames));
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
 
 		//then
@@ -100,25 +98,15 @@ class ItemServiceTest {
 		assertEquals(item.getImageChecks().size(), 2);
 		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
 		assertEquals(item.getImageChecks().get(1).getUrl(), imageChecks.get(1).getUrl());
+		assertEquals(item.getImageChecks().get(0).getItem().getName(), createRequest.getName());
 
 		assertEquals(item.getImageItems().size(), 1);
 		assertEquals(item.getImageItems().get(0).getUrl(), imageItems.get(0).getUrl());
-	}
+		assertEquals(item.getImageItems().get(0).getItem().getName(), createRequest.getName());
 
-	@DisplayName("01_01. creat fail not found category")
-	@Test
-	public void test_01_01() {
-		//given
-		given((categoryRepository.findByName(any()))).willReturn(
-			Optional.empty());
-
-		//when
-		CreateRequest createRequest = getCreateRequest();
-		RestApiException categoryException = assertThrows(RestApiException.class,
-			() -> itemService.create(createRequest, imageItems, imageChecks));
-
-		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+		assertEquals(item.getStyleItems().get(0).getStyle().getName(), styleNames.get(0));
+		assertEquals(item.getStyleItems().get(1).getStyle().getName(), styleNames.get(1));
+		assertEquals(item.getStyleItems().get(0).getItem().getName(), createRequest.getName());
 	}
 
 	@DisplayName("02_00. read success")
@@ -131,7 +119,7 @@ class ItemServiceTest {
 		//when
 		CreateRequest savedItem = getCreateRequest();
 		Response response = itemService.read(1L);
-
+		System.out.println(response);
 		//then
 		assertEquals(response.getLength(), savedItem.getLength());
 		assertEquals(response.getWidth(), savedItem.getWidth());
@@ -152,6 +140,7 @@ class ItemServiceTest {
 		assertEquals(response.getImageCheckUrls().get(1), imageChecks.get(1).getUrl());
 
 		assertEquals(response.getImageItemUrls().size(), 0);
+		assertEquals(response.getStyles().get(0), styleNames.get(0));
 	}
 
 	@DisplayName("02_01. read fail not found Item")
@@ -162,7 +151,8 @@ class ItemServiceTest {
 			Optional.empty());
 
 		//when
-		RestApiException itemException = assertThrows(RestApiException.class, () -> itemService.read(1L));
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.read(1L));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
@@ -204,10 +194,14 @@ class ItemServiceTest {
 	public void test_04_00() {
 		//given
 		Item save = getItem(imageItems, imageChecks);
-		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(save));
-		given(categoryRepository.findByName(any())).willReturn(
-			Optional.of(getCategory("update category", root)));
+		save.setStyleItems(new ArrayList<>(List.of(
+			StyleItem.builder()
+				.id(1L)
+				.item(save)
+				.style(Style.builder().name("style1").build())
+				.build())));
+
+		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
 		given(itemRepository.save(any())).willReturn(save);
 
 		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
@@ -215,7 +209,8 @@ class ItemServiceTest {
 
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
-		itemService.update(updateRequest, imageItems, imageChecks);
+		itemService.update(updateRequest, imageItems, imageChecks,
+			getCategory("update category", root), getStyleItems(List.of("update style 1")));
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
 		verify(imageItemService, times(1)).delete(any(ImageItem.class));
 		verify(imageCheckService, times(2)).delete(any(ImageCheck.class));
@@ -248,6 +243,7 @@ class ItemServiceTest {
 
 		assertEquals(item.getImageChecks().size(), 1);
 		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
+		assertEquals(item.getStyleItems().get(0).getStyle().getName(), "update style 1");
 	}
 
 	@DisplayName("04_01. update fail not found item")
@@ -260,29 +256,11 @@ class ItemServiceTest {
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, imageItems, imageChecks));
+			() -> itemService.update(updateRequest, imageItems, imageChecks,
+				getCategory("update category", root), getStyleItems(List.of("style1", "style2"))));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
-	}
-
-	@DisplayName("04_02. update fail not found category")
-	@Test
-	public void test_04_02() {
-		//given
-		Item save = getItem(imageItems, imageChecks);
-		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(save));
-		given(categoryRepository.findByName(any())).willReturn(
-			Optional.empty());
-
-		//when
-		UpdateRequest updateRequest = getUpdateRequest();
-		RestApiException categoryException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, imageItems, imageChecks));
-
-		//then
-		assertEquals(categoryException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
 	}
 
 	private static CreateRequest getCreateRequest() {
@@ -302,6 +280,7 @@ class ItemServiceTest {
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
+			.styles(styleNames)
 			.build();
 	}
 
@@ -323,6 +302,7 @@ class ItemServiceTest {
 			.designer("update designer")
 			.brand("update brand")
 			.productionYear(1023)
+			.styles(List.of("update style 1"))
 			.build();
 	}
 
@@ -349,6 +329,7 @@ class ItemServiceTest {
 			.updated(LocalDateTime.now())
 			.imageItems(new ArrayList<>(imageItems))
 			.imageChecks(new ArrayList<>(imageChecks))
+			.styleItems(new ArrayList<>(getStyleItems(styleNames)))
 			.build();
 	}
 
@@ -371,5 +352,18 @@ class ItemServiceTest {
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
 			.build();
+	}
+
+	private static List<StyleItem> getStyleItems(List<String> styles) {
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (String style : styles) {
+			styleItems.add(StyleItem.builder()
+				.style(Style.builder()
+					.name(style)
+					.build()
+				)
+				.build());
+		}
+		return styleItems;
 	}
 }

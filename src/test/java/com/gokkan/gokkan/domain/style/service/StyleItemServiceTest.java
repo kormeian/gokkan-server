@@ -17,6 +17,7 @@ import com.gokkan.gokkan.domain.style.repository.StyleRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,10 @@ class StyleItemServiceTest {
 	@InjectMocks
 	private StyleItemService styleItemService;
 
-	private final String name = "test style";
+	private final String name1 = "test style1";
+	private final String name2 = "test style2";
+	private final List<String> names = List.of(name1, name2);
+
 
 	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 
@@ -45,18 +49,18 @@ class StyleItemServiceTest {
 	@Test
 	public void test_01_00() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleRepository.findByName(any())).willReturn(Optional.of(style));
 		given(styleItemRepository.save(any())).willReturn(getStyleItem(style));
 
 		//when
-		styleItemService.create(name);
+		styleItemService.create(names);
 
-		verify(styleItemRepository, times(1)).save(styleItemCaptor.capture());
+		verify(styleItemRepository, times(2)).save(styleItemCaptor.capture());
 
 		//then
-		StyleItem styleItem = styleItemCaptor.getValue();
-		assertEquals(styleItem.getStyle().getName(), name);
+		List<StyleItem> styleItems = styleItemCaptor.getAllValues();
+		assertEquals(styleItems.get(0).getStyle().getName(), names.get(0));
 	}
 
 	@DisplayName("01_01. create fail not found style")
@@ -67,7 +71,7 @@ class StyleItemServiceTest {
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class,
-			() -> styleItemService.create("test style"));
+			() -> styleItemService.create(names));
 
 		//then
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE);
@@ -77,7 +81,7 @@ class StyleItemServiceTest {
 	@Test
 	public void test_02_00() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleItemRepository.findById(any())).willReturn(
 			Optional.of(getStyleItem(style)));
 		given(styleRepository.findByName(any())).willReturn(Optional.of(getStyle("update")));
@@ -97,7 +101,7 @@ class StyleItemServiceTest {
 	@Test
 	public void test_02_01() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleItemRepository.findById(any())).willReturn(
 			Optional.of(getStyleItem(style)));
 		given(styleRepository.findByName(any())).willReturn(Optional.empty());
