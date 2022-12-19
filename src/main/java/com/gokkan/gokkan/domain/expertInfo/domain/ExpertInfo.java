@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import jdk.jshell.Snippet;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class ExpertInfo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "expert_id")
+	@Column(name = "expert_info_id")
 	private Long id;
 
 	@JoinColumn(name = "member_id")
@@ -38,7 +39,7 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-	@Builder(builderMethodName = "testOnlyBuilder")
+	@Builder(builderMethodName = "TestOnlyBuilder")
 	public ExpertInfo(Long id, Member member, String name, String info) {
 		this.id = id;
 		this.member = member;

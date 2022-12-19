@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpertInfoServiceTest {
 
-	static Member member = Member.OnlyTestBuilder()
+	static Member member = Member.TestOnlyBuilder()
 		.id(1L)
 		.nickName("test")
 		.build();
@@ -58,7 +58,7 @@ class ExpertInfoServiceTest {
 	}
 
 	public ExpertInfo getExpertInfo() {
-		return ExpertInfo.testOnlyBuilder()
+		return ExpertInfo.TestOnlyBuilder()
 			.id(1L)
 			.name("name")
 			.info("info")
