@@ -13,6 +13,7 @@ public class MemberDto {
 	public static class RequestUpdateDto {
 
 		private String name;
+		private String email;
 		private String phoneNumber;
 		private String profileImageUrl;
 		private String address;
