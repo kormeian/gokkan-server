@@ -29,8 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
-
-	private final String name = "test style";
 	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
@@ -124,6 +122,12 @@ class StyleItemServiceTest {
 		//then
 
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE_ITEM);
+	}
+
+	private Style getStyle(String styleName) {
+		return Style.builder()
+			.name(styleName)
+			.build();
 	}
 
 	private StyleItem getStyleItem(Style style) {

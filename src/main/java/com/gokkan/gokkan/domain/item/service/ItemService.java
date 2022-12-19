@@ -68,8 +68,6 @@ public class ItemService {
 	@Transactional
 	public Response update(
 		UpdateRequest request,
-		Category category,
-		List<StyleItem> styleItems,
 		List<ImageItem> imageItems,
 		List<ImageCheck> imageChecks,
 		Category category,

@@ -44,8 +44,6 @@ public class ItemController {
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
-	private final CategoryService categoryService;
-	private final StyleItemService styleItemService;
 
 	@Operation(summary = "상품 생성", description = "상품 생성, Amazon S3에 파일 업로드, 업로드 된 이미지 url 상품에 저장")
 	@ApiResponse(responseCode = "201", description = "생성된 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))

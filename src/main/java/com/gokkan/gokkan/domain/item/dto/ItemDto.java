@@ -68,8 +68,6 @@ public class ItemDto {
 		private String brand;
 		@NotNull
 		private int productionYear;
-		@NotNull
-		private List<String> styles;
 
 		public Item toItem() {
 			return Item.builder()
@@ -144,8 +142,6 @@ public class ItemDto {
 		private String brand;
 		@NotNull
 		private int productionYear;
-		@NotNull
-		private List<String> styles;
 
 		public Item toItem(Item item) {
 			return Item.builder()
