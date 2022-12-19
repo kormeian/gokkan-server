@@ -87,6 +87,10 @@ public class Item {
 
 	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
+	private List<StyleItem> styleItems = new ArrayList<>();
+
+	@BatchSize(size = 11)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageCheck> imageChecks = new ArrayList<>();
 
 	@BatchSize(size = 11)

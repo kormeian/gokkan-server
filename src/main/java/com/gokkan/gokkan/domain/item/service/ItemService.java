@@ -41,7 +41,6 @@ public class ItemService {
 		List<ImageCheck> imageChecks,
 		Category category,
 		List<StyleItem> styleItems) {
-
 		Item item = itemRepository.save(request.toItem());
 		saveItemRelations(imageItems, imageChecks, category, styleItems, item);
 		return Response.toResponse(itemRepository.save(item));
@@ -69,6 +68,8 @@ public class ItemService {
 	@Transactional
 	public Response update(
 		UpdateRequest request,
+		Category category,
+		List<StyleItem> styleItems,
 		List<ImageItem> imageItems,
 		List<ImageCheck> imageChecks,
 		Category category,

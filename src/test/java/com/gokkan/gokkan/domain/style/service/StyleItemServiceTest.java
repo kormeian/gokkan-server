@@ -30,20 +30,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
 
+	private final String name = "test style";
+	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
 	@Mock
 	private StyleRepository styleRepository;
-
 	@InjectMocks
 	private StyleItemService styleItemService;
 
 	private final String name1 = "test style1";
 	private final String name2 = "test style2";
 	private final List<String> names = List.of(name1, name2);
-
-
-	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 
 	@DisplayName("01_00. create success")
 	@Test
@@ -134,14 +132,8 @@ class StyleItemServiceTest {
 			.item(getItem())
 			.build();
 	}
-
-	private static Style getStyle(String name) {
-		return Style.builder()
-			.name(name)
-			.build();
-	}
-
-	private static Item getItem() {
+  
+  private static Item getItem() {
 		return Item.builder()
 			.name("test name")
 			.startPrice(100)
@@ -165,5 +157,4 @@ class StyleItemServiceTest {
 			.imageChecks(new ArrayList<>())
 			.build();
 	}
-
 }

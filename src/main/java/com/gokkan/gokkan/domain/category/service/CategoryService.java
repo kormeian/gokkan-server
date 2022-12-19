@@ -72,6 +72,7 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
+
 	public Category getCategory(String categoryName) {
 		return getCategoryByName(categoryName, false);
 	}

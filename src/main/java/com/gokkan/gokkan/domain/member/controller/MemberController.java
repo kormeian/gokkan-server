@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.member.controller;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.domain.member.domain.MemberAdapter;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseDto;
 import com.gokkan.gokkan.domain.member.service.MemberService;
@@ -12,12 +11,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -26,34 +27,43 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "회원 컨트롤러", description = "회원 컨트롤러")
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class MemberController {
 
 	private final MemberService memberService;
 
+//	@GetMapping
+//	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
+//	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
+//	public ResponseEntity<ResponseDto> getUser() {
+//		MemberAdapter principal = (MemberAdapter) SecurityContextHolder.getContext()
+//			.getAuthentication()
+//			.getPrincipal();
+//
+//		Member member = principal.getMember();
+//
+//		return ResponseEntity.ok(ResponseDto.fromEntity(member));
+//	}
+
 	@GetMapping
 	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
 	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
-	public ResponseEntity<ResponseDto> getUser() {
-		MemberAdapter principal = (MemberAdapter) SecurityContextHolder.getContext()
-			.getAuthentication()
-			.getPrincipal();
-
-		Member member = principal.getMember();
+	public ResponseEntity<ResponseDto> getUser(@CurrentMember Member member) {
+		log.info("멤버 조회 요청 이름 : " + member.getName());
 
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
 
-	@PatchMapping
+	@PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
 	@Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
 	public ResponseEntity<Void> updateMember(
-		@Parameter(hidden = true) @CurrentMember Member member,
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestUpdateDto.class)))
-		@RequestBody RequestUpdateDto requestUpdateDto,
+		@RequestPart RequestUpdateDto requestUpdateDto,
 		@Parameter(description = "프로필 이미지 MultipartFile")
-		@RequestPart MultipartFile profileImage) {
-
+		@RequestPart List<MultipartFile> profileImage,
+		@Parameter(hidden = true) @CurrentMember Member member) {
 		memberService.updateMember(member, requestUpdateDto, profileImage);
 		return ResponseEntity.ok().build();
 	}
