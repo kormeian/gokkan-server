@@ -38,7 +38,7 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-	@Builder(builderMethodName = "testOnlyBuilder")
+	@Builder(builderMethodName = "WithIdBuilder")
 	public ExpertInfo(Long id, Member member, String name, String info) {
 		this.id = id;
 		this.member = member;
