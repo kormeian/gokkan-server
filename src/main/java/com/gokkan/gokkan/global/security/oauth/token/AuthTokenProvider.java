@@ -54,9 +54,5 @@ public class AuthTokenProvider {
 			throw new TokenValidFailedException();
 		}
 	}
-
-	public Key getKey() {
-		return key;
-	}
 }
 

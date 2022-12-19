@@ -8,7 +8,6 @@ import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import com.gokkan.gokkan.infra.utils.HeaderUtil;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.io.IOException;
@@ -43,11 +42,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 			log.info("토큰 유효 멤버 조회");
 			String userId = "";
 			try {
-				userId = Jwts.parserBuilder()
-					.setSigningKey(tokenProvider.getKey())
-					.build()
-					.parseClaimsJws(token.getToken())
-					.getBody().getSubject();
+				userId = token.getTokenClaims().getSubject();
 			} catch (SecurityException e) {
 				log.error("Invalid JWT signature.");
 				request.setAttribute("exception",
