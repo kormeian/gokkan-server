@@ -1,5 +1,7 @@
 package com.gokkan.gokkan.global.security.oauth.token;
 
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import com.gokkan.gokkan.global.security.oauth.exception.SecurityErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -60,17 +62,22 @@ public class AuthToken {
 				.parseClaimsJws(token)
 				.getBody();
 		} catch (SecurityException e) {
-			log.info("Invalid JWT signature.");
+			log.error("Invalid JWT signature.");
+			throw new RestApiException(SecurityErrorCode.INVALID_JWT_SIGNATURE);
 		} catch (MalformedJwtException e) {
-			log.info("Invalid JWT token.");
+			log.error("Invalid JWT token.");
+			throw new RestApiException(SecurityErrorCode.INVALID_JWT_TOKEN);
 		} catch (ExpiredJwtException e) {
-			log.info("Expired JWT token.");
+			log.error("Expired JWT token.");
+			throw new RestApiException(SecurityErrorCode.EXPIRED_JWT_TOKEN);
 		} catch (UnsupportedJwtException e) {
-			log.info("Unsupported JWT token.");
+			log.error("Unsupported JWT token.");
+			throw new RestApiException(SecurityErrorCode.UNSUPPORTED_JWT_TOKEN);
 		} catch (IllegalArgumentException e) {
-			log.info("JWT token compact of handler are invalid.");
+			log.error("JWT token compact of handler are invalid.");
+			throw new RestApiException(SecurityErrorCode.ILLEGAL_ARGUMENT_JWT_TOKEN);
 		}
-		return null;
+		//return null;
 	}
 
 	public Claims getExpiredTokenClaims() {
