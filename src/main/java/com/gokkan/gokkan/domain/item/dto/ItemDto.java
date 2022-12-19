@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.item.dto;
 
+import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.domain.Item;
@@ -69,9 +70,10 @@ public class ItemDto {
 		@NotNull
 		private int productionYear;
 
-		public Item toItem() {
+		public Item toItem(Category category) {
 			return Item.builder()
 				.name(this.name)
+				.category(category)
 				.startPrice(this.startPrice)
 				.length(this.length)
 				.width(this.width)
@@ -143,10 +145,11 @@ public class ItemDto {
 		@NotNull
 		private int productionYear;
 
-		public Item toItem(Item item) {
+		public Item toItem(Item item, Category category) {
 			return Item.builder()
 				.id(item.getId())
 				.name(this.name)
+				.category(category)
 				.startPrice(this.startPrice)
 				.length(this.length)
 				.width(this.width)
