@@ -28,11 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ExpertInfoServiceTest {
-
-	static Member member = Member.OnlyTestBuilder()
-		.id(1L)
-		.nickName("test")
-		.build();
 	ArgumentCaptor<ExpertInfo> expertInfoArgumentCaptor = ArgumentCaptor.forClass(ExpertInfo.class);
 	@Mock
 	private ExpertInfoRepository expertInfoRepository;
@@ -41,43 +36,29 @@ class ExpertInfoServiceTest {
 	@InjectMocks
 	private ExpertInfoService expertInfoService;
 
-	public RequestCreateExpertInfoByMemberId getRequestCreateExpertInfoByMemberId() {
-		return RequestCreateExpertInfoByMemberId.builder()
-			.memberId(1L)
-			.name("name")
-			.info("info")
-			.build();
-	}
-
-	public RequestCreateExpertInfoByNickName getRequestCreateExpertInfoByNickName() {
-		return RequestCreateExpertInfoByNickName.builder()
-			.nickName("test")
-			.name("name")
-			.info("info")
-			.build();
-	}
-
-	public ExpertInfo getExpertInfo() {
-		return ExpertInfo.testOnlyBuilder()
-			.id(1L)
-			.name("name")
-			.info("info")
-			.member(member)
-			.build();
-	}
+	final static Member member = Member.WithIdBuilder()
+		.id(1L)
+		.nickName("test")
+		.build();
 
 	@Test
 	@DisplayName("전문가 정보 등록(멤버 아이디) 성공")
 	void createExpertInfoByMemberId_success() {
 		//given
-		given(expertInfoRepository.existsByMemberId(anyLong())).willReturn(false);
 		given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+		given(expertInfoRepository.existsByMemberId(member.getId())).willReturn(false);
+
 
 		//when
 		expertInfoService.createExpertInfoByMemberId(getRequestCreateExpertInfoByMemberId());
 
 		//then
 		verify(expertInfoRepository).save(expertInfoArgumentCaptor.capture());
+		ExpertInfo expertInfo = expertInfoArgumentCaptor.getValue();
+		assertEquals(expertInfo.getMember(), member);
+		assertEquals(expertInfo.getName(), "name");
+		assertEquals(expertInfo.getInfo(), "info");
+
 	}
 
 	@Test
@@ -100,7 +81,7 @@ class ExpertInfoServiceTest {
 	void createExpertInfoByMemberId_error_alreadyExistMember() {
 		//given
 		given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-		given(expertInfoRepository.existsByMemberId(anyLong())).willReturn(true);
+		given(expertInfoRepository.existsByMemberId(member.getId())).willReturn(true);
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class,
@@ -123,6 +104,10 @@ class ExpertInfoServiceTest {
 
 		//then
 		verify(expertInfoRepository).save(expertInfoArgumentCaptor.capture());
+		ExpertInfo expertInfo = expertInfoArgumentCaptor.getValue();
+		assertEquals(expertInfo.getMember(), member);
+		assertEquals(expertInfo.getName(), "name");
+		assertEquals(expertInfo.getInfo(), "info");
 	}
 
 	@Test
@@ -168,6 +153,8 @@ class ExpertInfoServiceTest {
 
 		//then
 		verify(expertInfoRepository).save(expertInfoArgumentCaptor.capture());
+		ExpertInfo expertInfo = expertInfoArgumentCaptor.getValue();
+		assertEquals(expertInfo.getInfo(), "updateInfo");
 	}
 
 	@Test
@@ -211,5 +198,30 @@ class ExpertInfoServiceTest {
 
 		//then
 		assertEquals(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND, restApiException.getErrorCode());
+	}
+
+	private RequestCreateExpertInfoByMemberId getRequestCreateExpertInfoByMemberId() {
+		return RequestCreateExpertInfoByMemberId.builder()
+			.memberId(1L)
+			.name("name")
+			.info("info")
+			.build();
+	}
+
+	private RequestCreateExpertInfoByNickName getRequestCreateExpertInfoByNickName() {
+		return RequestCreateExpertInfoByNickName.builder()
+			.nickName("test")
+			.name("name")
+			.info("info")
+			.build();
+	}
+
+	private ExpertInfo getExpertInfo() {
+		return ExpertInfo.WithIdBuilder()
+			.id(1L)
+			.name("name")
+			.info("info")
+			.member(member)
+			.build();
 	}
 }
