@@ -41,8 +41,8 @@ public class ItemService {
 		List<ImageCheck> imageChecks,
 		Category category,
 		List<StyleItem> styleItems) {
-		Item item = itemRepository.save(request.toItem());
-		saveItemRelations(imageItems, imageChecks, category, styleItems, item);
+		Item item = itemRepository.save(request.toItem(category));
+		saveItemRelations(imageItems, imageChecks, styleItems, item);
 		return Response.toResponse(itemRepository.save(item));
 	}
 
@@ -74,7 +74,7 @@ public class ItemService {
 		List<StyleItem> styleItems) {
 
 		Item item = getItem(request.getItemId());
-		item = request.toItem(item);
+		item = request.toItem(item, category);
 
 		List<StyleItem> styleItemsSaved = item.getStyleItems();
 		if (styleItemsSaved != null && styleItemsSaved.size() != 0) {
@@ -95,7 +95,7 @@ public class ItemService {
 			}
 		}
 
-		saveItemRelations(imageItems, imageChecks, category, styleItems, item);
+		saveItemRelations(imageItems, imageChecks, styleItems, item);
 
 		return Response.toResponse(itemRepository.save(item));
 	}
@@ -105,9 +105,12 @@ public class ItemService {
 			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
 	}
 
-	private void saveItemRelations(List<ImageItem> imageItems, List<ImageCheck> imageChecks,
-		Category category, List<StyleItem> styleItems, Item item) {
-		item.setCategory(category);
+	private void saveItemRelations(
+		List<ImageItem> imageItems,
+		List<ImageCheck> imageChecks,
+		List<StyleItem> styleItems,
+		Item item) {
+
 		item.addStyleItem(styleItems);
 		item.addImageItems(imageItems);
 		item.addImageChecks(imageChecks);
