@@ -97,6 +97,9 @@ public class Item {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageItem> imageItems = new ArrayList<>();
 
+	@BatchSize(size = 5)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
+	private List<StyleItem> styleItems = new ArrayList<>();
 
 	public void addImageItems(List<ImageItem> imageItems) {
 		for (ImageItem imageItem : imageItems) {
@@ -118,5 +121,4 @@ public class Item {
 		}
 		this.setStyleItems(styleItems);
 	}
-
 }
