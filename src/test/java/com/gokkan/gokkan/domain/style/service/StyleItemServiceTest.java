@@ -29,17 +29,45 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
 
+	private final String name = "test style";
+	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
 	@Mock
 	private StyleRepository styleRepository;
-
 	@InjectMocks
 	private StyleItemService styleItemService;
 
-	private final String name = "test style";
+	private static Style getStyle(String name) {
+		return Style.builder()
+			.name(name)
+			.build();
+	}
 
-	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
+	private static Item getItem() {
+		return Item.builder()
+			.name("test name")
+			.startPrice(100)
+			.length(100L)
+			.width(100L)
+			.depth(100L)
+			.height(100L)
+			.material("나무")
+			.conditionGrade("test conditionGrade")
+			.conditionDescription("test conditionDescription")
+			.text("test text")
+			.madeIn("test madeIn")
+			.designer("test designer")
+			.brand("test brand")
+			.productionYear(2023)
+			.state(State.ASSESSING)
+			.assessed(false)
+			.created(LocalDateTime.now())
+			.updated(LocalDateTime.now())
+			.imageItems(new ArrayList<>())
+			.imageChecks(new ArrayList<>())
+			.build();
+	}
 
 	@DisplayName("01_00. create success")
 	@Test
@@ -130,37 +158,6 @@ class StyleItemServiceTest {
 		return StyleItem.builder()
 			.style(style)
 			.item(getItem())
-			.build();
-	}
-
-	private static Style getStyle(String name) {
-		return Style.builder()
-			.name(name)
-			.build();
-	}
-
-	private static Item getItem() {
-		return Item.builder()
-			.name("test name")
-			.startPrice(100)
-			.length(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.state(State.ASSESSING)
-			.assessed(false)
-			.created(LocalDateTime.now())
-			.updated(LocalDateTime.now())
-			.imageItems(new ArrayList<>())
-			.imageChecks(new ArrayList<>())
 			.build();
 	}
 
