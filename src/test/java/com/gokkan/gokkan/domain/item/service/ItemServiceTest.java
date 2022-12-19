@@ -13,6 +13,8 @@ import static org.mockito.Mockito.verify;
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
+import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
+import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
@@ -25,6 +27,7 @@ import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.style.domain.Style;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
+import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,10 +53,18 @@ class ItemServiceTest {
 		.build();
 	List<ImageItem> imageItems = List.of(getImageItem("item1"));
 	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
-	static List<String> styleNames = List.of("style1", "style2");
+	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
+
+	List<String> styleNames = List.of("style1", "style2");
 	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
 	@Mock
 	private ItemRepository itemRepository;
+	@Mock
+	private ImageItemRepository imageItemRepository;
+	@Mock
+	private ImageCheckRepository imageCheckRepository;
+	@Mock
+	private StyleItemRepository styleItemRepository;
 	@Mock
 	private ImageItemService imageItemService;
 	@Mock
@@ -66,16 +77,19 @@ class ItemServiceTest {
 	public void test_01_00() {
 		//given
 		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
+		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
+		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
 
 		//when
 		CreateRequest createRequest = getCreateRequest();
 		itemService.create(createRequest, imageItems, imageChecks,
 			getCategory("test category", root), getStyleItems(styleNames));
-		verify(itemRepository, times(1)).save(itemCaptor.capture());
+		verify(itemRepository, times(2)).save(itemCaptor.capture());
 
 		//then
-		Item item = itemCaptor.getValue();
-
+		Item item = itemCaptor.getAllValues().get(1);
+		System.out.println(item);
 		assertEquals(item.getName(), createRequest.getName());
 		assertEquals(item.getStartPrice(), createRequest.getStartPrice());
 		assertEquals(item.getState(), State.ASSESSING);
@@ -203,6 +217,9 @@ class ItemServiceTest {
 
 		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
 		given(itemRepository.save(any())).willReturn(save);
+		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
+		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
 
 		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
 		imageChecks = List.of((getImageCheck("update imageCheck1")));
@@ -263,7 +280,7 @@ class ItemServiceTest {
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
 	}
 
-	private static CreateRequest getCreateRequest() {
+	private CreateRequest getCreateRequest() {
 		return ItemDto.CreateRequest.builder()
 			.name("test name")
 			.category("test category")
@@ -306,7 +323,7 @@ class ItemServiceTest {
 			.build();
 	}
 
-	private static Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks) {
+	private Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks) {
 		return Item.builder()
 			.name("test name")
 			.category(getCategory("test category", root))
@@ -351,6 +368,13 @@ class ItemServiceTest {
 			.parent(parent)
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
+			.build();
+	}
+
+	private StyleItem getStyleItem(String styleName) {
+		return StyleItem.builder().style(Style.builder()
+				.name(styleName)
+				.build())
 			.build();
 	}
 

@@ -51,15 +51,13 @@ class StyleItemServiceTest {
 		//given
 		Style style = getStyle(name1);
 		given(styleRepository.findByName(any())).willReturn(Optional.of(style));
-		given(styleItemRepository.save(any())).willReturn(getStyleItem(style));
 
 		//when
-		styleItemService.create(names);
+		List<StyleItem> styleItems = styleItemService.create(names);
 
-		verify(styleItemRepository, times(2)).save(styleItemCaptor.capture());
+		verify(styleItemRepository, times(0)).save(styleItemCaptor.capture());
 
 		//then
-		List<StyleItem> styleItems = styleItemCaptor.getAllValues();
 		assertEquals(styleItems.get(0).getStyle().getName(), names.get(0));
 	}
 

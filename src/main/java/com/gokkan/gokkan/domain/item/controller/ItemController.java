@@ -61,7 +61,6 @@ public class ItemController {
 		List<StyleItem> styleItems = styleItemService.create(request.getStyles());
 		List<ImageItem> imageItems = imageItemService.save(awsS3Service.save(imageItemFiles));
 		List<ImageCheck> imageChecks = imageCheckService.save(awsS3Service.save(imageCheckFiles));
-
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(itemService.create(request, imageItems, imageChecks, category, styleItems));
 	}

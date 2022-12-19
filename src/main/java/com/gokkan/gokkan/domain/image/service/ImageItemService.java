@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ImageItemService {
 
 	private final ImageItemRepository imageItemRepository;
-	private final ItemRepository itemRepository;
 	private final AwsS3Service awsS3Service;
 
 	public List<ImageItem> save(List<String> urls) {
@@ -30,10 +29,11 @@ public class ImageItemService {
 			if (url == null || url.length() == 0) {
 				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
 			}
-			imageItems.add(imageItemRepository.save(
+			imageItems.add(
 				ImageItem.builder()
 					.url(url)
-					.build()));
+					.build()
+			);
 		}
 
 		return imageItems;

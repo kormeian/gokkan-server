@@ -73,7 +73,7 @@ public class CategoryService {
 	}
 
 	public Category getCategory(String categoryName) {
-		return getCategory(categoryName);
+		return getCategoryByName(categoryName, false);
 	}
 	private void duplicateCheck(String request) {
 		if (categoryRepository.existsByName(request)) {

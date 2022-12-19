@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ImageCheckService {
 
 	private final ImageCheckRepository imageCheckRepository;
-	private final ItemRepository itemRepository;
 	private final AwsS3Service awsS3Service;
 
 
@@ -30,10 +31,11 @@ public class ImageCheckService {
 				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
 			}
 
-			imageChecks.add(imageCheckRepository.save(
-				ImageCheck.builder()
-					.url(url)
-					.build()));
+			imageChecks.add(
+					ImageCheck.builder()
+						.url(url)
+						.build()
+			);
 		}
 
 		return imageChecks;

@@ -66,7 +66,7 @@ public class ItemDto {
 		@NotNull
 		private int productionYear;
 		@NotNull
-		private List<String> styles = new ArrayList<>();
+		private List<String> styles;
 
 		public Item toItem() {
 			return Item.builder()
@@ -139,7 +139,7 @@ public class ItemDto {
 		@NotNull
 		private int productionYear;
 		@NotNull
-		private List<String> styles = new ArrayList<>();
+		private List<String> styles;
 
 		public Item toItem(Item item) {
 			return Item.builder()
@@ -232,6 +232,7 @@ public class ItemDto {
 				.brand(item.getBrand())
 				.productionYear(item.getProductionYear())
 				.created(item.getCreated())
+				.updated(item.getUpdated())
 				.imageItemUrls(imageItems == null ? new ArrayList<>() :
 					imageItems.stream().map(ImageItem::getUrl)
 						.collect(Collectors.toList()))

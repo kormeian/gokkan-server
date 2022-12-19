@@ -19,16 +19,13 @@ public class StyleItemService {
 	private final StyleItemRepository styleItemRepository;
 	private final StyleRepository styleRepository;
 
-	@Transactional
 	public List<StyleItem> create(List<String> names) {
 		List<StyleItem> styleItems = new ArrayList<>();
 		for (String name : names) {
 			styleItems.add(
-				styleItemRepository.save(
 					StyleItem.builder()
 						.style(getStyle(name))
 						.build()
-				)
 			);
 		}
 		return styleItems;

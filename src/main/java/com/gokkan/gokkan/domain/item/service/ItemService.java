@@ -3,10 +3,10 @@ package com.gokkan.gokkan.domain.item.service;
 import static com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
-import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
+import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
+import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
@@ -28,6 +28,8 @@ public class ItemService {
 
 	private final ItemRepository itemRepository;
 	private final StyleItemRepository styleItemRepository;
+	private final ImageItemRepository imageItemRepository;
+	private final ImageCheckRepository imageCheckRepository;
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 
@@ -35,17 +37,13 @@ public class ItemService {
 	@Transactional
 	public Response create(
 		CreateRequest request,
-		List<ImageItem> imageItemUrls,
-		List<ImageCheck> imageCheckUrls,
+		List<ImageItem> imageItems,
+		List<ImageCheck> imageChecks,
 		Category category,
 		List<StyleItem> styleItems) {
 
-		Item item = request.toItem();
-		item.setCategory(category);
-		item.addStyleItem(styleItems);
-		item.addImageItems(imageItemUrls);
-		item.addImageChecks(imageCheckUrls);
-
+		Item item = itemRepository.save(request.toItem());
+		saveItemRelations(imageItems, imageChecks, category, styleItems, item);
 		return Response.toResponse(itemRepository.save(item));
 	}
 
@@ -79,13 +77,10 @@ public class ItemService {
 		Item item = getItem(request.getItemId());
 		item = request.toItem(item);
 
-		item.setCategory(category);
-
 		List<StyleItem> styleItemsSaved = item.getStyleItems();
 		if (styleItemsSaved != null && styleItemsSaved.size() != 0) {
 			styleItemRepository.deleteAll(styleItemsSaved);
 		}
-		item.addStyleItem(styleItems);
 
 		List<ImageItem> imageItemsSaved = item.getImageItems();
 		if (imageItemsSaved != null && imageItemsSaved.size() != 0) {
@@ -101,8 +96,7 @@ public class ItemService {
 			}
 		}
 
-		item.addImageItems(imageItems);
-		item.addImageChecks(imageChecks);
+		saveItemRelations(imageItems, imageChecks, category, styleItems, item);
 
 		return Response.toResponse(itemRepository.save(item));
 	}
@@ -110,5 +104,17 @@ public class ItemService {
 	private Item getItem(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
+	}
+
+	private void saveItemRelations(List<ImageItem> imageItems, List<ImageCheck> imageChecks,
+		Category category, List<StyleItem> styleItems, Item item) {
+		item.setCategory(category);
+		item.addStyleItem(styleItems);
+		item.addImageItems(imageItems);
+		item.addImageChecks(imageChecks);
+
+		imageItemRepository.saveAll(imageItems);
+		imageCheckRepository.saveAll(imageChecks);
+		styleItemRepository.saveAll(styleItems);
 	}
 }
