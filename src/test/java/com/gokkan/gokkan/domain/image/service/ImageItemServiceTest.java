@@ -36,12 +36,6 @@ class ImageItemServiceTest {
 	@InjectMocks
 	private ImageItemService imageItemService;
 
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
-	}
-
 	@DisplayName("01_00. save success")
 	@Test
 	public void test_01_00() {
@@ -118,6 +112,12 @@ class ImageItemServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
+	}
+
+	private static ImageItem getImageItem(String url) {
+		return ImageItem.builder()
+			.url(url)
+			.build();
 	}
 
 }

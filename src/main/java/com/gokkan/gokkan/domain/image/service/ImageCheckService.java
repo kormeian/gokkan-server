@@ -3,7 +3,6 @@ package com.gokkan.gokkan.domain.image.service;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
-import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +31,9 @@ public class ImageCheckService {
 			}
 
 			imageChecks.add(
-					ImageCheck.builder()
-						.url(url)
-						.build()
+				ImageCheck.builder()
+					.url(url)
+					.build()
 			);
 		}
 

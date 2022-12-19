@@ -23,9 +23,9 @@ public class StyleItemService {
 		List<StyleItem> styleItems = new ArrayList<>();
 		for (String name : names) {
 			styleItems.add(
-					StyleItem.builder()
-						.style(getStyle(name))
-						.build()
+				StyleItem.builder()
+					.style(getStyle(name))
+					.build()
 			);
 		}
 		return styleItems;

@@ -3,7 +3,6 @@ package com.gokkan.gokkan.domain.image.service;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
-import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
