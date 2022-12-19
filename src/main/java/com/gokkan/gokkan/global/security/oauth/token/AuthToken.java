@@ -3,7 +3,9 @@ package com.gokkan.gokkan.global.security.oauth.token;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.security.Key;
 import java.util.Date;
 import lombok.Getter;
@@ -51,11 +53,24 @@ public class AuthToken {
 	}
 
 	public Claims getTokenClaims() {
-		return Jwts.parserBuilder()
-			.setSigningKey(key)
-			.build()
-			.parseClaimsJws(token)
-			.getBody();
+		try {
+			return Jwts.parserBuilder()
+				.setSigningKey(key)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+		} catch (SecurityException e) {
+			log.info("Invalid JWT signature.");
+		} catch (MalformedJwtException e) {
+			log.info("Invalid JWT token.");
+		} catch (ExpiredJwtException e) {
+			log.info("Expired JWT token.");
+		} catch (UnsupportedJwtException e) {
+			log.info("Unsupported JWT token.");
+		} catch (IllegalArgumentException e) {
+			log.info("JWT token compact of handler are invalid.");
+		}
+		return null;
 	}
 
 	public Claims getExpiredTokenClaims() {
