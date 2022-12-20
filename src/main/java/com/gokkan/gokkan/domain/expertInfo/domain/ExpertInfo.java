@@ -21,7 +21,7 @@ public class ExpertInfo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "expert_id")
+	@Column(name = "expert_info_id")
 	private Long id;
 
 	@JoinColumn(name = "member_id")
@@ -38,13 +38,6 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-	@Builder(builderMethodName = "WithIdBuilder")
-	public ExpertInfo(Long id, Member member, String name, String info) {
-		this.id = id;
-		this.member = member;
-		this.name = name;
-		this.info = info;
-	}
 
 	public void updateInfo(String info) {
 		this.info = info;

@@ -70,20 +70,5 @@ public class Member {
 		this.role = role;
 	}
 
-	@Builder(builderMethodName = "WithIdBuilder")
-	public Member(Long id, String userId, String nickName, String email,
-		String profileImageUrl, String phoneNumber, String cardNumber, String address,
-		ProviderType providerType, Role role) {
-		this.id = id;
-		this.userId = userId;
-		this.nickName = nickName;
-		this.email = email;
-		this.profileImageUrl = profileImageUrl;
-		this.phoneNumber = phoneNumber;
-		this.cardNumber = cardNumber;
-		this.address = address;
-		this.providerType = providerType;
-		this.role = role;
-	}
 }
 
