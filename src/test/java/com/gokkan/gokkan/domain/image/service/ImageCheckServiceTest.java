@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
-import com.gokkan.gokkan.domain.image.dto.ImageDto.CreateRequest;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -47,7 +46,7 @@ class ImageCheckServiceTest {
 		}
 
 		//when
-		List<ImageCheck> imageChecks = imageCheckService.save(urls);
+		List<ImageCheck> imageChecks = imageCheckService.create(urls);
 		verify(imageCheckRepository, times(0)).save(imageCheckCaptor.capture());
 
 		//then
@@ -63,7 +62,7 @@ class ImageCheckServiceTest {
 
 		//when
 		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageCheckService.save(new ArrayList<>()));
+			() -> imageCheckService.create(new ArrayList<>()));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.EMPTY_URL);
@@ -76,7 +75,7 @@ class ImageCheckServiceTest {
 
 		//when
 		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageCheckService.save(new ArrayList<>(List.of("", ""))));
+			() -> imageCheckService.create(new ArrayList<>(List.of("", ""))));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.INVALID_FORMAT_URL);
@@ -113,13 +112,6 @@ class ImageCheckServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_CHECK);
-	}
-
-	private static CreateRequest getCreateRequest(List<String> urls) {
-		return CreateRequest.builder()
-			.urls(urls)
-			.itemId(1L)
-			.build();
 	}
 
 	private static ImageCheck getImageCheck(String url) {

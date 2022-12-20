@@ -19,7 +19,7 @@ public class ImageCheckService {
 	private final AwsS3Service awsS3Service;
 
 
-	public List<ImageCheck> save(List<String> urls) {
+	public List<ImageCheck> create(List<String> urls) {
 		if (urls.size() == 0) {
 			throw new RestApiException(ImageErrorCode.EMPTY_URL);
 		}

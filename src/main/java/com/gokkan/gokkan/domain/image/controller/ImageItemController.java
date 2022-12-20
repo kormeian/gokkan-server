@@ -34,7 +34,7 @@ public class ImageItemController {
 	public ResponseEntity<?> save(
 		@Parameter(description = "Image (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> multipartFiles) {
-		return ResponseEntity.ok(imageItemService.save(awsS3Service.save(multipartFiles)));
+		return ResponseEntity.ok(imageItemService.create(awsS3Service.save(multipartFiles)));
 	}
 
 	@Operation(summary = "상품 이미지 삭제", description = "상품 이미지 삭제, Amazon S3에 파일 삭제")

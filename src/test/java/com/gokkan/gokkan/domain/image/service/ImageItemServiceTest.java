@@ -46,7 +46,7 @@ class ImageItemServiceTest {
 		}
 
 		//when
-		List<ImageItem> imageItems = imageItemService.save(urls);
+		List<ImageItem> imageItems = imageItemService.create(urls);
 		verify(imageItemRepository, times(0)).save(imageItemCaptor.capture());
 
 		//then
@@ -62,7 +62,7 @@ class ImageItemServiceTest {
 
 		//when
 		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageItemService.save(new ArrayList<>()));
+			() -> imageItemService.create(new ArrayList<>()));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.EMPTY_URL);
@@ -75,7 +75,7 @@ class ImageItemServiceTest {
 
 		//when
 		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageItemService.save(new ArrayList<>(List.of("", ""))));
+			() -> imageItemService.create(new ArrayList<>(List.of("", ""))));
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.INVALID_FORMAT_URL);
