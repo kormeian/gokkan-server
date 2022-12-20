@@ -26,8 +26,7 @@ public class ExpertInfoService {
 		RequestCreateExpertInfoByMemberId requestCreateExpertInfoByMemberId) {
 		Member member = memberRepository.findById(requestCreateExpertInfoByMemberId.getMemberId())
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-		if (expertInfoRepository.existsByMemberId(
-			requestCreateExpertInfoByMemberId.getMemberId())) {
+		if (existByMemberId(member.getId())) {
 			throw new RestApiException(ExpertInfoErrorCode.ALREADY_EXIST_MEMBER);
 		}
 		expertInfoRepository.save(ExpertInfo.builder()
@@ -43,7 +42,7 @@ public class ExpertInfoService {
 		Member member = memberRepository.findByNickName(
 				requestCreateExpertInfoByNickName.getNickName())
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-		if (expertInfoRepository.existsByMemberId(member.getId())) {
+		if (existByMemberId(member.getId())) {
 			throw new RestApiException(ExpertInfoErrorCode.ALREADY_EXIST_MEMBER);
 		}
 		expertInfoRepository.save(ExpertInfo.builder()
@@ -55,16 +54,24 @@ public class ExpertInfoService {
 
 	@Transactional
 	public void updateExpertInfo(Member member, String info) {
-		ExpertInfo expertInfo = expertInfoRepository.findByMemberId(member.getId())
-			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
+		ExpertInfo expertInfo = findByMemberId(member.getId());
 		expertInfo.updateInfo(info);
 		expertInfoRepository.save(expertInfo);
 	}
 
 	@Transactional(readOnly = true)
 	public ResponseGetExpertInfo getExpertInfo(Member member) {
-		ExpertInfo expertInfo = expertInfoRepository.findByMemberId(member.getId())
-			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
+		ExpertInfo expertInfo = findByMemberId(member.getId());
 		return ResponseGetExpertInfo.fromEntity(expertInfo);
 	}
+
+	private boolean existByMemberId(Long memberId) {
+		return expertInfoRepository.existsByMemberId(memberId);
+	}
+
+	private ExpertInfo findByMemberId(Long memberId) {
+		return expertInfoRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
+	}
+
 }
