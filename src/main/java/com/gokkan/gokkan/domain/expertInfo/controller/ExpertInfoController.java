@@ -6,6 +6,7 @@ import com.gokkan.gokkan.domain.expertInfo.domain.dto.ExpertInfoDto.ResponseGetE
 import com.gokkan.gokkan.domain.expertInfo.service.ExpertInfoService;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "전문가 정보 컨트롤러", description = "전문가 정보 컨트롤러")
 @RestController
 @RequestMapping("/api/v1/expertInfo")
 @RequiredArgsConstructor

@@ -3,6 +3,7 @@ package com.gokkan.gokkan.domain.style.controller;
 import com.gokkan.gokkan.domain.style.service.ExpertStyleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "전문가 스타일 컨트롤러", description = "전문가 스타일 컨트롤러")
 @RestController
 @RequestMapping("/api/v1/expert/style")
 @RequiredArgsConstructor

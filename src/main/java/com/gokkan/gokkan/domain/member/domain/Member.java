@@ -27,12 +27,12 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "user_id", length = 64, unique = true)
+	@Column(unique = true)
 	@NotNull
 	private String userId;
 
+	private String name;
 	@Column(unique = true)
-	@NotNull
 	private String nickName;
 
 	@Column(unique = true)
@@ -44,6 +44,7 @@ public class Member {
 	private String phoneNumber;
 	private String cardNumber;
 	private String address;
+	private String addressDetail;
 
 	@Enumerated(EnumType.STRING)
 	@NotNull
@@ -56,14 +57,14 @@ public class Member {
 	@Builder
 	public Member(
 		@NotNull String userId,
-		@NotNull String nickName,
+		@NotNull String name,
 		@NotNull String email,
 		@NotNull String profileImageUrl,
 		@NotNull ProviderType providerType,
 		@NotNull Role role) {
 
 		this.userId = userId;
-		this.nickName = nickName;
+		this.name = name;
 		this.email = email != null ? email : "NO_EMAIL";
 		this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
 		this.providerType = providerType;
