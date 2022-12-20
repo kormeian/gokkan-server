@@ -13,9 +13,11 @@ public class MemberDto {
 	public static class RequestUpdateDto {
 
 		private String name;
+		private String nickName;
 		private String phoneNumber;
 		private String profileImageUrl;
 		private String address;
+		private String addressDetail;
 		private String cardNumber;
 	}
 
@@ -24,30 +26,33 @@ public class MemberDto {
 	public static class ResponseDto {
 
 		private final String name;
-		private final String email;
+		private final String nickName;
 		private final String phoneNumber;
 		private final String profileImageUrl;
 		private final String address;
+		private final String addressDetail;
 		private final String cardNumber;
 
 		@Builder
-		public ResponseDto(String name, String email, String phoneNumber, String profileImageUrl,
-			String address, String cardNumber) {
+		public ResponseDto(String name, String nickName, String phoneNumber, String profileImageUrl,
+			String address, String addressDetail, String cardNumber) {
 			this.name = name;
-			this.email = email;
+			this.nickName = nickName;
 			this.phoneNumber = phoneNumber;
 			this.profileImageUrl = profileImageUrl;
 			this.address = address;
+			this.addressDetail = addressDetail;
 			this.cardNumber = cardNumber;
 		}
 
 		public static ResponseDto fromEntity(Member member) {
 			return ResponseDto.builder()
 				.name(member.getName())
-				.email(member.getEmail())
+				.nickName(member.getNickName())
 				.phoneNumber(member.getPhoneNumber())
 				.profileImageUrl(member.getProfileImageUrl())
 				.address(member.getAddress())
+				.addressDetail(member.getAddressDetail())
 				.cardNumber(member.getCardNumber())
 				.build();
 		}

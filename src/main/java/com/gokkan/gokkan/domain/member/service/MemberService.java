@@ -23,18 +23,21 @@ public class MemberService {
 
 	@Transactional
 	public void updateMember(Member member, RequestUpdateDto requestUpdateDto,
-		List<MultipartFile> profileImage) {
+		MultipartFile profileImage) {
 		log.info("멤버 수정 시작 이름 : " + member.getName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		member.setName(requestUpdateDto.getName());
+		member.setNickName(requestUpdateDto.getNickName());
 		member.setPhoneNumber(requestUpdateDto.getPhoneNumber());
 		member.setAddress(requestUpdateDto.getAddress());
+		member.setAddressDetail(requestUpdateDto.getAddressDetail());
 		member.setCardNumber(requestUpdateDto.getCardNumber());
-		if (profileImage != null) {
-			String saveImage = awsS3Service.save(profileImage.get(0));
+		if (profileImage != null && !profileImage.isEmpty() && profileImage.getSize() > 0) {
+			String saveImage = awsS3Service.save(profileImage);
 			member.setProfileImageUrl(saveImage);
+			log.info("프로필 이미지 수정 완료");
 		} else {
 			member.setProfileImageUrl(member.getProfileImageUrl());
 		}
@@ -55,19 +58,21 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void updateAddress(Member member, String address) {
+	public void updateAddress(Member member, String address, String addressDetail) {
 		log.info("주소 수정 시작 이름 : " + member.getName());
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		member.setAddress(address);
+		member.setAddressDetail(addressDetail);
 		memberRepository.save(member);
 		log.info("주소 수정 완료");
 	}
 
+	@Transactional(readOnly = true)
 	public boolean checkDuplicateNickName(String nickName) {
 		log.info("닉네임 중복 체크");
-		return memberRepository.existsByName(nickName);
+		return memberRepository.existsByNickName(nickName);
 	}
 }
 
