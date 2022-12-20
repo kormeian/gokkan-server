@@ -70,10 +70,5 @@ public class Member {
 		this.role = role;
 	}
 
-	@Builder(builderMethodName = "TestOnlyBuilder")
-	public Member(Long id, String nickName) {
-		this.id = id;
-		this.nickName = nickName;
-	}
 }
 
