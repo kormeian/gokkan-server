@@ -3,19 +3,19 @@ package com.gokkan.gokkan.domain.image.service;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
-import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ImageCheckService {
 
 	private final ImageCheckRepository imageCheckRepository;
-	private final ItemRepository itemRepository;
 	private final AwsS3Service awsS3Service;
 
 
@@ -30,10 +30,11 @@ public class ImageCheckService {
 				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
 			}
 
-			imageChecks.add(imageCheckRepository.save(
+			imageChecks.add(
 				ImageCheck.builder()
 					.url(url)
-					.build()));
+					.build()
+			);
 		}
 
 		return imageChecks;
