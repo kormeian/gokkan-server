@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import jdk.jshell.Snippet;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,13 +38,6 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-	@Builder(builderMethodName = "TestOnlyBuilder")
-	public ExpertInfo(Long id, Member member, String name, String info) {
-		this.id = id;
-		this.member = member;
-		this.name = name;
-		this.info = info;
-	}
 
 	public void updateInfo(String info) {
 		this.info = info;
