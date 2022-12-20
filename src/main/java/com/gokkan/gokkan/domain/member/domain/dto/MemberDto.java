@@ -43,7 +43,7 @@ public class MemberDto {
 
 		public static ResponseDto fromEntity(Member member) {
 			return ResponseDto.builder()
-				.name(member.getNickName())
+				.name(member.getName())
 				.email(member.getEmail())
 				.phoneNumber(member.getPhoneNumber())
 				.profileImageUrl(member.getProfileImageUrl())
