@@ -3,10 +3,12 @@ package com.gokkan.gokkan.domain.item.service;
 import static com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
+import com.gokkan.gokkan.domain.category.service.CategoryService;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
+import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
@@ -14,13 +16,17 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
+import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -30,18 +36,30 @@ public class ItemService {
 	private final StyleItemRepository styleItemRepository;
 	private final ImageItemRepository imageItemRepository;
 	private final ImageCheckRepository imageCheckRepository;
+
+	private final CategoryService categoryService;
+	private final StyleItemService styleItemService;
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
+	private final AwsS3Service awsS3Service;
 
 
 	@Transactional
 	public Response create(
 		CreateRequest request,
-		List<ImageItem> imageItems,
-		List<ImageCheck> imageChecks,
-		Category category,
-		List<StyleItem> styleItems) {
-		Item item = itemRepository.save(request.toItem(category));
+		List<MultipartFile> imageItemFiles,
+		List<MultipartFile> imageCheckFiles,
+		Member member) {
+		memberLoginCheck(member);
+
+		checkImageFiles(imageItemFiles, imageCheckFiles);
+
+		Category category = categoryService.getCategory(request.getCategory());
+		List<StyleItem> styleItems = styleItemService.create(request.getStyles());
+		List<ImageItem> imageItems = imageItemService.create(awsS3Service.save(imageItemFiles));
+		List<ImageCheck> imageChecks = imageCheckService.create(awsS3Service.save(imageCheckFiles));
+
+		Item item = itemRepository.save(request.toItem(category, member));
 		saveItemRelations(imageItems, imageChecks, styleItems, item);
 		return Response.toResponse(itemRepository.save(item));
 	}
@@ -53,51 +71,78 @@ public class ItemService {
 	}
 
 	@Transactional
-	public boolean delete(Long itemId) {
+	public boolean delete(Long itemId, Member member) {
+		memberLoginCheck(member);
 		Item item = getItem(itemId);
-		List<ImageItem> imageItems = item.getImageItems();
-		imageItems.stream().map(imageItem -> imageItemService.delete(imageItem.getId()));
+		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
 
-		List<ImageCheck> imageChecks = item.getImageChecks();
-		imageChecks.stream().map(imageItem -> imageCheckService.delete(imageItem.getId()));
+		deleteImageItems(item.getImageItems());
+		deleteImageChecks(item.getImageChecks());
 		itemRepository.delete(item);
-
 		return true;
 	}
 
 	@Transactional
 	public Response update(
 		UpdateRequest request,
-		List<ImageItem> imageItems,
-		List<ImageCheck> imageChecks,
-		Category category,
-		List<StyleItem> styleItems) {
+		List<MultipartFile> imageItemFiles,
+		List<MultipartFile> imageCheckFiles,
+		Member member) {
 
+		memberLoginCheck(member);
 		Item item = getItem(request.getItemId());
+		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
+
+		checkImageFiles(imageItemFiles, imageCheckFiles);
+
+		Category category = categoryService.getCategory(request.getCategory());
+		List<StyleItem> styleItems = styleItemService.create(request.getStyles());
+		List<ImageItem> imageItems = imageItemService.create(awsS3Service.save(imageItemFiles));
+		List<ImageCheck> imageChecks = imageCheckService.create(awsS3Service.save(imageCheckFiles));
+
 		item = request.toItem(item, category);
 
-		List<StyleItem> styleItemsSaved = item.getStyleItems();
-		if (styleItemsSaved != null && styleItemsSaved.size() != 0) {
-			styleItemRepository.deleteAll(styleItemsSaved);
-		}
+		deleteStyleItems(item.getStyleItems());
+		deleteImageItems(item.getImageItems());
+		deleteImageChecks(item.getImageChecks());
 
-		List<ImageItem> imageItemsSaved = item.getImageItems();
-		if (imageItemsSaved != null && imageItemsSaved.size() != 0) {
-			for (ImageItem imageItem : imageItemsSaved) {
-				imageItemService.delete(imageItem);
-			}
-		}
+		saveItemRelations(imageItems, imageChecks, styleItems, item);
 
-		List<ImageCheck> imageChecksSaved = item.getImageChecks();
+		return Response.toResponse(itemRepository.save(item));
+	}
+
+	private void deleteImageChecks(List<ImageCheck> imageChecksSaved) {
 		if (imageChecksSaved != null && imageChecksSaved.size() != 0) {
 			for (ImageCheck imageCheck : imageChecksSaved) {
 				imageCheckService.delete(imageCheck);
 			}
 		}
+	}
 
-		saveItemRelations(imageItems, imageChecks, styleItems, item);
+	private void deleteImageItems(List<ImageItem> imageItemsSaved) {
+		if (imageItemsSaved != null && imageItemsSaved.size() != 0) {
+			for (ImageItem imageItem : imageItemsSaved) {
+				imageItemService.delete(imageItem);
+			}
+		}
+	}
 
-		return Response.toResponse(itemRepository.save(item));
+	private void deleteStyleItems(List<StyleItem> styleItemsSaved) {
+		if (styleItemsSaved != null && styleItemsSaved.size() != 0) {
+			styleItemRepository.deleteAll(styleItemsSaved);
+		}
+	}
+
+	private void checkImageFiles(List<MultipartFile> imageItemFiles,
+		List<MultipartFile> imageCheckFiles) {
+		awsS3Service.check(imageItemFiles);
+		awsS3Service.check(imageCheckFiles);
+	}
+
+	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		if (!memberId.equals(itemMemberId)) {
+			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
+		}
 	}
 
 	private Item getItem(Long itemId) {
@@ -118,5 +163,11 @@ public class ItemService {
 		imageItemRepository.saveAll(imageItems);
 		imageCheckRepository.saveAll(imageChecks);
 		styleItemRepository.saveAll(styleItems);
+	}
+
+	private static void memberLoginCheck(Member member) {
+		if (member == null) {
+			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		}
 	}
 }
