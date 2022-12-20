@@ -28,10 +28,11 @@ public class ImageItemService {
 			if (url == null || url.length() == 0) {
 				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
 			}
-			imageItems.add(imageItemRepository.save(
+			imageItems.add(
 				ImageItem.builder()
 					.url(url)
-					.build()));
+					.build()
+			);
 		}
 
 		return imageItems;

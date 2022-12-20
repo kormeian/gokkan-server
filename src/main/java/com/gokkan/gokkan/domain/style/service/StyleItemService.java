@@ -6,6 +6,8 @@ import com.gokkan.gokkan.domain.style.exception.StyleErrorCode;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.domain.style.repository.StyleRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,16 @@ public class StyleItemService {
 	private final StyleItemRepository styleItemRepository;
 	private final StyleRepository styleRepository;
 
-	@Transactional
-	public StyleItem create(String name) {
-		StyleItem styleItem = StyleItem.builder()
-			.style(getStyle(name))
-			.build();
-		return styleItemRepository.save(styleItem);
+	public List<StyleItem> create(List<String> names) {
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (String name : names) {
+			styleItems.add(
+				StyleItem.builder()
+					.style(getStyle(name))
+					.build()
+			);
+		}
+		return styleItems;
 	}
 
 	@Transactional

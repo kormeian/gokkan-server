@@ -36,12 +36,6 @@ class ImageItemServiceTest {
 	@InjectMocks
 	private ImageItemService imageItemService;
 
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
-	}
-
 	@DisplayName("01_00. save success")
 	@Test
 	public void test_01_00() {
@@ -52,11 +46,10 @@ class ImageItemServiceTest {
 		}
 
 		//when
-		imageItemService.save(urls);
-		verify(imageItemRepository, times(3)).save(imageItemCaptor.capture());
+		List<ImageItem> imageItems = imageItemService.save(urls);
+		verify(imageItemRepository, times(0)).save(imageItemCaptor.capture());
 
 		//then
-		List<ImageItem> imageItems = imageItemCaptor.getAllValues();
 		for (int i = 0; i < urls.size(); i++) {
 			assertEquals(imageItems.get(i).getUrl(), urls.get(i));
 		}
@@ -119,6 +112,12 @@ class ImageItemServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_ITEM);
+	}
+
+	private static ImageItem getImageItem(String url) {
+		return ImageItem.builder()
+			.url(url)
+			.build();
 	}
 
 }
