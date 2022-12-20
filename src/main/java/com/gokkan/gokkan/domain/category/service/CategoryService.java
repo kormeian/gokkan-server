@@ -17,6 +17,12 @@ public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
+	private static void checkParentNameAndChildName(String name, String parent) {
+		if (name.equals(parent)) {
+			throw new RestApiException(CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
+		}
+	}
+
 	@Transactional
 	public CategoryDto.Response create(CategoryDto.CreateRequest request) {
 		checkParentNameAndChildName(request.getName(), request.getParent());
@@ -72,7 +78,6 @@ public class CategoryService {
 		return CategoryDto.Response.toResponse(categoryRepository.save(category));
 	}
 
-
 	public Category getCategory(String categoryName) {
 		return getCategoryByName(categoryName, false);
 	}
@@ -96,11 +101,5 @@ public class CategoryService {
 			: categoryRepository.findByName(name)
 				.orElseThrow(
 					() -> new RestApiException(CategoryErrorCode.NOT_FOUND_CATEGORY));
-	}
-
-	private static void checkParentNameAndChildName(String name, String parent) {
-		if (name.equals(parent)) {
-			throw new RestApiException(CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
-		}
 	}
 }

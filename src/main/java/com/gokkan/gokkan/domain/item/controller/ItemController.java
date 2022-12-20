@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,9 +56,8 @@ public class ItemController {
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageCheckFiles) {
 
-
 		checkBeforeSaveInS3(imageItemFiles, imageCheckFiles);
-    
+
 		Category category = categoryService.getCategory(request.getCategory());
 		List<StyleItem> styleItems = styleItemService.create(request.getStyles());
 		List<ImageItem> imageItems = imageItemService.save(awsS3Service.save(imageItemFiles));

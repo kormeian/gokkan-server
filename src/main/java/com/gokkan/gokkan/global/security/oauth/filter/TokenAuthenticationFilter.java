@@ -1,11 +1,7 @@
 package com.gokkan.gokkan.global.security.oauth.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.exception.errorcode.ErrorCode;
-import com.gokkan.gokkan.global.exception.exception.RestApiException;
-import com.gokkan.gokkan.global.security.oauth.exception.SecurityErrorCode;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import com.gokkan.gokkan.infra.utils.HeaderUtil;
@@ -14,10 +10,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;

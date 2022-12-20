@@ -14,13 +14,13 @@ import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService {
+
 	private static final long THREE_DAYS_MSEC = 259200000;
 	private static final String REFRESH_TOKEN = "refresh_token";
 	private final AppProperties appProperties;
@@ -28,10 +28,11 @@ public class AuthService {
 	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 	private final MemberRepository memberRepository;
 
-	public String newAccessToken(String refreshToken){
+	public String newAccessToken(String refreshToken) {
 		log.info("엑세스 토큰 재발급 시작");
 		// refresh token 으로 DB 확인
-		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new RestApiException(
+		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByRefreshToken(
+			refreshToken).orElseThrow(() -> new RestApiException(
 			AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
 		log.info("리프레시 토큰 유효");
@@ -39,7 +40,7 @@ public class AuthService {
 			memberRefreshToken.getRefreshToken());
 
 		Member member = memberRepository.findByUserId(memberRefreshToken.getUserId());
-		if(member == null) {
+		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		String userId = member.getUserId();

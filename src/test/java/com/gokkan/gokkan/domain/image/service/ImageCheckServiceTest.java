@@ -37,6 +37,19 @@ class ImageCheckServiceTest {
 	@InjectMocks
 	private ImageCheckService imageCheckService;
 
+	private static CreateRequest getCreateRequest(List<String> urls) {
+		return CreateRequest.builder()
+			.urls(urls)
+			.itemId(1L)
+			.build();
+	}
+
+	private static ImageCheck getImageCheck(String url) {
+		return ImageCheck.builder()
+			.url(url)
+			.build();
+	}
+
 	@DisplayName("01_00. save success")
 	@Test
 	public void test_01_00() {
@@ -113,18 +126,5 @@ class ImageCheckServiceTest {
 
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_CHECK);
-	}
-
-	private static CreateRequest getCreateRequest(List<String> urls) {
-		return CreateRequest.builder()
-			.urls(urls)
-			.itemId(1L)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(String url) {
-		return ImageCheck.builder()
-			.url(url)
-			.build();
 	}
 }

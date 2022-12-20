@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.global.security.oauth.exception;
 
-import com.gokkan.gokkan.global.exception.errorcode.ErrorCode;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

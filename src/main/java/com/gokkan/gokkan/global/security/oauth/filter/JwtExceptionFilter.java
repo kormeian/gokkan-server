@@ -10,7 +10,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 
@@ -21,7 +20,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 	이를 통해 JWT 만료 에러와 인증 에러를 따로 잡아낼 수 있다.
 	 */
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+		FilterChain chain) throws ServletException, IOException {
 		try {
 			chain.doFilter(request, response); // JwtAuthenticationFilter로 이동
 		} catch (RestApiException ex) {
@@ -30,14 +30,14 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 		}
 	}
 
-	public void setErrorResponse(HttpServletRequest req, HttpServletResponse res, RestApiException ex) throws IOException {
+	public void setErrorResponse(HttpServletRequest req, HttpServletResponse res,
+		RestApiException ex) throws IOException {
 
 		res.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
 		final Map<String, Object> body = new HashMap<>();
 		body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
 		body.put("error", "Unauthorized");
-		// ex.getMessage() 에는 jwtException을 발생시키면서 입력한 메세지가 들어있다.
 		body.put("message", ex.getErrorCode().getMessage());
 		body.put("path", req.getServletPath());
 		final ObjectMapper mapper = new ObjectMapper();

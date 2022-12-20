@@ -6,7 +6,6 @@ import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -49,6 +49,21 @@ class CategoryServiceTest {
 	@InjectMocks
 	private CategoryService categoryService;
 
+	private static CreateRequest getCreateRequest(String name, String parent) {
+		return CreateRequest.builder()
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+		return UpdateRequest.builder()
+			.id(id)
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
 	@DisplayName("01_01. create root category success already exist root")
 	@Test
 	public void test_01_01() {
@@ -347,21 +362,6 @@ class CategoryServiceTest {
 			.parent(parent)
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
-			.build();
-	}
-
-	private static CreateRequest getCreateRequest(String name, String parent) {
-		return CreateRequest.builder()
-			.parent(parent)
-			.name(name)
-			.build();
-	}
-
-	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
-		return UpdateRequest.builder()
-			.id(id)
-			.parent(parent)
-			.name(name)
 			.build();
 	}
 }
