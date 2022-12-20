@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.domain.member.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
 import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import javax.persistence.Column;
@@ -11,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,61 +22,53 @@ import lombok.Setter;
 @Entity
 public class Member {
 
-	@JsonIgnore
 	@Id
 	@Column(name = "member_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "USER_ID", length = 64, unique = true)
+	@Column(name = "user_id", length = 64, unique = true)
 	@NotNull
-	@Size(max = 64)
 	private String userId;
 
-	@Column(name = "name", length = 100)
+	@Column(unique = true)
 	@NotNull
-	@Size(max = 100)
-	private String name;
+	private String nickName;
 
-	@Column(name = "EMAIL", length = 512, unique = true)
+	@Column(unique = true)
 	@NotNull
-	@Size(max = 512)
 	private String email;
 
-	@Column(name = "PROFILE_IMAGE_URL", length = 512)
-	@NotNull
-	@Size(max = 512)
 	private String profileImageUrl;
 
 	private String phoneNumber;
 	private String cardNumber;
 	private String address;
 
-	@Column(name = "PROVIDER_TYPE", length = 20)
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private ProviderType providerType;
 
-	@Column(name = "ROLE", length = 20)
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private Role role;
 
 	@Builder
 	public Member(
-		@NotNull @Size(max = 64) String userId,
-		@NotNull @Size(max = 100) String name,
-		@NotNull @Size(max = 512) String email,
-		@NotNull @Size(max = 512) String profileImageUrl,
+		@NotNull String userId,
+		@NotNull String nickName,
+		@NotNull String email,
+		@NotNull String profileImageUrl,
 		@NotNull ProviderType providerType,
 		@NotNull Role role) {
 
 		this.userId = userId;
-		this.name = name;
+		this.nickName = nickName;
 		this.email = email != null ? email : "NO_EMAIL";
 		this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
 		this.providerType = providerType;
 		this.role = role;
 	}
+
 }
 

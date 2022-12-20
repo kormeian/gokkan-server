@@ -51,7 +51,7 @@ public class MemberController {
 	@Operation(summary = "로그인한 회원 정보 조회", description = "로그인한 회원 정보 조회")
 	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseDto.class)))
 	public ResponseEntity<ResponseDto> getUser(@CurrentMember Member member) {
-		log.info("멤버 조회 요청 이름 : " + member.getName());
+		log.info("멤버 조회 요청 이름 : " + member.getNickName());
 
 		return ResponseEntity.ok(ResponseDto.fromEntity(member));
 	}
