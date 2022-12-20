@@ -36,8 +36,7 @@ class ExpertInfoServiceTest {
 	@InjectMocks
 	private ExpertInfoService expertInfoService;
 
-	final static Member member = Member.WithIdBuilder()
-		.id(1L)
+	final static Member member = Member.builder()
 		.nickName("test")
 		.build();
 
@@ -217,8 +216,7 @@ class ExpertInfoServiceTest {
 	}
 
 	private ExpertInfo getExpertInfo() {
-		return ExpertInfo.WithIdBuilder()
-			.id(1L)
+		return ExpertInfo.builder()
 			.name("name")
 			.info("info")
 			.member(member)
