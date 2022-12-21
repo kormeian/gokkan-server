@@ -45,7 +45,7 @@ public class Item {
 	private String name;
 
 	@Column(length = 10)
-	private long startPrice;
+	private Long startPrice;
 
 	@Column(length = 10)
 	@Enumerated(EnumType.STRING)
