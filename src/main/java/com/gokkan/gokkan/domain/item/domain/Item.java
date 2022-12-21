@@ -45,7 +45,7 @@ public class Item {
 	private String name;
 
 	@Column(length = 10)
-	private long startPrice;
+	private Long startPrice;
 
 	@Column(length = 10)
 	@Enumerated(EnumType.STRING)
@@ -77,6 +77,7 @@ public class Item {
 	private String brand;
 	@Column(length = 4)
 	private int productionYear;
+	private String thumbnail;
 	private boolean assessed;
 
 	private LocalDateTime created;

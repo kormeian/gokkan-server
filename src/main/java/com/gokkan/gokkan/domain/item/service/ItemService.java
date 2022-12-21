@@ -16,12 +16,14 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
+import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -120,6 +122,19 @@ public class ItemService {
 		saveItemRelations(imageItems, imageChecks, styleItems, item);
 
 		return Response.toResponse(itemRepository.save(item));
+	}
+
+
+	public Long createTemporary(Member member) {
+		memberLoginCheck(member);
+		return itemRepository.save(
+				Item.builder()
+					.member(member)
+					.state(State.TEMPORARY)
+					.created(LocalDateTime.now())
+					.updated(LocalDateTime.now())
+					.build())
+			.getId();
 	}
 
 	private void deleteImageChecks(List<ImageCheck> imageChecksSaved) {

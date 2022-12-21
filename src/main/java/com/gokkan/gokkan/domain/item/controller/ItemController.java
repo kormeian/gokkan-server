@@ -86,4 +86,15 @@ public class ItemController {
 		return ResponseEntity.ok(
 			itemService.update(request, imageItemFiles, imageCheckFiles, member));
 	}
+
+	@Operation(summary = "상품 임시 생성", description = "상품 임시 생성, 상품 아이디만 반환")
+	@ApiResponse(responseCode = "201", description = "상품 임시 생성, 상품 아이디만 반환")
+	@PostMapping("/temp")
+	@Transactional
+	public ResponseEntity<?> create(
+		@Parameter(hidden = true)
+		@CurrentMember Member member) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(itemService.createTemporary(member));
+	}
 }
