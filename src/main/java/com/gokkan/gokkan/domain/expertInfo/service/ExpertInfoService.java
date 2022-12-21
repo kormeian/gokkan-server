@@ -31,7 +31,7 @@ public class ExpertInfoService {
 		}
 		expertInfoRepository.save(ExpertInfo.builder()
 			.member(member)
-			.name(requestCreateExpertInfoByMemberId.getName())
+			.name(member.getNickName())
 			.info(requestCreateExpertInfoByMemberId.getInfo())
 			.build());
 	}
@@ -47,7 +47,7 @@ public class ExpertInfoService {
 		}
 		expertInfoRepository.save(ExpertInfo.builder()
 			.member(member)
-			.name(requestCreateExpertInfoByNickName.getName())
+			.name(member.getNickName())
 			.info(requestCreateExpertInfoByNickName.getInfo())
 			.build());
 	}

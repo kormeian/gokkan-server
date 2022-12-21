@@ -13,14 +13,11 @@ public class ExpertInfoDto {
 
 		@NotNull
 		private Long memberId;
-		@NotNull
-		private String name;
 		private String info;
 
 		@Builder
-		public RequestCreateExpertInfoByMemberId(Long memberId, String name, String info) {
+		public RequestCreateExpertInfoByMemberId(Long memberId, String info) {
 			this.memberId = memberId;
-			this.name = name;
 			this.info = info;
 		}
 	}
@@ -30,14 +27,11 @@ public class ExpertInfoDto {
 
 		@NotNull
 		private String nickName;
-		@NotNull
-		private String name;
 		private String info;
 
 		@Builder
-		public RequestCreateExpertInfoByNickName(String nickName, String name, String info) {
+		public RequestCreateExpertInfoByNickName(String nickName, String info) {
 			this.nickName = nickName;
-			this.name = name;
 			this.info = info;
 		}
 	}

@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -32,7 +33,7 @@ public class ExpertInfo {
 	@OneToOne(fetch = FetchType.LAZY)
 	private Member member;
 
-	@JoinColumn(name = "expert_style_id")
+	@BatchSize(size = 10)
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<ExpertStyle> expertStyles = new ArrayList<>();
 
@@ -46,8 +47,15 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-
 	public void updateInfo(String info) {
 		this.info = info;
+	}
+
+	public void addExpertStyle(ExpertStyle expertStyle) {
+		this.expertStyles.add(expertStyle);
+	}
+
+	public void setExpertStyles(List<ExpertStyle> expertStyles) {
+		this.expertStyles = expertStyles;
 	}
 }
