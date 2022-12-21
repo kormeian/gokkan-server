@@ -1,6 +1,9 @@
 package com.gokkan.gokkan.domain.expertInfo.domain;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,6 +31,10 @@ public class ExpertInfo {
 	@JoinColumn(name = "member_id")
 	@OneToOne(fetch = FetchType.LAZY)
 	private Member member;
+
+	@JoinColumn(name = "expert_style_id")
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<ExpertStyle> expertStyles = new ArrayList<>();
 
 	private String name;
 	private String info;

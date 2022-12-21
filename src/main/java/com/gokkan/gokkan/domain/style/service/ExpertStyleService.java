@@ -75,6 +75,7 @@ public class ExpertStyleService {
 		ExpertInfo expertInfo = expertInfoRepository.findById(expertInfoId)
 			.orElseThrow(() -> new RestApiException(
 				ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
+		//TODO: info에서 스타일 리스트 받기
 		List<String> allByExpertInfo = expertStyleRepository.findAllByExpertInfo(expertInfo)
 			.stream().map(
 				ExpertStyle::getStyleName).collect(Collectors.toList());
