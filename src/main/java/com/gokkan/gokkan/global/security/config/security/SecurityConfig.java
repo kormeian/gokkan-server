@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.security.config.properties.AppProperties;
 import com.gokkan.gokkan.global.security.config.properties.CorsProperties;
 import com.gokkan.gokkan.global.security.oauth.exception.RestAuthenticationEntryPoint;
+import com.gokkan.gokkan.global.security.oauth.filter.JwtExceptionFilter;
 import com.gokkan.gokkan.global.security.oauth.filter.TokenAuthenticationFilter;
 import com.gokkan.gokkan.global.security.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.gokkan.gokkan.global.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
@@ -88,6 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.addFilterBefore(tokenAuthenticationFilter(),
 			UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtExceptionFilter(),
+			tokenAuthenticationFilter().getClass());
 
 	}
 
@@ -114,6 +117,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public TokenAuthenticationFilter tokenAuthenticationFilter() {
 		return new TokenAuthenticationFilter(tokenProvider, memberRepository);
+	}
+
+	@Bean
+	public JwtExceptionFilter jwtExceptionFilter() {
+		return new JwtExceptionFilter();
 	}
 
 	/*

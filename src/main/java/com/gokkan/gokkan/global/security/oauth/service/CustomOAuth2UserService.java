@@ -76,8 +76,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	}
 
 	private Member updateUser(Member member, OAuth2UserInfo userInfo) {
-		if (userInfo.getName() != null && !member.getNickName().equals(userInfo.getName())) {
-			member.setNickName(userInfo.getName());
+		if (userInfo.getName() != null && !member.getName().equals(userInfo.getName())) {
+			member.setName(userInfo.getName());
 		}
 
 		if (userInfo.getImageUrl() != null && !member.getProfileImageUrl()

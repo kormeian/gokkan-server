@@ -17,6 +17,7 @@ import com.gokkan.gokkan.domain.style.repository.StyleRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
 
-	private final String name = "test style";
+	private final String name1 = "test style1";
+	private final String name2 = "test style2";
+	private final List<String> names = List.of(name1, name2);
 	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
@@ -37,12 +40,6 @@ class StyleItemServiceTest {
 	private StyleRepository styleRepository;
 	@InjectMocks
 	private StyleItemService styleItemService;
-
-	private static Style getStyle(String name) {
-		return Style.builder()
-			.name(name)
-			.build();
-	}
 
 	private static Item getItem() {
 		return Item.builder()
@@ -73,18 +70,16 @@ class StyleItemServiceTest {
 	@Test
 	public void test_01_00() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleRepository.findByName(any())).willReturn(Optional.of(style));
-		given(styleItemRepository.save(any())).willReturn(getStyleItem(style));
 
 		//when
-		styleItemService.create(name);
+		List<StyleItem> styleItems = styleItemService.create(names);
 
-		verify(styleItemRepository, times(1)).save(styleItemCaptor.capture());
+		verify(styleItemRepository, times(0)).save(styleItemCaptor.capture());
 
 		//then
-		StyleItem styleItem = styleItemCaptor.getValue();
-		assertEquals(styleItem.getStyle().getName(), name);
+		assertEquals(styleItems.get(0).getStyle().getName(), names.get(0));
 	}
 
 	@DisplayName("01_01. create fail not found style")
@@ -95,7 +90,7 @@ class StyleItemServiceTest {
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class,
-			() -> styleItemService.create("test style"));
+			() -> styleItemService.create(names));
 
 		//then
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE);
@@ -105,7 +100,7 @@ class StyleItemServiceTest {
 	@Test
 	public void test_02_00() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleItemRepository.findById(any())).willReturn(
 			Optional.of(getStyleItem(style)));
 		given(styleRepository.findByName(any())).willReturn(Optional.of(getStyle("update")));
@@ -125,7 +120,7 @@ class StyleItemServiceTest {
 	@Test
 	public void test_02_01() {
 		//given
-		Style style = getStyle(name);
+		Style style = getStyle(name1);
 		given(styleItemRepository.findById(any())).willReturn(
 			Optional.of(getStyleItem(style)));
 		given(styleRepository.findByName(any())).willReturn(Optional.empty());
@@ -154,11 +149,16 @@ class StyleItemServiceTest {
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE_ITEM);
 	}
 
+	private Style getStyle(String styleName) {
+		return Style.builder()
+			.name(styleName)
+			.build();
+	}
+
 	private StyleItem getStyleItem(Style style) {
 		return StyleItem.builder()
 			.style(style)
 			.item(getItem())
 			.build();
 	}
-
 }

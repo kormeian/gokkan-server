@@ -60,11 +60,10 @@ class ImageCheckServiceTest {
 		}
 
 		//when
-		imageCheckService.save(urls);
-		verify(imageCheckRepository, times(3)).save(imageCheckCaptor.capture());
+		List<ImageCheck> imageChecks = imageCheckService.save(urls);
+		verify(imageCheckRepository, times(0)).save(imageCheckCaptor.capture());
 
 		//then
-		List<ImageCheck> imageChecks = imageCheckCaptor.getAllValues();
 		for (int i = 0; i < urls.size(); i++) {
 			assertEquals(imageChecks.get(i).getUrl(), urls.get(i));
 		}
@@ -128,5 +127,4 @@ class ImageCheckServiceTest {
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_CHECK);
 	}
-
 }

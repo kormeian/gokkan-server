@@ -14,14 +14,16 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(
 		HttpServletRequest request,
 		HttpServletResponse response,
-		AuthenticationException authException
-	) throws IOException {
+		AuthenticationException authException) throws IOException {
+
 		authException.printStackTrace();
-		log.info("Responding with unauthorized error. Message := {}", authException.getMessage());
+		log.info("Responding with unauthorized error. Message := {}",
+			authException.getMessage());
 		response.sendError(
 			HttpServletResponse.SC_UNAUTHORIZED,
 			authException.getLocalizedMessage()
 		);
+
 	}
 }
 

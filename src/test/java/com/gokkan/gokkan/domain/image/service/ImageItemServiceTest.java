@@ -52,11 +52,10 @@ class ImageItemServiceTest {
 		}
 
 		//when
-		imageItemService.save(urls);
-		verify(imageItemRepository, times(3)).save(imageItemCaptor.capture());
+		List<ImageItem> imageItems = imageItemService.save(urls);
+		verify(imageItemRepository, times(0)).save(imageItemCaptor.capture());
 
 		//then
-		List<ImageItem> imageItems = imageItemCaptor.getAllValues();
 		for (int i = 0; i < urls.size(); i++) {
 			assertEquals(imageItems.get(i).getUrl(), urls.get(i));
 		}
