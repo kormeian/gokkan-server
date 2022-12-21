@@ -1,12 +1,9 @@
 package com.gokkan.gokkan.domain.expertCareer.controller;
 
-import com.gokkan.gokkan.domain.expertCareer.domain.ExpertCareer;
 import com.gokkan.gokkan.domain.expertCareer.domain.dto.ExpertCareerDto.RequestCreateExpertCareer;
 import com.gokkan.gokkan.domain.expertCareer.domain.dto.ExpertCareerDto.RequestUpdateExpertCareer;
 import com.gokkan.gokkan.domain.expertCareer.domain.dto.ExpertCareerDto.ResponseGetExpertCareer;
 import com.gokkan.gokkan.domain.expertCareer.service.ExpertCareerService;
-import com.gokkan.gokkan.domain.expertInfo.domain.dto.ExpertInfoDto.RequestCreateExpertInfoByMemberId;
-import com.gokkan.gokkan.domain.expertInfo.domain.dto.ExpertInfoDto.ResponseGetExpertInfo;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -59,7 +55,7 @@ public class ExpertCareerController {
 	@Operation(summary = "내 전문가 커리어 조회", description = "내 전문가 커리어 조회")
 	public ResponseEntity<List<ResponseGetExpertCareer>> getExpertCareer(
 		@Parameter(hidden = true) @CurrentMember Member member) {
-		return ResponseEntity.ok(expertCareerService.getExpertCareer(member));
+		return ResponseEntity.ok(expertCareerService.getMyExpertCareer(member));
 	}
 
 	@DeleteMapping("/my-career")
