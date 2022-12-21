@@ -31,6 +31,8 @@ public class Member {
 	@NotNull
 	private String userId;
 
+	private String name;
+
 	@Column(unique = true)
 	@NotNull
 	private String nickName;
