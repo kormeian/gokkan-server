@@ -31,16 +31,16 @@ public class ExpertCareerDto {
 	@Getter
 	@Schema(name = "전문가 커리어 수정 요청", description = "전문가 커리어 수정 요청")
 	public static class RequestUpdateExpertCareer {
-		private final Long expertInfoId;
+		private final Long expertCareerId;
 		private final LocalDate startDate;
 		private final LocalDate endDate;
 		private final String companyName;
 		private final String position;
 
 		@Builder
-		public RequestUpdateExpertCareer(Long expertInfoId, LocalDate startDate, LocalDate endDate,
+		public RequestUpdateExpertCareer(Long expertCareerId, LocalDate startDate, LocalDate endDate,
 			String companyName, String position) {
-			this.expertInfoId = expertInfoId;
+			this.expertCareerId = expertCareerId;
 			this.startDate = startDate;
 			this.endDate = endDate;
 			this.companyName = companyName;
