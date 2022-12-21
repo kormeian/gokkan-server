@@ -43,4 +43,11 @@ public class ExpertCareer {
 		this.companyName = companyName;
 		this.position = position;
 	}
+
+	public void update(LocalDate startDate, LocalDate endDate, String companyName, String position) {
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.companyName = companyName;
+		this.position = position;
+	}
 }
