@@ -45,6 +45,17 @@ public class ItemService {
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
 
+	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		if (!memberId.equals(itemMemberId)) {
+			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
+		}
+	}
+
+	private static void memberLoginCheck(Member member) {
+		if (member == null) {
+			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		}
+	}
 
 	@Transactional
 	public Response create(
@@ -154,12 +165,6 @@ public class ItemService {
 		awsS3Service.check(imageCheckFiles);
 	}
 
-	private static void memberMatchCheck(String memberId, String itemMemberId) {
-		if (!memberId.equals(itemMemberId)) {
-			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
-		}
-	}
-
 	private Item getItem(Long itemId) {
 		return itemRepository.findById(itemId)
 			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
@@ -178,11 +183,5 @@ public class ItemService {
 		imageItemRepository.saveAll(imageItems);
 		imageCheckRepository.saveAll(imageChecks);
 		styleItemRepository.saveAll(styleItems);
-	}
-
-	private static void memberLoginCheck(Member member) {
-		if (member == null) {
-			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
-		}
 	}
 }

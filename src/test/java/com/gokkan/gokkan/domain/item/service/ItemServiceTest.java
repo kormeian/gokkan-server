@@ -55,6 +55,25 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
 
+	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
+	Category root = Category.builder()
+		.id(0L)
+		.parent(null)
+		.level(0)
+		.name("root")
+		.children(new ArrayList<>())
+		.build();
+	List<ImageItem> imageItems = List.of(getImageItem("item1"));
+	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
+	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
+	List<String> styleNames = List.of("style1", "style2");
+	String png = "png";
+	Member member = Member.builder()
+		.userId("userId")
+		.email("member@email.com")
+		.name("name")
+		.providerType(ProviderType.KAKAO)
+		.build();
 	@Mock
 	private ItemRepository itemRepository;
 	@Mock
@@ -71,11 +90,21 @@ class ItemServiceTest {
 	private ImageItemService imageItemService;
 	@Mock
 	private ImageCheckService imageCheckService;
-
 	@InjectMocks
 	private ItemService itemService;
 
-	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
+	private static List<StyleItem> getStyleItems(List<String> styles) {
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (String style : styles) {
+			styleItems.add(StyleItem.builder()
+				.style(Style.builder()
+					.name(style)
+					.build()
+				)
+				.build());
+		}
+		return styleItems;
+	}
 
 	@DisplayName("01_00. create success")
 	@Test
