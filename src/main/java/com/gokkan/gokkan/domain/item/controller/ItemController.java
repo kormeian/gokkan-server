@@ -45,7 +45,6 @@ public class ItemController {
 		@RequestPart List<MultipartFile> imageCheckFiles,
 		@Parameter(hidden = true)
 		@CurrentMember Member member) {
-
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(itemService.create(request, imageItemFiles, imageCheckFiles, member));
 	}

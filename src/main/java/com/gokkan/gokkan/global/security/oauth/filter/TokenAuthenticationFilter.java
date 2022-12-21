@@ -2,8 +2,6 @@ package com.gokkan.gokkan.global.security.oauth.filter;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.exception.exception.RestApiException;
-import com.gokkan.gokkan.global.security.oauth.exception.SecurityErrorCode;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import com.gokkan.gokkan.infra.utils.HeaderUtil;
@@ -33,17 +31,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 		String tokenStr = HeaderUtil.getAccessToken(request);
 		AuthToken token = tokenProvider.convertAuthToken(tokenStr);
-		try {
-			if (token.validate()) {
-				log.info("토큰 유효 멤버 조회");
-				Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
-				Authentication authentication = tokenProvider.getAuthentication(token, member);
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
-		} catch (RestApiException e) {
-			if (e.getErrorCode().equals(SecurityErrorCode.EXPIRED_JWT_TOKEN)) {
-				request.setAttribute("exception", e.getErrorCode().getMessage());
-			}
+		if (token.validate()) {
+			log.info("토큰 유효 멤버 조회");
+			Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
+			Authentication authentication = tokenProvider.getAuthentication(token, member);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
 
 		filterChain.doFilter(request, response);

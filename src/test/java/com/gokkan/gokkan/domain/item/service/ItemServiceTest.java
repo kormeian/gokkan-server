@@ -424,28 +424,6 @@ class ItemServiceTest {
 			.build();
 	}
 
-	private static UpdateRequest getUpdateRequest() {
-		return ItemDto.UpdateRequest.builder()
-			.itemId(1L)
-			.name("update name")
-			.category("update category")
-			.startPrice(200)
-			.length(200L)
-			.width(200L)
-			.depth(200L)
-			.height(200L)
-			.material("철제")
-			.conditionGrade("update conditionGrade")
-			.conditionDescription("update conditionDescription")
-			.text("update text")
-			.madeIn("update madeIn")
-			.designer("update designer")
-			.brand("update brand")
-			.productionYear(1023)
-			.styles(List.of("update style 1"))
-			.build();
-	}
-
 	private Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks) {
 		return Item.builder()
 			.name("test name")
@@ -471,27 +449,6 @@ class ItemServiceTest {
 			.imageItems(new ArrayList<>(imageItems))
 			.imageChecks(new ArrayList<>(imageChecks))
 			.styleItems(new ArrayList<>(getStyleItems(styleNames)))
-			.build();
-	}
-
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(String url) {
-		return ImageCheck.builder()
-			.url(url)
-			.build();
-	}
-
-	private static Category getCategory(String name, Category parent) {
-		return Category.builder()
-			.name(name)
-			.parent(parent)
-			.children(new ArrayList<>())
-			.level(parent.getLevel() + 1)
 			.build();
 	}
 
