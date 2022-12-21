@@ -2,11 +2,8 @@ package com.gokkan.gokkan.domain.expertComment.domain;
 
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
 import com.gokkan.gokkan.domain.item.domain.Item;
-import com.gokkan.gokkan.domain.item.type.State;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -42,7 +39,8 @@ public class ExpertComment {
 	private Item item;
 
 	@Builder
-	public ExpertComment(String comment, Long minPrice, Long maxPrice, ExpertInfo expertInfo, Item item) {
+	public ExpertComment(String comment, Long minPrice, Long maxPrice, ExpertInfo expertInfo,
+		Item item) {
 		this.comment = comment;
 		this.minPrice = minPrice;
 		this.maxPrice = maxPrice;

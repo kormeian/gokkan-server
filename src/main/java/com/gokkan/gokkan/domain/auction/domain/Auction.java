@@ -41,7 +41,8 @@ public class Auction {
 	private ExpertComment expertComment;
 
 	@Builder
-	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice, Long currentPrice, AuctionStatus auctionStatus, ExpertComment expertComment) {
+	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice,
+		Long currentPrice, AuctionStatus auctionStatus, ExpertComment expertComment) {
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 		this.startPrice = startPrice;

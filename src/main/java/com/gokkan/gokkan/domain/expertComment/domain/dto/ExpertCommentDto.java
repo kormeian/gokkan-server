@@ -20,7 +20,8 @@ public class ExpertCommentDto {
 		private final State status;
 
 		@Builder
-		public RequestCreateExpertComment(Long itemId, String comment, Long minPrice, Long maxPrice, State status) {
+		public RequestCreateExpertComment(Long itemId, String comment, Long minPrice, Long maxPrice,
+			State status) {
 			this.itemId = itemId;
 			this.comment = comment;
 			this.minPrice = minPrice;
@@ -41,7 +42,7 @@ public class ExpertCommentDto {
 	}
 
 	@Getter
-	public static class ResponseExpertComment{
+	public static class ResponseExpertComment {
 
 		private final Long itemId;
 		private final String itemName;

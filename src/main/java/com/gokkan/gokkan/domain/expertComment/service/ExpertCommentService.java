@@ -21,7 +21,6 @@ import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,8 @@ public class ExpertCommentService {
 		}
 		ExpertInfo expertInfo = expertInfoRepository.findByMember(member)
 			.orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-		log.info("전문가 정보 아이디 : " + expertInfo.getId() + "아이템 아이디 : " + requestCreateExpertComment.getItemId());
+		log.info("전문가 정보 아이디 : " + expertInfo.getId() + "아이템 아이디 : "
+			+ requestCreateExpertComment.getItemId());
 		Item item = itemRepository.findById(requestCreateExpertComment.getItemId())
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM));
 		State requestState = requestCreateExpertComment.getStatus();
@@ -72,7 +72,8 @@ public class ExpertCommentService {
 		log.info("전문가 코멘트 조회");
 		ExpertInfo expertInfo = expertInfoRepository.findById(expertInfoId)
 			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
-		List<ExpertComment> expertComments = expertCommentRepository.findAllByExpertInfo(expertInfo);
+		List<ExpertComment> expertComments = expertCommentRepository.findAllByExpertInfo(
+			expertInfo);
 		//TODO : DTO로 변환
 		return new ArrayList<>();
 	}
