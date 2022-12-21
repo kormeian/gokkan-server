@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/expertInfo")
+@RequestMapping("/api/v1/expert/info")
 @Tag(name = "전문가 정보 컨트롤러", description = "전문가 정보 컨트롤러")
 @RequiredArgsConstructor
 public class ExpertInfoController {
@@ -38,7 +38,7 @@ public class ExpertInfoController {
 		expertInfoService.createExpertInfoByMemberId(requestCreateExpertInfoByMemberId);
 	}
 
-	@PostMapping("/nickName")
+	@PostMapping("/nick-name")
 	@Operation(summary = "전문가 정보 생성 (멤버 닉네임)", description = "전문가 정보 생성 (멤버 닉네임)")
 	public void createExpertInfoByName(
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestCreateExpertInfoByNickName.class)))
@@ -46,7 +46,7 @@ public class ExpertInfoController {
 		expertInfoService.createExpertInfoByNickName(requestCreateExpertInfoByNickName);
 	}
 
-	@PatchMapping("/myInfo")
+	@PatchMapping("/my-info")
 	@Operation(summary = "내 전문가 정보 수정", description = "내 전문가 정보 수정")
 	public void updateExpertInfo(
 		@Parameter(hidden = true) @CurrentMember Member member,
@@ -54,7 +54,7 @@ public class ExpertInfoController {
 		expertInfoService.updateExpertInfo(member, info);
 	}
 
-	@GetMapping("/myInfo")
+	@GetMapping("/my-info")
 	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseGetExpertInfo.class)))
 	@Operation(summary = "내 전문가 정보 조회", description = "내 전문가 정보 조회")
 	public ResponseEntity<ResponseGetExpertInfo> getExpertInfo(
