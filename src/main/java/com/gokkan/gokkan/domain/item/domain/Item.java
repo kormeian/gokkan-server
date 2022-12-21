@@ -77,6 +77,7 @@ public class Item {
 	private String brand;
 	@Column(length = 4)
 	private int productionYear;
+	private String thumbnail;
 	private boolean assessed;
 
 	private LocalDateTime created;
