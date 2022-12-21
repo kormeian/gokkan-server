@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum State {
-	CLOSED("마감"),
 	RETURN("반려"),
-	ASSESSING("감정중"),
-	AUCTION("경매중"),
+	ASSESSING("감정 대기"),
+	COMPLETE("감정 완료"),
+	TEMPORARY("임시 저장"),
 	;
 
 	private final String description;
