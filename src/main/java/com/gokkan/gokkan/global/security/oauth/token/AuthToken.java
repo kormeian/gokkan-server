@@ -75,9 +75,9 @@ public class AuthToken {
 			throw new RestApiException(SecurityErrorCode.UNSUPPORTED_JWT_TOKEN);
 		} catch (IllegalArgumentException e) {
 			log.error("JWT token compact of handler are invalid.");
-			throw new RestApiException(SecurityErrorCode.ILLEGAL_ARGUMENT_JWT_TOKEN);
+			//throw new RestApiException(SecurityErrorCode.ILLEGAL_ARGUMENT_JWT_TOKEN);
 		}
-		//return null;
+		return null;
 	}
 
 	public Claims getExpiredTokenClaims() {
