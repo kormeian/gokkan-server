@@ -36,7 +36,7 @@ public class ItemDto {
 		private String name;
 
 		@NotNull
-		private long startPrice;
+		private Long startPrice;
 
 		@NotNull
 		private String category;
@@ -108,41 +108,26 @@ public class ItemDto {
 
 		@NotNull
 		private Long itemId;
-		@NotNull
 		private String name;
 
-		@NotNull
 		private long startPrice;
 
-		@NotNull
 		private String category;
 
-		@NotNull
 		private List<String> styles;
 
-		@NotNull
 		private Long length;
-		@NotNull
 		private Long width;
-		@NotNull
 		private Long depth;
-		@NotNull
 		private Long height;
-		@NotNull
 		private String material;
 
-		@NotNull
 		private String conditionGrade;
-		@NotNull
 		private String conditionDescription;
-		@NotNull
 		private String text;
 
-		@NotNull
 		private String madeIn;
-		@NotNull
 		private String designer;
-		@NotNull
 		private String brand;
 		@NotNull
 		private int productionYear;

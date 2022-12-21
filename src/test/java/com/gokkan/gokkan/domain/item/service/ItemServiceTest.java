@@ -123,7 +123,6 @@ class ItemServiceTest {
 		assertEquals(item.getDesigner(), createRequest.getDesigner());
 		assertEquals(item.getBrand(), createRequest.getBrand());
 		assertEquals(item.getProductionYear(), createRequest.getProductionYear());
-		assertFalse(item.isAssessed());
 
 		assertEquals(item.getImageChecks().size(), 2);
 		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
@@ -329,7 +328,6 @@ class ItemServiceTest {
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
-		assertFalse(item.isAssessed());
 
 		assertEquals(item.getImageItems().size(), 2);
 		assertEquals(item.getImageItems().get(0).getUrl(), imageItems.get(0).getUrl());
@@ -403,24 +401,75 @@ class ItemServiceTest {
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
 	}
 
-	private CreateRequest getCreateRequest() {
-		return ItemDto.CreateRequest.builder()
-			.name("test name")
-			.category("test category")
-			.startPrice(100)
-			.length(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.styles(styleNames)
+	@DisplayName("05_00. create temporary success")
+	@Test
+	public void test_05_00(){
+	    //given
+		given(itemRepository.save(any())).willReturn(
+			Item.builder().id(1L).member(member).state(State.TEMPORARY).build());
+	    //when
+		itemService.createTemporary(member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
+
+	    //then
+		Item item = itemCaptor.getValue();
+		assertEquals(item.getMember().getUserId(), member.getUserId());
+		assertEquals(item.getState(), State.TEMPORARY);
+	}
+
+	@DisplayName("05_01. create temporary fail not login")
+	@Test
+	public void test_05_01(){
+		//given
+
+		//when
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.createTemporary(null));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
+	}
+
+	Category root = Category.builder()
+		.id(0L)
+		.parent(null)
+		.level(0)
+		.name("root")
+		.children(new ArrayList<>())
+		.build();
+	List<ImageItem> imageItems = List.of(getImageItem("item1"));
+	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
+	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
+
+	List<String> styleNames = List.of("style1", "style2");
+
+	String png = "png";
+
+	Member member = Member.builder()
+		.userId("userId")
+		.email("member@email.com")
+		.name("name")
+		.providerType(ProviderType.KAKAO)
+		.build();
+
+	private static Category getCategory(String name, Category parent) {
+		return Category.builder()
+			.name(name)
+			.parent(parent)
+			.children(new ArrayList<>())
+			.level(parent.getLevel() + 1)
+			.build();
+	}
+
+	private static ImageItem getImageItem(String url) {
+		return ImageItem.builder()
+			.url(url)
+			.build();
+	}
+
+	private static ImageCheck getImageCheck(String url) {
+		return ImageCheck.builder()
+			.url(url)
 			.build();
 	}
 
@@ -429,7 +478,7 @@ class ItemServiceTest {
 			.name("test name")
 			.member(member)
 			.category(getCategory("test category", root))
-			.startPrice(100)
+			.startPrice(100L)
 			.length(100L)
 			.width(100L)
 			.depth(100L)
@@ -472,28 +521,6 @@ class ItemServiceTest {
 		return styleItems;
 	}
 
-	Category root = Category.builder()
-		.id(0L)
-		.parent(null)
-		.level(0)
-		.name("root")
-		.children(new ArrayList<>())
-		.build();
-	List<ImageItem> imageItems = List.of(getImageItem("item1"));
-	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
-	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
-
-	List<String> styleNames = List.of("style1", "style2");
-
-	String png = "png";
-
-	Member member = Member.builder()
-		.userId("userId")
-		.email("member@email.com")
-		.name("name")
-		.providerType(ProviderType.KAKAO)
-		.build();
-
 	private List<MultipartFile> getMultipartFiles(String extension) throws IOException {
 		List<MultipartFile> multipartFile = new ArrayList<>();
 		for (int i = 1; i <= 2; i++) {
@@ -502,5 +529,49 @@ class ItemServiceTest {
 			multipartFile.add(new MockMultipartFile(String.format("%d", i), file, extension, fis));
 		}
 		return multipartFile;
+	}
+
+
+	private CreateRequest getCreateRequest() {
+		return ItemDto.CreateRequest.builder()
+			.name("test name")
+			.category("test category")
+			.startPrice(100L)
+			.length(100L)
+			.width(100L)
+			.depth(100L)
+			.height(100L)
+			.material("나무")
+			.conditionGrade("test conditionGrade")
+			.conditionDescription("test conditionDescription")
+			.text("test text")
+			.madeIn("test madeIn")
+			.designer("test designer")
+			.brand("test brand")
+			.productionYear(2023)
+			.styles(styleNames)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest() {
+		return ItemDto.UpdateRequest.builder()
+			.itemId(1L)
+			.name("update name")
+			.category("update category")
+			.startPrice(200)
+			.length(200L)
+			.width(200L)
+			.depth(200L)
+			.height(200L)
+			.material("철제")
+			.conditionGrade("update conditionGrade")
+			.conditionDescription("update conditionDescription")
+			.text("update text")
+			.madeIn("update madeIn")
+			.designer("update designer")
+			.brand("update brand")
+			.productionYear(1023)
+			.styles(List.of("update style 1"))
+			.build();
 	}
 }

@@ -44,7 +44,7 @@ class StyleItemServiceTest {
 	private static Item getItem() {
 		return Item.builder()
 			.name("test name")
-			.startPrice(100)
+			.startPrice(100L)
 			.length(100L)
 			.width(100L)
 			.depth(100L)
@@ -58,7 +58,6 @@ class StyleItemServiceTest {
 			.brand("test brand")
 			.productionYear(2023)
 			.state(State.ASSESSING)
-			.assessed(false)
 			.created(LocalDateTime.now())
 			.updated(LocalDateTime.now())
 			.imageItems(new ArrayList<>())
