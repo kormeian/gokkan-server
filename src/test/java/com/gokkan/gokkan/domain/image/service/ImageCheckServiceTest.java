@@ -36,13 +36,6 @@ class ImageCheckServiceTest {
 	@InjectMocks
 	private ImageCheckService imageCheckService;
 
-	private static CreateRequest getCreateRequest(List<String> urls) {
-		return CreateRequest.builder()
-			.urls(urls)
-			.itemId(1L)
-			.build();
-	}
-
 	private static ImageCheck getImageCheck(String url) {
 		return ImageCheck.builder()
 			.url(url)
