@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	Member findByUserId(String userId);
+
 	Optional<Member> findByNickName(String nickName);
 
 	boolean existsByNickName(String nickName);

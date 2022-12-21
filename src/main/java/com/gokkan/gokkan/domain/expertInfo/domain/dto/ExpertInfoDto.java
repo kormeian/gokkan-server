@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.expertInfo.domain.dto;
 
 
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
+import io.swagger.v3.oas.annotations.media.Schema;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Getter;
 public class ExpertInfoDto {
 
 	@Getter
+	@Schema(name = "전문가 정보 생성 요청(멤버 아이디) DTO")
 	public static class RequestCreateExpertInfoByMemberId {
 
 		@NotNull
@@ -23,6 +25,7 @@ public class ExpertInfoDto {
 	}
 
 	@Getter
+	@Schema(name = "전문가 정보 생성 요청(멤버 닉네임) DTO")
 	public static class RequestCreateExpertInfoByNickName {
 
 		@NotNull
@@ -37,6 +40,7 @@ public class ExpertInfoDto {
 	}
 
 	@Getter
+	@Schema(name = "전문가 정보 조회 결과 DTO")
 	public static class ResponseGetExpertInfo {
 
 		private String name;
