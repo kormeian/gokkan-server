@@ -68,18 +68,19 @@ public class ExpertCareerService {
 		log.info("전문가 아이디 : " + expertInfo.getId());
 		expertInfo.getExpertCareers().clear();
 		for (RequestUpdateExpertCareer request : requestUpdateExpertCareer) {
-			expertCareerRepository.findById(request.getExpertInfoId()).ifPresent(expertCareer -> {
-				expertCareer.update(request.getStartDate(), request.getEndDate(),
-					request.getCompanyName(), request.getPosition());
-				expertInfo.addExpertCareer(expertCareer);
-			});
+			ExpertCareer expertCareer = expertCareerRepository.findById(
+				request.getExpertCareerId()).orElseThrow(
+				() -> new RestApiException(ExpertCareerErrorCode.EXPERT_CAREER_NOT_FOUND));
+			expertCareer.update(request.getStartDate(), request.getEndDate(),request.getCompanyName(), request.getPosition());
+			expertCareerRepository.save(expertCareer);
+			expertInfo.addExpertCareer(expertCareer);
 		}
 
 		log.info("전문가 커리어 수정 완료");
 	}
 
 	@Transactional(readOnly = true)
-	public List<ResponseGetExpertCareer> getExpertCareer(Member member) {
+	public List<ResponseGetExpertCareer> getMyExpertCareer(Member member) {
 		log.info("전문가 커리어 조회");
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
@@ -101,7 +102,7 @@ public class ExpertCareerService {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		if (expertCareerId == null) {
-			throw new RestApiException(ExpertCareerErrorCode.EMPTY_EXPERT_CAREER_ID);
+			throw new RestApiException(ExpertCareerErrorCode.EMPTY_EXPERT_CAREER);
 		}
 		ExpertCareer expertCareer = expertCareerRepository.findById(expertCareerId).orElseThrow(
 			() -> new RestApiException(ExpertCareerErrorCode.EXPERT_CAREER_NOT_FOUND));
