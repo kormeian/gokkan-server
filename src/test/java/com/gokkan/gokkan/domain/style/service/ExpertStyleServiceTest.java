@@ -241,12 +241,12 @@ class ExpertStyleServiceTest {
 	void getExpertStyles_success() {
 		//given
 		ExpertInfo expertInfo = getExpertInfo();
-		given(expertInfoRepository.findById(anyLong())).willReturn(Optional.of(expertInfo));
 		List<ExpertStyle> expertStyles = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			expertStyles.add(getExpertStyle());
 		}
-		given(expertStyleRepository.findAllByExpertInfo(any())).willReturn(expertStyles);
+		expertInfo.setExpertStyles(expertStyles);
+		given(expertInfoRepository.findById(anyLong())).willReturn(Optional.of(expertInfo));
 
 		//when
 		List<String> allByExpertInfo = expertStyleService.getExpertStyles(1L);
@@ -275,7 +275,6 @@ class ExpertStyleServiceTest {
 	void getExpertStyles_error_notFoundExpertStyle() {
 		//given
 		given(expertInfoRepository.findById(anyLong())).willReturn(Optional.of(getExpertInfo()));
-		given(expertStyleRepository.findAllByExpertInfo(any())).willReturn(new ArrayList<>());
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
 			expertStyleService.getExpertStyles(1L);

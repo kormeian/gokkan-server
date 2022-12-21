@@ -1,6 +1,9 @@
 package com.gokkan.gokkan.domain.expertInfo.domain;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,11 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -28,6 +33,10 @@ public class ExpertInfo {
 	@OneToOne(fetch = FetchType.LAZY)
 	private Member member;
 
+	@BatchSize(size = 10)
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<ExpertStyle> expertStyles = new ArrayList<>();
+
 	private String name;
 	private String info;
 
@@ -38,8 +47,15 @@ public class ExpertInfo {
 		this.info = info;
 	}
 
-
 	public void updateInfo(String info) {
 		this.info = info;
+	}
+
+	public void addExpertStyle(ExpertStyle expertStyle) {
+		this.expertStyles.add(expertStyle);
+	}
+
+	public void setExpertStyles(List<ExpertStyle> expertStyles) {
+		this.expertStyles = expertStyles;
 	}
 }
