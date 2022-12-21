@@ -71,7 +71,8 @@ public class ExpertCareerService {
 			ExpertCareer expertCareer = expertCareerRepository.findById(
 				request.getExpertCareerId()).orElseThrow(
 				() -> new RestApiException(ExpertCareerErrorCode.EXPERT_CAREER_NOT_FOUND));
-			expertCareer.update(request.getStartDate(), request.getEndDate(),request.getCompanyName(), request.getPosition());
+			expertCareer.update(request.getStartDate(), request.getEndDate(),
+				request.getCompanyName(), request.getPosition());
 			expertCareerRepository.save(expertCareer);
 			expertInfo.addExpertCareer(expertCareer);
 		}

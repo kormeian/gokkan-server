@@ -35,7 +35,8 @@ public class ExpertCareer {
 	private String position;
 
 	@Builder
-	public ExpertCareer(ExpertInfo expertInfo, LocalDate startDate, LocalDate endDate, String companyName,
+	public ExpertCareer(ExpertInfo expertInfo, LocalDate startDate, LocalDate endDate,
+		String companyName,
 		String position) {
 		this.expertInfo = expertInfo;
 		this.startDate = startDate;
@@ -44,7 +45,8 @@ public class ExpertCareer {
 		this.position = position;
 	}
 
-	public void update(LocalDate startDate, LocalDate endDate, String companyName, String position) {
+	public void update(LocalDate startDate, LocalDate endDate, String companyName,
+		String position) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.companyName = companyName;

@@ -31,6 +31,7 @@ public class ExpertCareerDto {
 	@Getter
 	@Schema(name = "전문가 커리어 수정 요청", description = "전문가 커리어 수정 요청")
 	public static class RequestUpdateExpertCareer {
+
 		private final Long expertCareerId;
 		private final LocalDate startDate;
 		private final LocalDate endDate;
@@ -38,7 +39,8 @@ public class ExpertCareerDto {
 		private final String position;
 
 		@Builder
-		public RequestUpdateExpertCareer(Long expertCareerId, LocalDate startDate, LocalDate endDate,
+		public RequestUpdateExpertCareer(Long expertCareerId, LocalDate startDate,
+			LocalDate endDate,
 			String companyName, String position) {
 			this.expertCareerId = expertCareerId;
 			this.startDate = startDate;
@@ -51,6 +53,7 @@ public class ExpertCareerDto {
 	@Getter
 	@Schema(name = "전문가 커리어 응답", description = "전문가 커리어 응답")
 	public static class ResponseGetExpertCareer {
+
 		private final Long id;
 		private final LocalDate startDate;
 		private final LocalDate endDate;
@@ -58,7 +61,8 @@ public class ExpertCareerDto {
 		private final String position;
 
 		@Builder
-		public ResponseGetExpertCareer(Long id, LocalDate startDate, LocalDate endDate, String companyName,
+		public ResponseGetExpertCareer(Long id, LocalDate startDate, LocalDate endDate,
+			String companyName,
 			String position) {
 			this.id = id;
 			this.startDate = startDate;

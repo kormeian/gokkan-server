@@ -34,15 +34,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpertCareerServiceTest {
 
+	ArgumentCaptor<ExpertCareer> expertCareerArgumentCaptor = ArgumentCaptor.forClass(
+		ExpertCareer.class);
 	@Mock
 	private ExpertCareerRepository expertCareerRepository;
 	@Mock
 	private ExpertInfoRepository expertInfoRepository;
 	@InjectMocks
 	private ExpertCareerService expertCareerService;
-
-	ArgumentCaptor<ExpertCareer> expertCareerArgumentCaptor = ArgumentCaptor.forClass(
-		ExpertCareer.class);
 
 	@Test
 	@DisplayName("전문가 경력 생성 성공")
