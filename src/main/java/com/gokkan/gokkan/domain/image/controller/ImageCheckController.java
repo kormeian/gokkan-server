@@ -35,7 +35,7 @@ public class ImageCheckController {
 		@Parameter(description = "Image (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> multipartFiles) {
 		return ResponseEntity.ok(
-			imageCheckService.save(awsS3Service.save(multipartFiles)));
+			imageCheckService.create(awsS3Service.save(multipartFiles)));
 	}
 
 	@Operation(summary = "검수 이미지 삭제", description = "검수 이미지 삭제, Amazon S3에 파일 삭제")

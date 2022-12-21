@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -70,9 +71,10 @@ public class ItemDto {
 		@NotNull
 		private int productionYear;
 
-		public Item toItem(Category category) {
+		public Item toItem(Category category, Member member) {
 			return Item.builder()
 				.name(this.name)
+				.member(member)
 				.category(category)
 				.startPrice(this.startPrice)
 				.length(this.length)
@@ -148,6 +150,7 @@ public class ItemDto {
 		public Item toItem(Item item, Category category) {
 			return Item.builder()
 				.id(item.getId())
+				.member(item.getMember())
 				.name(this.name)
 				.category(category)
 				.startPrice(this.startPrice)

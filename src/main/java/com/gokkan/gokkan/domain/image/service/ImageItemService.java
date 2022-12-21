@@ -18,7 +18,7 @@ public class ImageItemService {
 	private final ImageItemRepository imageItemRepository;
 	private final AwsS3Service awsS3Service;
 
-	public List<ImageItem> save(List<String> urls) {
+	public List<ImageItem> create(List<String> urls) {
 		if (urls.size() == 0) {
 			throw new RestApiException(ImageErrorCode.EMPTY_URL);
 		}

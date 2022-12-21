@@ -4,6 +4,7 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -84,6 +85,9 @@ public class Item {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Category category;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member member;
 
 	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)

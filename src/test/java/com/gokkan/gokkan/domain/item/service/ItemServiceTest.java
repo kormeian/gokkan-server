@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
+import com.gokkan.gokkan.domain.category.service.CategoryService;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
@@ -25,10 +28,16 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.style.domain.Style;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
+import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,23 +49,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
 
-	static Category root = Category.builder()
-		.id(0L)
-		.parent(null)
-		.level(0)
-		.name("root")
-		.children(new ArrayList<>())
-		.build();
-	List<ImageItem> imageItems = List.of(getImageItem("item1"));
-	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
-	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
-
-	List<String> styleNames = List.of("style1", "style2");
-	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
 	@Mock
 	private ItemRepository itemRepository;
 	@Mock
@@ -66,81 +64,37 @@ class ItemServiceTest {
 	@Mock
 	private StyleItemRepository styleItemRepository;
 	@Mock
+	private CategoryService categoryService;
+	@Mock
+	private StyleItemService styleItemService;
+	@Mock
 	private ImageItemService imageItemService;
 	@Mock
 	private ImageCheckService imageCheckService;
+
 	@InjectMocks
 	private ItemService itemService;
 
-	private static UpdateRequest getUpdateRequest() {
-		return ItemDto.UpdateRequest.builder()
-			.itemId(1L)
-			.name("update name")
-			.category("update category")
-			.startPrice(200)
-			.length(200L)
-			.width(200L)
-			.depth(200L)
-			.height(200L)
-			.material("철제")
-			.conditionGrade("update conditionGrade")
-			.conditionDescription("update conditionDescription")
-			.text("update text")
-			.madeIn("update madeIn")
-			.designer("update designer")
-			.brand("update brand")
-			.productionYear(1023)
-			.styles(List.of("update style 1"))
-			.build();
-	}
-
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(String url) {
-		return ImageCheck.builder()
-			.url(url)
-			.build();
-	}
-
-	private static Category getCategory(String name, Category parent) {
-		return Category.builder()
-			.name(name)
-			.parent(parent)
-			.children(new ArrayList<>())
-			.level(parent.getLevel() + 1)
-			.build();
-	}
-
-	private static List<StyleItem> getStyleItems(List<String> styles) {
-		List<StyleItem> styleItems = new ArrayList<>();
-		for (String style : styles) {
-			styleItems.add(StyleItem.builder()
-				.style(Style.builder()
-					.name(style)
-					.build()
-				)
-				.build());
-		}
-		return styleItems;
-	}
+	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
 
 	@DisplayName("01_00. create success")
 	@Test
-	public void test_01_00() {
+	public void test_01_00() throws IOException {
 		//given
+		given(categoryService.getCategory(anyString())).willReturn(
+			getCategory("test category", root));
+		given(styleItemService.create(anyList())).willReturn(styleItems);
+		given(imageItemService.create(anyList())).willReturn(imageItems);
+		given(imageCheckService.create(anyList())).willReturn(imageChecks);
 		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
+
 		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
 		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
 		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
 
 		//when
 		CreateRequest createRequest = getCreateRequest();
-		itemService.create(createRequest, imageItems, imageChecks,
-			getCategory("test category", root), getStyleItems(styleNames));
+		itemService.create(createRequest, getMultipartFiles(png), getMultipartFiles(png), member);
 		verify(itemRepository, times(2)).save(itemCaptor.capture());
 
 		//then
@@ -183,6 +137,24 @@ class ItemServiceTest {
 		assertEquals(item.getStyleItems().get(0).getStyle().getName(), styleNames.get(0));
 		assertEquals(item.getStyleItems().get(1).getStyle().getName(), styleNames.get(1));
 		assertEquals(item.getStyleItems().get(0).getItem().getName(), createRequest.getName());
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
+	}
+
+	@DisplayName("01_01. create fail not login")
+	@Test
+	public void test_01_01() {
+		//given
+
+		//when
+		CreateRequest createRequest = getCreateRequest();
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(createRequest, getMultipartFiles(png), getMultipartFiles(png),
+				null));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
 	}
 
 	@DisplayName("02_00. read success")
@@ -242,7 +214,7 @@ class ItemServiceTest {
 			Optional.of(getItem(imageItems, imageChecks)));
 
 		//when
-		boolean deleted = itemService.delete(1L);
+		boolean deleted = itemService.delete(1L, member);
 		verify(itemRepository, times(1)).delete(itemCaptor.capture());
 
 		//then
@@ -258,16 +230,53 @@ class ItemServiceTest {
 
 		//when
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.delete(1L));
+			() -> itemService.delete(1L, member));
 		verify(itemRepository, times(0)).delete(itemCaptor.capture());
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
 	}
 
+	@DisplayName("03_02. delete fail member not login")
+	@Test
+	public void test_03_02() {
+		//given
+
+		//when
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.delete(1L, null));
+		verify(itemRepository, times(0)).delete(itemCaptor.capture());
+
+		//then
+		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
+	}
+
+	@DisplayName("03_03. delete fail member mismatch")
+	@Test
+	public void test_03_03() {
+		//given
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(getItem(imageItems, imageChecks)));
+
+		//when
+		Member loginMember = Member.builder()
+			.userId("mismatch")
+			.email("member@email.com")
+			.name("name")
+			.providerType(ProviderType.KAKAO)
+			.build();
+
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.delete(1L, loginMember));
+		verify(itemRepository, times(0)).delete(itemCaptor.capture());
+
+		//then
+		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
+	}
+
 	@DisplayName("04_00. update success")
 	@Test
-	public void test_04_00() {
+	public void test_04_00() throws IOException {
 		//given
 		Item save = getItem(imageItems, imageChecks);
 		save.setStyleItems(new ArrayList<>(List.of(
@@ -278,25 +287,31 @@ class ItemServiceTest {
 				.build())));
 
 		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
-		given(itemRepository.save(any())).willReturn(save);
+
+		given(categoryService.getCategory(anyString())).willReturn(
+			getCategory("update category", root));
+		styleItems = List.of(getStyleItem("update style 1"));
+		given(styleItemService.create(anyList())).willReturn(styleItems);
+		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
+		given(imageItemService.create(anyList())).willReturn(imageItems);
+		imageChecks = List.of((getImageCheck("update imageCheck1")));
+		given(imageCheckService.create(anyList())).willReturn(imageChecks);
+		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
+
 		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
 		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
 		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
 
-		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
-		imageChecks = List.of((getImageCheck("update imageCheck1")));
-
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
-		itemService.update(updateRequest, imageItems, imageChecks,
-			getCategory("update category", root), getStyleItems(List.of("update style 1")));
+		itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png), member);
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
 		verify(imageItemService, times(1)).delete(any(ImageItem.class));
 		verify(imageCheckService, times(2)).delete(any(ImageCheck.class));
 
 		//then
 		Item item = itemCaptor.getValue();
-
+		System.out.println(item);
 		assertEquals(item.getName(), updateRequest.getName());
 		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
 		assertEquals(item.getState(), State.ASSESSING);
@@ -322,7 +337,8 @@ class ItemServiceTest {
 
 		assertEquals(item.getImageChecks().size(), 1);
 		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
-		assertEquals(item.getStyleItems().get(0).getStyle().getName(), "update style 1");
+		assertEquals(item.getStyleItems().get(0).getStyle().getName(),
+			styleItems.get(0).getStyle().getName());
 	}
 
 	@DisplayName("04_01. update fail not found item")
@@ -335,11 +351,56 @@ class ItemServiceTest {
 		//when
 		UpdateRequest updateRequest = getUpdateRequest();
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, imageItems, imageChecks,
-				getCategory("update category", root), getStyleItems(List.of("style1", "style2"))));
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
+	}
+
+	@DisplayName("04_02. update fail member not login")
+	@Test
+	public void test_04_02() {
+		//given
+
+		//when
+		UpdateRequest updateRequest = getUpdateRequest();
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				null));
+
+		//then
+		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
+	}
+
+	@DisplayName("04_03. update fail member mismatch")
+	@Test
+	public void test_04_03() {
+		//given
+		Item save = getItem(imageItems, imageChecks);
+		save.setStyleItems(new ArrayList<>(List.of(
+			StyleItem.builder()
+				.id(1L)
+				.item(save)
+				.style(Style.builder().name("style1").build())
+				.build())));
+
+		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
+
+		//when
+		Member loginMember = Member.builder()
+			.userId("mismatch")
+			.email("member@email.com")
+			.name("name")
+			.providerType(ProviderType.KAKAO)
+			.build();
+		UpdateRequest updateRequest = getUpdateRequest();
+		RestApiException itemException = assertThrows(RestApiException.class,
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				loginMember));
+
+		//then
+		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
 	}
 
 	private CreateRequest getCreateRequest() {
@@ -366,6 +427,7 @@ class ItemServiceTest {
 	private Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks) {
 		return Item.builder()
 			.name("test name")
+			.member(member)
 			.category(getCategory("test category", root))
 			.startPrice(100)
 			.length(100L)
@@ -395,5 +457,50 @@ class ItemServiceTest {
 				.name(styleName)
 				.build())
 			.build();
+	}
+
+	private static List<StyleItem> getStyleItems(List<String> styles) {
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (String style : styles) {
+			styleItems.add(StyleItem.builder()
+				.style(Style.builder()
+					.name(style)
+					.build()
+				)
+				.build());
+		}
+		return styleItems;
+	}
+
+	Category root = Category.builder()
+		.id(0L)
+		.parent(null)
+		.level(0)
+		.name("root")
+		.children(new ArrayList<>())
+		.build();
+	List<ImageItem> imageItems = List.of(getImageItem("item1"));
+	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
+	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
+
+	List<String> styleNames = List.of("style1", "style2");
+
+	String png = "png";
+
+	Member member = Member.builder()
+		.userId("userId")
+		.email("member@email.com")
+		.name("name")
+		.providerType(ProviderType.KAKAO)
+		.build();
+
+	private List<MultipartFile> getMultipartFiles(String extension) throws IOException {
+		List<MultipartFile> multipartFile = new ArrayList<>();
+		for (int i = 1; i <= 2; i++) {
+			String file = String.format("%d.%s", i, extension);
+			FileInputStream fis = new FileInputStream("src/main/resources/testImages/" + file);
+			multipartFile.add(new MockMultipartFile(String.format("%d", i), file, extension, fis));
+		}
+		return multipartFile;
 	}
 }
