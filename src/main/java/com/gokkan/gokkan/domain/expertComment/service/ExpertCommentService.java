@@ -37,24 +37,32 @@ public class ExpertCommentService {
 	private final AuctionRepository auctionRepository;
 
 	@Transactional
-	public void createComment(Member member,
+	public void createExpertComment(Member member,
 		RequestCreateExpertComment requestCreateExpertComment) {
 		log.info("전문가 코멘트 생성");
 		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		ExpertInfo expertInfo = expertInfoRepository.findByMember(member)
-			.orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-		log.info("전문가 정보 아이디 : " + expertInfo.getId() + "아이템 아이디 : "
+			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
+		log.info("전문가 정보 아이디 : " + expertInfo.getId() + " 아이템 아이디 : "
 			+ requestCreateExpertComment.getItemId());
 		Item item = itemRepository.findById(requestCreateExpertComment.getItemId())
 			.orElseThrow(() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM));
 		State requestState = requestCreateExpertComment.getStatus();
-		if (!isStateAssessing(requestState)) {
+		if (!isStateAssessing(item.getState())) {
 			throw new RestApiException(ExpertCommentErrorCode.ITEM_STATE_NOT_ASSESSING);
 		}
-		ExpertComment expertComment = expertCommentRepository.save(
-			RequestCreateExpertComment.toEntity(requestCreateExpertComment, expertInfo, item));
+		ExpertComment expertComment;
+		if(expertCommentRepository.existsByExpertInfoAndItem(expertInfo, item)){
+			log.info("반려된 의견 있음");
+			expertComment = expertCommentRepository.findByExpertInfoAndItem(expertInfo, item);
+			expertComment.update(requestCreateExpertComment.getComment(), requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
+			expertCommentRepository.save(expertComment);
+		} else{
+			expertComment = expertCommentRepository.save(
+				RequestCreateExpertComment.toEntity(requestCreateExpertComment, expertInfo, item));
+		}
 		if (isStateReturn(requestState)) {
 			item.setState(State.RETURN);
 			log.info("반려");
@@ -99,5 +107,10 @@ public class ExpertCommentService {
 			.auctionStatus(AuctionStatus.STARTED)
 			.expertComment(expertComment)
 			.build();
+	}
+
+	private ExpertComment updateExpertComment(ExpertComment expertComment, RequestCreateExpertComment requestCreateExpertComment){
+		expertComment.update(requestCreateExpertComment.getComment(), requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
+		return expertComment;
 	}
 }
