@@ -47,4 +47,10 @@ public class ExpertComment {
 		this.expertInfo = expertInfo;
 		this.item = item;
 	}
+
+	public void update(String comment, Long minPrice, Long maxPrice) {
+		this.comment = comment;
+		this.minPrice = minPrice;
+		this.maxPrice = maxPrice;
+	}
 }
