@@ -4,6 +4,7 @@ import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import lombok.Getter;
 public class ExpertCommentDto {
 
 	@Getter
+	@Schema(name = "전문가 의견 생성 요청", description = "전문가 의견 생성 요청")
 	public static class RequestCreateExpertComment {
 
 		private final Long itemId;
