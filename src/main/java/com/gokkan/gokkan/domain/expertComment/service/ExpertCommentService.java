@@ -54,12 +54,13 @@ public class ExpertCommentService {
 			throw new RestApiException(ExpertCommentErrorCode.ITEM_STATE_NOT_ASSESSING);
 		}
 		ExpertComment expertComment;
-		if(expertCommentRepository.existsByExpertInfoAndItem(expertInfo, item)){
+		if (expertCommentRepository.existsByExpertInfoAndItem(expertInfo, item)) {
 			log.info("반려된 의견 있음");
 			expertComment = expertCommentRepository.findByExpertInfoAndItem(expertInfo, item);
-			expertComment.update(requestCreateExpertComment.getComment(), requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
+			expertComment.update(requestCreateExpertComment.getComment(),
+				requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
 			expertCommentRepository.save(expertComment);
-		} else{
+		} else {
 			expertComment = expertCommentRepository.save(
 				RequestCreateExpertComment.toEntity(requestCreateExpertComment, expertInfo, item));
 		}
@@ -109,8 +110,10 @@ public class ExpertCommentService {
 			.build();
 	}
 
-	private ExpertComment updateExpertComment(ExpertComment expertComment, RequestCreateExpertComment requestCreateExpertComment){
-		expertComment.update(requestCreateExpertComment.getComment(), requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
+	private ExpertComment updateExpertComment(ExpertComment expertComment,
+		RequestCreateExpertComment requestCreateExpertComment) {
+		expertComment.update(requestCreateExpertComment.getComment(),
+			requestCreateExpertComment.getMinPrice(), requestCreateExpertComment.getMaxPrice());
 		return expertComment;
 	}
 }

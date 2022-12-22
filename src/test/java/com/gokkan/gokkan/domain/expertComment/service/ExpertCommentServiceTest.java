@@ -34,6 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ExpertCommentServiceTest {
 
+	ArgumentCaptor<ExpertComment> expertCommentArgumentCaptor = ArgumentCaptor.forClass(
+		ExpertComment.class);
+	ArgumentCaptor<Auction> auctionArgumentCaptor = ArgumentCaptor.forClass(Auction.class);
 	@Mock
 	private ExpertCommentRepository expertCommentRepository;
 	@Mock
@@ -44,9 +47,6 @@ class ExpertCommentServiceTest {
 	private AuctionRepository auctionRepository;
 	@InjectMocks
 	private ExpertCommentService expertCommentService;
-
-	ArgumentCaptor<ExpertComment> expertCommentArgumentCaptor = ArgumentCaptor.forClass(ExpertComment.class);
-	ArgumentCaptor<Auction> auctionArgumentCaptor = ArgumentCaptor.forClass(Auction.class);
 
 	@Test
 	@DisplayName("전문가 의견 생성 완료")
@@ -60,7 +60,8 @@ class ExpertCommentServiceTest {
 		given(auctionRepository.save(any())).willReturn(getAuction());
 
 		//when
-		expertCommentService.createExpertComment(getMember(), getRequestCreateExpertComment(State.COMPLETE));
+		expertCommentService.createExpertComment(getMember(),
+			getRequestCreateExpertComment(State.COMPLETE));
 		verify(expertCommentRepository).save(expertCommentArgumentCaptor.capture());
 		verify(auctionRepository).save(auctionArgumentCaptor.capture());
 
@@ -83,12 +84,14 @@ class ExpertCommentServiceTest {
 			Optional.of(getExpertInfo()));
 		given(itemRepository.findById(any())).willReturn(Optional.of(getItem(State.ASSESSING)));
 		given(expertCommentRepository.existsByExpertInfoAndItem(any(), any())).willReturn(true);
-		given(expertCommentRepository.findByExpertInfoAndItem(any(), any())).willReturn(getExpertComment());
+		given(expertCommentRepository.findByExpertInfoAndItem(any(), any())).willReturn(
+			getExpertComment());
 		given(expertCommentRepository.save(any())).willReturn(getExpertComment());
 		given(auctionRepository.save(any())).willReturn(getAuction());
 
 		//when
-		expertCommentService.createExpertComment(getMember(), getRequestCreateExpertComment(State.COMPLETE));
+		expertCommentService.createExpertComment(getMember(),
+			getRequestCreateExpertComment(State.COMPLETE));
 		verify(expertCommentRepository).save(expertCommentArgumentCaptor.capture());
 		verify(auctionRepository).save(auctionArgumentCaptor.capture());
 
@@ -106,13 +109,14 @@ class ExpertCommentServiceTest {
 	@Test
 	@DisplayName("전문가 의견 생성 실패 - 멤버 정보 없음")
 	void createExpertComment_error_memberNotFound() {
-	    //given
+		//given
 
-	    //when
+		//when
 		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
-			expertCommentService.createExpertComment(null, getRequestCreateExpertComment(State.COMPLETE));
-			});
-	    //then
+			expertCommentService.createExpertComment(null,
+				getRequestCreateExpertComment(State.COMPLETE));
+		});
+		//then
 		assertThat(restApiException.getErrorCode()).isEqualTo(MemberErrorCode.MEMBER_NOT_FOUND);
 	}
 
@@ -124,11 +128,13 @@ class ExpertCommentServiceTest {
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
-			expertCommentService.createExpertComment(getMember(), getRequestCreateExpertComment(State.COMPLETE));
-			});
+			expertCommentService.createExpertComment(getMember(),
+				getRequestCreateExpertComment(State.COMPLETE));
+		});
 
 		//then
-		assertThat(restApiException.getErrorCode()).isEqualTo(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND);
+		assertThat(restApiException.getErrorCode()).isEqualTo(
+			ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND);
 	}
 
 	@Test
@@ -140,7 +146,8 @@ class ExpertCommentServiceTest {
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
-			expertCommentService.createExpertComment(getMember(), getRequestCreateExpertComment(State.COMPLETE));
+			expertCommentService.createExpertComment(getMember(),
+				getRequestCreateExpertComment(State.COMPLETE));
 		});
 
 		//then
@@ -156,11 +163,13 @@ class ExpertCommentServiceTest {
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
-			expertCommentService.createExpertComment(getMember(), getRequestCreateExpertComment(State.COMPLETE));
+			expertCommentService.createExpertComment(getMember(),
+				getRequestCreateExpertComment(State.COMPLETE));
 		});
 
 		//then
-		assertThat(restApiException.getErrorCode()).isEqualTo(ExpertCommentErrorCode.ITEM_STATE_NOT_ASSESSING);
+		assertThat(restApiException.getErrorCode()).isEqualTo(
+			ExpertCommentErrorCode.ITEM_STATE_NOT_ASSESSING);
 	}
 
 	private Auction getAuction() {
