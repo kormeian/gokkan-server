@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "상품 컨트롤러", description = "상품 임시 저장, 저장 완료, 수정, 삭제")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/items")
@@ -32,20 +34,20 @@ public class ItemController {
 
 	private final ItemService itemService;
 
-	@Operation(summary = "상품 생성", description = "상품 생성, Amazon S3에 파일 업로드, 업로드 된 이미지 url 상품에 저장")
-	@ApiResponse(responseCode = "201", description = "생성된 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@Operation(summary = "상품 생성 완료", description = "상품 생성, Amazon S3에 파일 업로드, 업로드 된 이미지 url 상품에 저장")
+	@ApiResponse(responseCode = "200", description = "생성된 상품 반환, 상품 상태 검수중으로 변경, 수정 불가", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
 	public ResponseEntity<?> create(
-		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = ItemDto.CreateRequest.class)))
-		@RequestPart ItemDto.CreateRequest request,
+		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = ItemDto.UpdateRequest.class)))
+		@RequestPart ItemDto.UpdateRequest request,
 		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageCheckFiles,
 		@Parameter(hidden = true)
 		@CurrentMember Member member) {
-		return ResponseEntity.status(HttpStatus.CREATED)
+		return ResponseEntity.status(HttpStatus.OK)
 			.body(itemService.create(request, imageItemFiles, imageCheckFiles, member));
 	}
 
@@ -70,7 +72,7 @@ public class ItemController {
 	}
 
 	@Operation(summary = "상품 수정", description = "상품 수정, Amazon S3에 파일 업로드, 수정된 이미지 url 상품에 저장")
-	@ApiResponse(responseCode = "201", description = "수정된 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@ApiResponse(responseCode = "201", description = "수정된 상품 반환, 상품은 임시 저장상태", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
 	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
 	public ResponseEntity<?> update(
