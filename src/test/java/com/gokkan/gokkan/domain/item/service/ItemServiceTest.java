@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.item.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,14 +15,13 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.service.CategoryService;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
+import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
+import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
-import com.gokkan.gokkan.domain.item.dto.ItemDto;
-import com.gokkan.gokkan.domain.item.dto.ItemDto.CreateRequest;
-import com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
@@ -40,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -71,123 +70,391 @@ class ItemServiceTest {
 	private ImageItemService imageItemService;
 	@Mock
 	private ImageCheckService imageCheckService;
+	@Mock
+	private AwsS3Service awsS3Service;
 
 	@InjectMocks
 	private ItemService itemService;
 
 	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
 
-	@DisplayName("01_00. create success")
+	@DisplayName("01_00. create success from empty image saved")
 	@Test
 	public void test_01_00() throws IOException {
 		//given
-		given(categoryService.getCategory(anyString())).willReturn(
-			getCategory("test category", root));
-		given(styleItemService.create(anyList())).willReturn(styleItems);
-		given(imageItemService.create(anyList())).willReturn(imageItems);
-		given(imageCheckService.create(anyList())).willReturn(imageChecks);
-		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>());
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getEmptyItem()));
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(updateRequest.getCategory(), root));
 
-		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
-		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
-		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(new ArrayList<>());
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(url1, url2)));
+		given(imageItemService.create(anyList()))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))));
+		given(imageCheckService.create(anyList()))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))));
 
+		given(imageItemService.checkImageItemDeleted(new ArrayList<>(), new ArrayList<>()))
+			.willReturn(new ArrayList<>());
+		given(imageCheckService.checkImageCheckDeleted(new ArrayList<>(), new ArrayList<>()))
+			.willReturn(new ArrayList<>());
+
+		given(styleItemRepository.saveAll(any()))
+			.willReturn(new ArrayList<>());
+		given((imageItemRepository.saveAll(any())))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))));
+		given((imageCheckRepository.saveAll(any())))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))));
+
+		given(itemRepository.save(any()))
+			.willReturn(getItem(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))),
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))),
+				new ArrayList<>()));
 		//when
-		CreateRequest createRequest = getCreateRequest();
-		itemService.create(createRequest, getMultipartFiles(png), getMultipartFiles(png), member);
-		verify(itemRepository, times(2)).save(itemCaptor.capture());
+
+		itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png), member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
 
 		//then
-		Item item = itemCaptor.getAllValues().get(1);
-		System.out.println(item);
-		assertEquals(item.getName(), createRequest.getName());
-		assertEquals(item.getStartPrice(), createRequest.getStartPrice());
+		Item item = itemCaptor.getValue();
+		assertEquals(item.getName(), updateRequest.getName());
+		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
 		assertEquals(item.getState(), State.ASSESSING);
-		assertEquals(item.getCategory().getName(), createRequest.getCategory());
-		assertEquals(item.getStyleItems().get(0).getStyle().getName(),
-			createRequest.getStyles().get(0));
-		assertEquals(item.getStyleItems().get(0).getItem().getName(), createRequest.getName());
-		assertEquals(item.getStyleItems().get(1).getStyle().getName(),
-			createRequest.getStyles().get(1));
-		assertEquals(item.getStyleItems().get(1).getItem().getName(), createRequest.getName());
 
-		assertEquals(item.getLength(), createRequest.getLength());
-		assertEquals(item.getWidth(), createRequest.getWidth());
-		assertEquals(item.getDepth(), createRequest.getDepth());
-		assertEquals(item.getHeight(), createRequest.getHeight());
-		assertEquals(item.getMaterial(), createRequest.getMaterial());
-		assertEquals(item.getConditionGrade(), createRequest.getConditionGrade());
-		assertEquals(item.getConditionDescription(), createRequest.getConditionDescription());
-		assertEquals(item.getText(), createRequest.getText());
-		assertEquals(item.getMadeIn(), createRequest.getMadeIn());
-		assertEquals(item.getDesigner(), createRequest.getDesigner());
-		assertEquals(item.getBrand(), createRequest.getBrand());
-		assertEquals(item.getProductionYear(), createRequest.getProductionYear());
+		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 0);
+
+		assertEquals(item.getLength(), updateRequest.getLength());
+		assertEquals(item.getWidth(), updateRequest.getWidth());
+		assertEquals(item.getDepth(), updateRequest.getDepth());
+		assertEquals(item.getHeight(), updateRequest.getHeight());
+		assertEquals(item.getMaterial(), updateRequest.getMaterial());
+		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
+		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
+		assertEquals(item.getText(), updateRequest.getText());
+		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+		assertEquals(item.getDesigner(), updateRequest.getDesigner());
+		assertEquals(item.getBrand(), updateRequest.getBrand());
+		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
 
 		assertEquals(item.getImageChecks().size(), 2);
-		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
-		assertEquals(item.getImageChecks().get(1).getUrl(), imageChecks.get(1).getUrl());
-		assertEquals(item.getImageChecks().get(0).getItem().getName(), createRequest.getName());
-
-		assertEquals(item.getImageItems().size(), 1);
-		assertEquals(item.getImageItems().get(0).getUrl(), imageItems.get(0).getUrl());
-		assertEquals(item.getImageItems().get(0).getItem().getName(), createRequest.getName());
-
-		assertEquals(item.getStyleItems().get(0).getStyle().getName(), styleNames.get(0));
-		assertEquals(item.getStyleItems().get(1).getStyle().getName(), styleNames.get(1));
-		assertEquals(item.getStyleItems().get(0).getItem().getName(), createRequest.getName());
+		assertEquals(item.getImageChecks().get(0).getId(), 1L);
+		assertEquals(item.getImageChecks().get(1).getId(), 2L);
+		assertEquals(item.getImageItems().size(), 2);
+		assertEquals(item.getImageItems().get(0).getId(), 1L);
+		assertEquals(item.getImageItems().get(1).getId(), 2L);
 
 		assertEquals(item.getMember().getName(), member.getName());
 		assertEquals(item.getMember().getEmail(), member.getEmail());
 	}
 
-	@DisplayName("01_01. create fail not login")
+	@DisplayName("01_01. create success from not empty item not change image, style")
 	@Test
 	public void test_01_01() {
 		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style1)));
+
+		List<ImageItem> savedImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2)));
+		List<ImageCheck> savedImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2)));
+		List<StyleItem> savedStyleItems =
+			new ArrayList<>(Arrays.asList(getStyleItem(style1)));
+
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getItem(savedImageItems, savedImageChecks, savedStyleItems)));
+
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(updateRequest.getCategory(), root));
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(savedStyleItems);
+
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>());
+		given(imageItemService.create(anyList()))
+			.willReturn(new ArrayList<>());
+		given(imageCheckService.create(anyList()))
+			.willReturn(new ArrayList<>());
+
+		given(imageItemService.checkImageItemDeleted(anyList(), anyList()))
+			.willReturn(savedImageItems);
+		given(imageCheckService.checkImageCheckDeleted(anyList(), anyList()))
+			.willReturn(savedImageChecks);
+
+		given(styleItemRepository.saveAll(any())).willReturn(savedStyleItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(savedImageItems);
+		given((imageCheckRepository.saveAll(any()))).willReturn(savedImageChecks);
+
+		given(itemRepository.save(any()))
+			.willReturn(getItem(savedImageItems, savedImageChecks, savedStyleItems));
+		//when
+
+		itemService.create(updateRequest, new ArrayList<>(), new ArrayList<>(), member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
+
+		//then
+		Item item = itemCaptor.getValue();
+		System.out.println(item);
+		assertEquals(item.getName(), updateRequest.getName());
+		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
+		assertEquals(item.getState(), State.ASSESSING);
+
+		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 1);
+
+		assertEquals(
+			item.getStyleItems().get(0).getStyle().getName(),
+			updateRequest.getStyles().get(0));
+
+		assertEquals(item.getLength(), updateRequest.getLength());
+		assertEquals(item.getWidth(), updateRequest.getWidth());
+		assertEquals(item.getDepth(), updateRequest.getDepth());
+		assertEquals(item.getHeight(), updateRequest.getHeight());
+		assertEquals(item.getMaterial(), updateRequest.getMaterial());
+		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
+		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
+		assertEquals(item.getText(), updateRequest.getText());
+		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+		assertEquals(item.getDesigner(), updateRequest.getDesigner());
+		assertEquals(item.getBrand(), updateRequest.getBrand());
+		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
+
+		assertEquals(item.getImageItems().size(), 2);
+		assertEquals(
+			item.getImageItems().get(0).getId(),
+			updateRequest.getImageItemUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageItems().get(1).getId(),
+			updateRequest.getImageItemUrls().get(1).getImageId());
+
+		assertEquals(item.getImageChecks().size(), 2);
+		assertEquals(
+			item.getImageChecks().get(0).getId(),
+			updateRequest.getImageCheckUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageChecks().get(1).getId(),
+			updateRequest.getImageCheckUrls().get(1).getImageId());
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
+	}
+
+	@DisplayName("01_02. create success from not empty item change image, style")
+	@Test
+	public void test_01_02() throws IOException {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
+		List<ImageItem> savedImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2)));
+		List<ImageCheck> savedImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2)));
+		List<StyleItem> savedStyleItems =
+			new ArrayList<>(Arrays.asList(getStyleItem(style1)));
+
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getItem(savedImageItems, savedImageChecks, savedStyleItems)));
+
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(categoryName1, root));
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(getStyleItem(style2))));
+
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(url3, url4)));
+		List<ImageItem> newImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(3L, url3), getImageItem(4L, url4)));
+		given(imageItemService.create(anyList()))
+			.willReturn(newImageItems);
+		List<ImageCheck> newImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(null, url3), getImageCheck(null, url4)));
+		given(imageCheckService.create(anyList()))
+			.willReturn(newImageChecks);
+
+		given(imageItemService.checkImageItemDeleted(anyList(), anyList()))
+			.willReturn(savedImageItems);
+		given(imageCheckService.checkImageCheckDeleted(anyList(), anyList()))
+			.willReturn(savedImageChecks);
+
+		given(styleItemRepository.saveAll(any())).willReturn(savedStyleItems);
+		ArrayList<ImageItem> finalImageItems = new ArrayList<>(savedImageItems);
+		finalImageItems.addAll(newImageItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(finalImageItems);
+		ArrayList<ImageCheck> finalImageChecks = new ArrayList<>(savedImageChecks);
+		finalImageChecks.addAll(newImageChecks);
+		given((imageCheckRepository.saveAll(any()))).willReturn(finalImageChecks);
+
+		given(itemRepository.save(any()))
+			.willReturn(getItem(savedImageItems, savedImageChecks, savedStyleItems));
+		//when
+
+		itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png), member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
+
+		//then
+		Item item = itemCaptor.getValue();
+		System.out.println(item);
+		assertEquals(item.getName(), updateRequest.getName());
+		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
+		assertEquals(item.getState(), State.ASSESSING);
+
+		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 1);
+
+		assertEquals(
+			item.getStyleItems().get(0).getStyle().getName(),
+			updateRequest.getStyles().get(0));
+
+		assertEquals(item.getLength(), updateRequest.getLength());
+		assertEquals(item.getWidth(), updateRequest.getWidth());
+		assertEquals(item.getDepth(), updateRequest.getDepth());
+		assertEquals(item.getHeight(), updateRequest.getHeight());
+		assertEquals(item.getMaterial(), updateRequest.getMaterial());
+		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
+		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
+		assertEquals(item.getText(), updateRequest.getText());
+		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+		assertEquals(item.getDesigner(), updateRequest.getDesigner());
+		assertEquals(item.getBrand(), updateRequest.getBrand());
+		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
+
+		assertEquals(item.getImageItems().size(), 4);
+		assertEquals(
+			item.getImageItems().get(0).getId(),
+			updateRequest.getImageItemUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageItems().get(1).getId(),
+			updateRequest.getImageItemUrls().get(1).getImageId());
+		assertEquals(
+			item.getImageItems().get(2).getUrl(), url3);
+		assertEquals(
+			item.getImageItems().get(3).getUrl(), url4);
+
+		assertEquals(item.getImageChecks().size(), 4);
+		assertEquals(
+			item.getImageChecks().get(0).getId(),
+			updateRequest.getImageCheckUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageChecks().get(1).getId(),
+			updateRequest.getImageCheckUrls().get(1).getImageId());
+		assertEquals(
+			item.getImageChecks().get(2).getUrl(), url3);
+		assertEquals(
+			item.getImageChecks().get(3).getUrl(), url4);
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
+	}
+
+	@DisplayName("01_03. create fail MEMBER_NOT_LOGIN")
+	@Test
+	public void test_01_03() {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
 
 		//when
-		CreateRequest createRequest = getCreateRequest();
+
 		RestApiException restApiException = assertThrows(RestApiException.class,
-			() -> itemService.create(createRequest, getMultipartFiles(png), getMultipartFiles(png),
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
 				null));
 
 		//then
 		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
 	}
 
-	@DisplayName("02_00. read success")
+	@DisplayName("01_04. create fail MEMBER_MISMATCH")
 	@Test
-	public void test_02_00() {
+	public void test_01_04() {
 		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
 		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(getItem(new ArrayList<>(), imageChecks)));
+			Optional.of(Item.builder()
+				.member(Member.builder()
+					.build())
+				.build()));
 
 		//when
-		CreateRequest savedItem = getCreateRequest();
-		Response response = itemService.read(1L);
-		System.out.println(response);
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
 		//then
-		assertEquals(response.getLength(), savedItem.getLength());
-		assertEquals(response.getWidth(), savedItem.getWidth());
-		assertEquals(response.getDepth(), savedItem.getDepth());
-		assertEquals(response.getHeight(), savedItem.getHeight());
-		assertEquals(response.getMaterial(), savedItem.getMaterial());
-		assertEquals(response.getConditionGrade(), savedItem.getConditionGrade());
-		assertEquals(response.getConditionDescription(), savedItem.getConditionDescription());
-		assertEquals(response.getText(), savedItem.getText());
-		assertEquals(response.getMadeIn(), savedItem.getMadeIn());
-		assertEquals(response.getDesigner(), savedItem.getDesigner());
-		assertEquals(response.getBrand(), savedItem.getBrand());
-		assertEquals(response.getProductionYear(), savedItem.getProductionYear());
-		assertFalse(response.isAssessed());
+		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
+	}
 
-		assertEquals(response.getImageCheckUrls().size(), 2);
-		assertEquals(response.getImageCheckUrls().get(0), imageChecks.get(0).getUrl());
-		assertEquals(response.getImageCheckUrls().get(1), imageChecks.get(1).getUrl());
+	@DisplayName("01_05_1. create fail CAN_NOT_UPDATE_STATE")
+	@Test
+	public void test_01_05_1() {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
 
-		assertEquals(response.getImageItemUrls().size(), 0);
-		assertEquals(response.getStyles().get(0), styleNames.get(0));
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(Item.builder()
+				.member(member)
+				.state(State.ASSESSING)
+				.build()));
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_UPDATE_STATE);
+	}
+
+	@DisplayName("01_05_2. create fail CAN_NOT_UPDATE_STATE")
+	@Test
+	public void test_01_05_2() {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(Item.builder()
+				.member(member)
+				.state(State.COMPLETE)
+				.build()));
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_UPDATE_STATE);
 	}
 
 	@DisplayName("02_01. read fail not found Item")
@@ -210,7 +477,7 @@ class ItemServiceTest {
 	public void test_03_00() {
 		//given
 		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(getItem(imageItems, imageChecks)));
+			Optional.of(getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>())));
 
 		//when
 		boolean deleted = itemService.delete(1L, member);
@@ -255,7 +522,7 @@ class ItemServiceTest {
 	public void test_03_03() {
 		//given
 		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(getItem(imageItems, imageChecks)));
+			Optional.of(getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>())));
 
 		//when
 		Member loginMember = Member.builder()
@@ -273,48 +540,148 @@ class ItemServiceTest {
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
 	}
 
-	@DisplayName("04_00. update success")
+
+	@DisplayName("04_00. update success from empty image saved")
 	@Test
 	public void test_04_00() throws IOException {
 		//given
-		Item save = getItem(imageItems, imageChecks);
-		save.setStyleItems(new ArrayList<>(List.of(
-			StyleItem.builder()
-				.id(1L)
-				.item(save)
-				.style(Style.builder().name("style1").build())
-				.build())));
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>());
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getEmptyItem()));
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(updateRequest.getCategory(), root));
 
-		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(new ArrayList<>());
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(url1, url2)));
+		given(imageItemService.create(anyList()))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))));
+		given(imageCheckService.create(anyList()))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))));
 
-		given(categoryService.getCategory(anyString())).willReturn(
-			getCategory("update category", root));
-		styleItems = List.of(getStyleItem("update style 1"));
-		given(styleItemService.create(anyList())).willReturn(styleItems);
-		imageItems = List.of(getImageItem("update imageItem1"), getImageItem("update imageItem2"));
-		given(imageItemService.create(anyList())).willReturn(imageItems);
-		imageChecks = List.of((getImageCheck("update imageCheck1")));
-		given(imageCheckService.create(anyList())).willReturn(imageChecks);
-		given(itemRepository.save(any())).willReturn(getItem(imageItems, imageChecks));
+		given(imageItemService.checkImageItemDeleted(new ArrayList<>(), new ArrayList<>()))
+			.willReturn(new ArrayList<>());
+		given(imageCheckService.checkImageCheckDeleted(new ArrayList<>(), new ArrayList<>()))
+			.willReturn(new ArrayList<>());
 
-		given(styleItemRepository.saveAll(any())).willReturn(styleItems);
-		given((imageItemRepository.saveAll(any()))).willReturn(imageItems);
-		given((imageCheckRepository.saveAll(any()))).willReturn(imageChecks);
+		given(styleItemRepository.saveAll(any()))
+			.willReturn(new ArrayList<>());
+		given((imageItemRepository.saveAll(any())))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))));
+		given((imageCheckRepository.saveAll(any())))
+			.willReturn(
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))));
 
+		given(itemRepository.save(any()))
+			.willReturn(getItem(
+				new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2))),
+				new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2))),
+				new ArrayList<>()));
 		//when
-		UpdateRequest updateRequest = getUpdateRequest();
+
 		itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png), member);
 		verify(itemRepository, times(1)).save(itemCaptor.capture());
-		verify(imageItemService, times(1)).delete(any(ImageItem.class));
-		verify(imageCheckService, times(2)).delete(any(ImageCheck.class));
+
+		//then
+		Item item = itemCaptor.getValue();
+		assertEquals(item.getName(), updateRequest.getName());
+		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
+		assertEquals(item.getState(), State.TEMPORARY);
+
+		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 0);
+
+		assertEquals(item.getLength(), updateRequest.getLength());
+		assertEquals(item.getWidth(), updateRequest.getWidth());
+		assertEquals(item.getDepth(), updateRequest.getDepth());
+		assertEquals(item.getHeight(), updateRequest.getHeight());
+		assertEquals(item.getMaterial(), updateRequest.getMaterial());
+		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
+		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
+		assertEquals(item.getText(), updateRequest.getText());
+		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+		assertEquals(item.getDesigner(), updateRequest.getDesigner());
+		assertEquals(item.getBrand(), updateRequest.getBrand());
+		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
+
+		assertEquals(item.getImageChecks().size(), 2);
+		assertEquals(item.getImageChecks().get(0).getId(), 1L);
+		assertEquals(item.getImageChecks().get(1).getId(), 2L);
+		assertEquals(item.getImageItems().size(), 2);
+		assertEquals(item.getImageItems().get(0).getId(), 1L);
+		assertEquals(item.getImageItems().get(1).getId(), 2L);
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
+	}
+
+	@DisplayName("04_01. update success from not empty item not change image, style")
+	@Test
+	public void test_04_01() throws IOException {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style1)));
+
+		List<ImageItem> savedImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2)));
+		List<ImageCheck> savedImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2)));
+		List<StyleItem> savedStyleItems =
+			new ArrayList<>(Arrays.asList(getStyleItem(style1)));
+
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getItem(savedImageItems, savedImageChecks, savedStyleItems)));
+
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(updateRequest.getCategory(), root));
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(savedStyleItems);
+
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>());
+		given(imageItemService.create(anyList()))
+			.willReturn(new ArrayList<>());
+		given(imageCheckService.create(anyList()))
+			.willReturn(new ArrayList<>());
+
+		given(imageItemService.checkImageItemDeleted(anyList(), anyList()))
+			.willReturn(savedImageItems);
+		given(imageCheckService.checkImageCheckDeleted(anyList(), anyList()))
+			.willReturn(savedImageChecks);
+
+		given(styleItemRepository.saveAll(any())).willReturn(savedStyleItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(savedImageItems);
+		given((imageCheckRepository.saveAll(any()))).willReturn(savedImageChecks);
+
+		given(itemRepository.save(any()))
+			.willReturn(getItem(savedImageItems, savedImageChecks, savedStyleItems));
+		//when
+
+		itemService.update(updateRequest, new ArrayList<>(), new ArrayList<>(), member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
 
 		//then
 		Item item = itemCaptor.getValue();
 		System.out.println(item);
 		assertEquals(item.getName(), updateRequest.getName());
 		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
-		assertEquals(item.getState(), State.ASSESSING);
+		assertEquals(item.getState(), State.TEMPORARY);
+
 		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 1);
+
+		assertEquals(
+			item.getStyleItems().get(0).getStyle().getName(),
+			updateRequest.getStyles().get(0));
 
 		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
@@ -330,104 +697,227 @@ class ItemServiceTest {
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
 
 		assertEquals(item.getImageItems().size(), 2);
-		assertEquals(item.getImageItems().get(0).getUrl(), imageItems.get(0).getUrl());
-		assertEquals(item.getImageItems().get(1).getUrl(), imageItems.get(1).getUrl());
+		assertEquals(
+			item.getImageItems().get(0).getId(),
+			updateRequest.getImageItemUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageItems().get(1).getId(),
+			updateRequest.getImageItemUrls().get(1).getImageId());
 
-		assertEquals(item.getImageChecks().size(), 1);
-		assertEquals(item.getImageChecks().get(0).getUrl(), imageChecks.get(0).getUrl());
-		assertEquals(item.getStyleItems().get(0).getStyle().getName(),
-			styleItems.get(0).getStyle().getName());
+		assertEquals(item.getImageChecks().size(), 2);
+		assertEquals(
+			item.getImageChecks().get(0).getId(),
+			updateRequest.getImageCheckUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageChecks().get(1).getId(),
+			updateRequest.getImageCheckUrls().get(1).getImageId());
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
 	}
 
-	@DisplayName("04_01. update fail not found item")
+	@DisplayName("04_02. update success from not empty item change image, style")
 	@Test
-	public void test_04_01() {
+	public void test_04_02() throws IOException {
 		//given
-		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.empty());
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
 
+		List<ImageItem> savedImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(1L, url1), getImageItem(2L, url2)));
+		List<ImageCheck> savedImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(1L, url1), getImageCheck(2L, url2)));
+		List<StyleItem> savedStyleItems =
+			new ArrayList<>(Arrays.asList(getStyleItem(style1)));
+
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getItem(savedImageItems, savedImageChecks, savedStyleItems)));
+
+		given(categoryService.getCategory(anyString()))
+			.willReturn(getCategory(categoryName1, root));
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(getStyleItem(style2))));
+
+		given(awsS3Service.save(anyList()))
+			.willReturn(new ArrayList<>(Arrays.asList(url3, url4)));
+		List<ImageItem> newImageItems =
+			new ArrayList<>(Arrays.asList(getImageItem(3L, url3), getImageItem(4L, url4)));
+		given(imageItemService.create(anyList()))
+			.willReturn(newImageItems);
+		List<ImageCheck> newImageChecks =
+			new ArrayList<>(Arrays.asList(getImageCheck(null, url3), getImageCheck(null, url4)));
+		given(imageCheckService.create(anyList()))
+			.willReturn(newImageChecks);
+
+		given(imageItemService.checkImageItemDeleted(anyList(), anyList()))
+			.willReturn(savedImageItems);
+		given(imageCheckService.checkImageCheckDeleted(anyList(), anyList()))
+			.willReturn(savedImageChecks);
+
+		given(styleItemRepository.saveAll(any())).willReturn(savedStyleItems);
+		ArrayList<ImageItem> finalImageItems = new ArrayList<>(savedImageItems);
+		finalImageItems.addAll(newImageItems);
+		given((imageItemRepository.saveAll(any()))).willReturn(finalImageItems);
+		ArrayList<ImageCheck> finalImageChecks = new ArrayList<>(savedImageChecks);
+		finalImageChecks.addAll(newImageChecks);
+		given((imageCheckRepository.saveAll(any()))).willReturn(finalImageChecks);
+
+		given(itemRepository.save(any()))
+			.willReturn(getItem(savedImageItems, savedImageChecks, savedStyleItems));
 		//when
-		UpdateRequest updateRequest = getUpdateRequest();
-		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
-				member));
+
+		itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png), member);
+		verify(itemRepository, times(1)).save(itemCaptor.capture());
 
 		//then
-		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
+		Item item = itemCaptor.getValue();
+		System.out.println(item);
+		assertEquals(item.getName(), updateRequest.getName());
+		assertEquals(item.getStartPrice(), updateRequest.getStartPrice());
+		assertEquals(item.getState(), State.TEMPORARY);
+
+		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
+		assertEquals(item.getStyleItems().size(), 1);
+
+		assertEquals(
+			item.getStyleItems().get(0).getStyle().getName(),
+			updateRequest.getStyles().get(0));
+
+		assertEquals(item.getLength(), updateRequest.getLength());
+		assertEquals(item.getWidth(), updateRequest.getWidth());
+		assertEquals(item.getDepth(), updateRequest.getDepth());
+		assertEquals(item.getHeight(), updateRequest.getHeight());
+		assertEquals(item.getMaterial(), updateRequest.getMaterial());
+		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
+		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
+		assertEquals(item.getText(), updateRequest.getText());
+		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+		assertEquals(item.getDesigner(), updateRequest.getDesigner());
+		assertEquals(item.getBrand(), updateRequest.getBrand());
+		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
+
+		assertEquals(item.getImageItems().size(), 4);
+		assertEquals(
+			item.getImageItems().get(0).getId(),
+			updateRequest.getImageItemUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageItems().get(1).getId(),
+			updateRequest.getImageItemUrls().get(1).getImageId());
+		assertEquals(
+			item.getImageItems().get(2).getUrl(), url3);
+		assertEquals(
+			item.getImageItems().get(3).getUrl(), url4);
+
+		assertEquals(item.getImageChecks().size(), 4);
+		assertEquals(
+			item.getImageChecks().get(0).getId(),
+			updateRequest.getImageCheckUrls().get(0).getImageId());
+		assertEquals(
+			item.getImageChecks().get(1).getId(),
+			updateRequest.getImageCheckUrls().get(1).getImageId());
+		assertEquals(
+			item.getImageChecks().get(2).getUrl(), url3);
+		assertEquals(
+			item.getImageChecks().get(3).getUrl(), url4);
+
+		assertEquals(item.getMember().getName(), member.getName());
+		assertEquals(item.getMember().getEmail(), member.getEmail());
 	}
 
-	@DisplayName("04_02. update fail member not login")
+	@DisplayName("04_03. update fail MEMBER_NOT_LOGIN")
 	@Test
-	public void test_04_02() {
+	public void test_04_03() throws IOException {
 		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
 
 		//when
-		UpdateRequest updateRequest = getUpdateRequest();
-		RestApiException itemException = assertThrows(RestApiException.class,
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
 			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
 				null));
 
 		//then
-		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
-	}
-
-	@DisplayName("04_03. update fail member mismatch")
-	@Test
-	public void test_04_03() {
-		//given
-		Item save = getItem(imageItems, imageChecks);
-		save.setStyleItems(new ArrayList<>(List.of(
-			StyleItem.builder()
-				.id(1L)
-				.item(save)
-				.style(Style.builder().name("style1").build())
-				.build())));
-
-		given(itemRepository.findById(anyLong())).willReturn(Optional.of(save));
-
-		//when
-		Member loginMember = Member.builder()
-			.userId("mismatch")
-			.email("member@email.com")
-			.name("name")
-			.providerType(ProviderType.KAKAO)
-			.build();
-		UpdateRequest updateRequest = getUpdateRequest();
-		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
-				loginMember));
-
-		//then
-		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
-	}
-
-	@DisplayName("05_00. create temporary success")
-	@Test
-	public void test_05_00(){
-	    //given
-		given(itemRepository.save(any())).willReturn(
-			Item.builder().id(1L).member(member).state(State.TEMPORARY).build());
-	    //when
-		itemService.createTemporary(member);
-		verify(itemRepository, times(1)).save(itemCaptor.capture());
-
-	    //then
-		Item item = itemCaptor.getValue();
-		assertEquals(item.getMember().getUserId(), member.getUserId());
-		assertEquals(item.getState(), State.TEMPORARY);
-	}
-
-	@DisplayName("05_01. create temporary fail not login")
-	@Test
-	public void test_05_01(){
-		//given
-
-		//when
-		RestApiException restApiException = assertThrows(RestApiException.class,
-			() -> itemService.createTemporary(null));
-
-		//then
 		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
+	}
+
+	@DisplayName("04_04. update fail MEMBER_MISMATCH")
+	@Test
+	public void test_04_04() throws IOException {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(Item.builder()
+				.member(Member.builder()
+					.build())
+				.build()));
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
+	}
+
+	@DisplayName("04_05_1. create fail CAN_NOT_UPDATE_STATE")
+	@Test
+	public void test_04_05_1() {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(Item.builder()
+				.member(member)
+				.state(State.ASSESSING)
+				.build()));
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_UPDATE_STATE);
+	}
+
+	@DisplayName("04_05_2. create fail CAN_NOT_UPDATE_STATE")
+	@Test
+	public void test_04_05_2() {
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
+			new ArrayList<>(Arrays.asList(style2)));
+
+		given(itemRepository.findById(anyLong())).willReturn(
+			Optional.of(Item.builder()
+				.member(member)
+				.state(State.COMPLETE)
+				.build()));
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.update(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_UPDATE_STATE);
 	}
 
 	Category root = Category.builder()
@@ -437,13 +927,18 @@ class ItemServiceTest {
 		.name("root")
 		.children(new ArrayList<>())
 		.build();
-	List<ImageItem> imageItems = List.of(getImageItem("item1"));
-	List<ImageCheck> imageChecks = List.of(getImageCheck("check1"), getImageCheck("check2"));
-	List<StyleItem> styleItems = List.of(getStyleItem("style1"), getStyleItem("style2"));
-
-	List<String> styleNames = List.of("style1", "style2");
 
 	String png = "png";
+	String url1 = "url1";
+	String url2 = "url2";
+	String url3 = "url3";
+	String url4 = "url4";
+	String style1 = "style1";
+	String style2 = "style2";
+	String style3 = "style3";
+	String style4 = "style4";
+	String categoryName1 = "test category1";
+	String categoryName2 = "test category2";
 
 	Member member = Member.builder()
 		.userId("userId")
@@ -461,23 +956,41 @@ class ItemServiceTest {
 			.build();
 	}
 
-	private static ImageItem getImageItem(String url) {
+	private static ImageItem getImageItem(Long id, String url) {
 		return ImageItem.builder()
+			.id(id)
 			.url(url)
 			.build();
 	}
 
-	private static ImageCheck getImageCheck(String url) {
+	private static ImageCheck getImageCheck(Long id, String url) {
 		return ImageCheck.builder()
+			.id(id)
 			.url(url)
 			.build();
 	}
 
-	private Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks) {
+	private Item getEmptyItem() {
 		return Item.builder()
+			.id(1L)
+			.member(member)
+			.state(State.TEMPORARY)
+			.imageChecks(new ArrayList<>())
+			.imageItems(new ArrayList<>())
+			.styleItems(new ArrayList<>())
+			.created(LocalDateTime.now())
+			.updated(LocalDateTime.now())
+			.build();
+
+	}
+
+	private Item getItem(List<ImageItem> imageItems, List<ImageCheck> imageChecks,
+		List<StyleItem> styleItems) {
+		return Item.builder()
+			.id(1L)
 			.name("test name")
 			.member(member)
-			.category(getCategory("test category", root))
+			.category(getCategory(categoryName1, root))
 			.startPrice(100L)
 			.length(100L)
 			.width(100L)
@@ -491,34 +1004,27 @@ class ItemServiceTest {
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
-			.state(State.ASSESSING)
-			.assessed(false)
+			.state(State.TEMPORARY)
 			.created(LocalDateTime.now())
 			.updated(LocalDateTime.now())
 			.imageItems(new ArrayList<>(imageItems))
 			.imageChecks(new ArrayList<>(imageChecks))
-			.styleItems(new ArrayList<>(getStyleItems(styleNames)))
+			.styleItems(new ArrayList<>(styleItems))
 			.build();
 	}
 
 	private StyleItem getStyleItem(String styleName) {
-		return StyleItem.builder().style(Style.builder()
+		return StyleItem.builder()
+			.style(Style.builder()
 				.name(styleName)
 				.build())
 			.build();
 	}
 
-	private static List<StyleItem> getStyleItems(List<String> styles) {
-		List<StyleItem> styleItems = new ArrayList<>();
-		for (String style : styles) {
-			styleItems.add(StyleItem.builder()
-				.style(Style.builder()
-					.name(style)
-					.build()
-				)
-				.build());
-		}
-		return styleItems;
+	private static ImageDto.UpdateRequest getImageUpdateRequest(Long id) {
+		return ImageDto.UpdateRequest.builder()
+			.imageId(id)
+			.build();
 	}
 
 	private List<MultipartFile> getMultipartFiles(String extension) throws IOException {
@@ -531,33 +1037,15 @@ class ItemServiceTest {
 		return multipartFile;
 	}
 
+	private UpdateRequest getUpdateRequest(
+		List<ImageDto.UpdateRequest> imageItems,
+		List<ImageDto.UpdateRequest> imageChecks,
+		List<String> styleItems) {
 
-	private CreateRequest getCreateRequest() {
-		return ItemDto.CreateRequest.builder()
-			.name("test name")
-			.category("test category")
-			.startPrice(100L)
-			.length(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.styles(styleNames)
-			.build();
-	}
-
-	private static UpdateRequest getUpdateRequest() {
-		return ItemDto.UpdateRequest.builder()
+		return UpdateRequest.builder()
 			.itemId(1L)
 			.name("update name")
-			.category("update category")
+			.category(categoryName1)
 			.startPrice(200)
 			.length(200L)
 			.width(200L)
@@ -571,7 +1059,9 @@ class ItemServiceTest {
 			.designer("update designer")
 			.brand("update brand")
 			.productionYear(1023)
-			.styles(List.of("update style 1"))
+			.imageItemUrls(imageItems)
+			.imageCheckUrls(imageChecks)
+			.styles(styleItems)
 			.build();
 	}
 }
