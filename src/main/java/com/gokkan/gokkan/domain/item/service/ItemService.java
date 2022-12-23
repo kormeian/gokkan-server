@@ -23,6 +23,7 @@ import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,8 +57,20 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public Response read(Long itemId) {
+	public Response readDetail(Long itemId) {
 		Item item = getItem(itemId);
+		itemStateCheckForRead(item.getState(),
+			new ArrayList<>(List.of(State.COMPLETE, State.ASSESSING)));
+		return Response.toResponse(item);
+	}
+
+	@Transactional(readOnly = true)
+	public Response readTempDetail(Long itemId, Member member) {
+		Item item = getItem(itemId);
+		memberLoginCheck(member);
+		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
+		itemStateCheckForRead(item.getState(),
+			new ArrayList<>(List.of(State.TEMPORARY, State.RETURN)));
 		return Response.toResponse(item);
 	}
 
@@ -66,7 +79,7 @@ public class ItemService {
 		memberLoginCheck(member);
 		Item item = getItem(itemId);
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
-
+		itemStateCheckForUpdateAndDelete(item.getState());
 		imageItemService.deleteAllImageItems(item.getImageItems());
 		imageCheckService.deleteAllImageItems(item.getImageChecks());
 		itemRepository.delete(item);
@@ -101,7 +114,7 @@ public class ItemService {
 		memberLoginCheck(member);
 		Item item = getItem(request.getItemId());
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
-		itemStateCheck(item);
+		itemStateCheckForUpdateAndDelete(item.getState());
 
 		checkImageFiles(imageItemFiles, imageCheckFiles,
 			request.getImageItemUrls().size(), request.getImageCheckUrls().size());
@@ -172,9 +185,18 @@ public class ItemService {
 		}
 	}
 
-	private static void itemStateCheck(Item item) {
-		if (item.getState() == State.COMPLETE || item.getState() == State.ASSESSING) {
-			throw new RestApiException(ItemErrorCode.CAN_NOT_UPDATE_STATE);
+	private static void itemStateCheckForUpdateAndDelete(State state) {
+		if (state == State.COMPLETE || state == State.ASSESSING) {
+			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
 		}
+	}
+
+	private static void itemStateCheckForRead(State itemState, List<State> states) {
+		for (State state : states) {
+			if (state == itemState) {
+				return;
+			}
+		}
+		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 }

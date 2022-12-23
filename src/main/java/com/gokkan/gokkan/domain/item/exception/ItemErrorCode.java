@@ -11,8 +11,9 @@ public enum ItemErrorCode implements ErrorCode {
 
 
 	NOT_FOUND_ITEM(HttpStatus.BAD_REQUEST, "해당 상품이 존재하지 않습니다."),
-	CAN_NOT_UPDATE_STATE(HttpStatus.FORBIDDEN, "해당 상품은 수정할 수 없는 상태 입니다."),
+	CAN_NOT_FIX_STATE(HttpStatus.FORBIDDEN, "해당 상품은 수정 또는 삭제할 수 없는 상태 입니다."),
+	CAN_NOT_READ_STATE(HttpStatus.FORBIDDEN, "해당 상품은 조회할 수 없는 상태 입니다."),
 	;
 	private final HttpStatus httpStatus;
 	private final String message;
-}
+	}

@@ -51,13 +51,24 @@ public class ItemController {
 			.body(itemService.create(request, imageItemFiles, imageCheckFiles, member));
 	}
 
-	@Operation(summary = "상품 조회", description = "itemId에 해당하는 상품 조회")
+	@Operation(summary = "상품 디테일 조회", description = "itemId에 해당하는 상품 디테일 조회, 상품 상태 임시저장/반려 상태는 읽지 못함")
 	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
-	@GetMapping("")
+	@GetMapping("/details")
 	public ResponseEntity<?> read(
 		@Parameter(description = "상품 아이디", required = true)
 		@RequestParam Long itemId) {
-		return ResponseEntity.ok(itemService.read(itemId));
+		return ResponseEntity.ok(itemService.readDetail(itemId));
+	}
+
+	@Operation(summary = "임시 저장 상품 디테일 조회", description = "itemId에 해당하는 임시 저장 상품 디테일 조회")
+	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@GetMapping("/details/temp")
+	public ResponseEntity<?> tempRead(
+		@Parameter(description = "상품 아이디", required = true)
+		@RequestParam Long itemId,
+		@Parameter(hidden = true)
+		@CurrentMember Member member) {
+		return ResponseEntity.ok(itemService.readTempDetail(itemId, member));
 	}
 
 	@Operation(summary = "상품 삭제", description = "itemId에 해당하는 상품 삭제")
