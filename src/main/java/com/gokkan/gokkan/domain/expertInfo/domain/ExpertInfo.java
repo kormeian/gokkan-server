@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.expertInfo.domain;
 
+import com.gokkan.gokkan.domain.expertCareer.domain.ExpertCareer;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
 import java.util.ArrayList;
@@ -37,6 +38,10 @@ public class ExpertInfo {
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<ExpertStyle> expertStyles = new ArrayList<>();
 
+	@BatchSize(size = 10)
+	@OneToMany(fetch = FetchType.LAZY)
+	private List<ExpertCareer> expertCareers = new ArrayList<>();
+
 	private String name;
 	private String info;
 
@@ -57,5 +62,9 @@ public class ExpertInfo {
 
 	public void setExpertStyles(List<ExpertStyle> expertStyles) {
 		this.expertStyles = expertStyles;
+	}
+
+	public void addExpertCareer(ExpertCareer expertCareer) {
+		this.expertCareers.add(expertCareer);
 	}
 }
