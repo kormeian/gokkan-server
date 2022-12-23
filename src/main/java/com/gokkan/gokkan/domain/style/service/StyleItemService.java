@@ -19,15 +19,42 @@ public class StyleItemService {
 	private final StyleItemRepository styleItemRepository;
 	private final StyleRepository styleRepository;
 
-	public List<StyleItem> create(List<String> names) {
-		List<StyleItem> styleItems = new ArrayList<>();
+	public List<StyleItem> createNotDuplicate(List<String> names, List<StyleItem> saved) {
 		for (String name : names) {
-			styleItems.add(
-				StyleItem.builder()
-					.style(getStyle(name))
-					.build()
-			);
+			if (!styleRepository.existsByName(name)) {
+				throw new RestApiException(StyleErrorCode.NOT_FOUND_STYLE);
+			}
 		}
+
+		boolean[] deleted = new boolean[saved.size()];        // true -> 삭제 해야할 것 			false -> 삭제 안하고 저장 해 놓을것
+		boolean[] duplicate = new boolean[names.size()];    // true -> 저장 된 것과 중복된 것 	false -> 중복 안되어서 StyleItem 생성 할 것
+
+		for (int i = 0; i < names.size(); i++) {
+			String name = names.get(i);
+			for (int j = 0; j < saved.size(); j++) {
+				if (name.equals(saved.get(j).getStyle().getName())) {
+					duplicate[i] = true;
+					deleted[j] = true;
+					break;
+				}
+			}
+		}
+
+		List<StyleItem> styleItems = new ArrayList<>();
+		for (int i = 0; i < deleted.length; i++) {
+			if (deleted[i]) {
+				styleItems.add(saved.get(i));
+			}
+		}
+
+		for (int i = 0; i < duplicate.length; i++) {
+			if (!duplicate[i]) {
+				styleItems.add(StyleItem.builder()
+					.style(getStyle(names.get(i)))
+					.build());
+			}
+		}
+
 		return styleItems;
 	}
 
@@ -46,5 +73,9 @@ public class StyleItemService {
 	private Style getStyle(String name) {
 		return styleRepository.findByName(name)
 			.orElseThrow(() -> new RestApiException(StyleErrorCode.NOT_FOUND_STYLE));
+	}
+
+	public void deleteAll(List<StyleItem> styleItems) {
+		styleItemRepository.deleteAll(styleItems);
 	}
 }

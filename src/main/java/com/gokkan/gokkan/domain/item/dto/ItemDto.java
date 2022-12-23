@@ -3,9 +3,8 @@ package com.gokkan.gokkan.domain.item.dto;
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
+import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.item.domain.Item;
-import com.gokkan.gokkan.domain.item.type.State;
-import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,9 +28,11 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 생성 request")
+	@Schema(name = "상품 생성 완료 request")
 	public static class CreateRequest {
 
+		@NotNull
+		private Long itemId;
 		@NotNull
 		private String name;
 
@@ -41,7 +42,10 @@ public class ItemDto {
 		@NotNull
 		private String category;
 
-		@NotNull
+		private List<ImageDto.UpdateRequest> imageItemUrls;
+
+		private List<ImageDto.UpdateRequest> imageCheckUrls;
+
 		private List<String> styles;
 
 		@NotNull
@@ -62,75 +66,10 @@ public class ItemDto {
 		@NotNull
 		private String text;
 
-		@NotNull
-		private String madeIn;
-		@NotNull
-		private String designer;
-		@NotNull
-		private String brand;
-		@NotNull
-		private int productionYear;
-
-		public Item toItem(Category category, Member member) {
-			return Item.builder()
-				.name(this.name)
-				.member(member)
-				.category(category)
-				.startPrice(this.startPrice)
-				.length(this.length)
-				.width(this.width)
-				.depth(this.depth)
-				.height(this.height)
-				.material(this.material)
-				.conditionGrade(this.conditionGrade)
-				.conditionDescription(this.conditionDescription)
-				.text(this.text)
-				.madeIn(this.madeIn)
-				.designer(this.designer)
-				.brand(this.brand)
-				.productionYear(this.productionYear)
-				.state(State.ASSESSING)
-				.assessed(false)
-				.created(LocalDateTime.now())
-				.updated(LocalDateTime.now())
-				.build();
-		}
-	}
-
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	@NoArgsConstructor
-	@ToString
-	@Builder
-	@Schema(name = "상품 수정 request")
-	public static class UpdateRequest {
-
-		@NotNull
-		private Long itemId;
-		private String name;
-
-		private long startPrice;
-
-		private String category;
-
-		private List<String> styles;
-
-		private Long length;
-		private Long width;
-		private Long depth;
-		private Long height;
-		private String material;
-
-		private String conditionGrade;
-		private String conditionDescription;
-		private String text;
-
 		private String madeIn;
 		private String designer;
 		private String brand;
-		@NotNull
-		private int productionYear;
+		private Integer productionYear;
 
 		public Item toItem(Item item, Category category) {
 			return Item.builder()
@@ -152,7 +91,74 @@ public class ItemDto {
 				.brand(this.brand)
 				.productionYear(this.productionYear)
 				.state(item.getState())
-				.assessed(item.isAssessed())
+				.created(item.getCreated())
+				.updated(LocalDateTime.now())
+				.imageItems(item.getImageItems())
+				.imageChecks(item.getImageChecks())
+				.styleItems(item.getStyleItems())
+				.build();
+		}
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@ToString
+	@Builder
+	@Schema(name = "상품 수정 request")
+	public static class UpdateRequest {
+
+		@NotNull
+		private Long itemId;
+		private String name;
+
+		private long startPrice;
+
+		private String category;
+
+		private List<ImageDto.UpdateRequest> imageItemUrls;
+
+		private List<ImageDto.UpdateRequest> imageCheckUrls;
+
+		private List<String> styles;
+
+		private Long length;
+		private Long width;
+		private Long depth;
+		private Long height;
+		private String material;
+
+		private String conditionGrade;
+		private String conditionDescription;
+		private String text;
+
+		private String madeIn;
+		private String designer;
+		private String brand;
+		private Integer productionYear;
+
+
+		public Item toItem(Item item, Category category) {
+			return Item.builder()
+				.id(item.getId())
+				.member(item.getMember())
+				.name(this.name)
+				.category(category)
+				.startPrice(this.startPrice)
+				.length(this.length)
+				.width(this.width)
+				.depth(this.depth)
+				.height(this.height)
+				.material(this.material)
+				.conditionGrade(this.conditionGrade)
+				.conditionDescription(this.conditionDescription)
+				.text(this.text)
+				.madeIn(this.madeIn)
+				.designer(this.designer)
+				.brand(this.brand)
+				.productionYear(this.productionYear)
+				.state(item.getState())
 				.created(item.getCreated())
 				.updated(LocalDateTime.now())
 				.imageItems(item.getImageItems())
@@ -194,11 +200,12 @@ public class ItemDto {
 		private String designer;
 		private String brand;
 		private int productionYear;
-		private boolean assessed;
 
-		private List<String> imageItemUrls = new ArrayList<>();
-		private List<String> imageCheckUrls = new ArrayList<>();
-		private List<String> styles = new ArrayList<>();
+		private String writer;
+		private String category;
+		private List<ImageDto.Response> imageItemUrls;
+		private List<ImageDto.Response> imageCheckUrls;
+		private List<String> styles;
 
 		private LocalDateTime created;
 		private LocalDateTime updated;
@@ -226,11 +233,21 @@ public class ItemDto {
 				.productionYear(item.getProductionYear())
 				.created(item.getCreated())
 				.updated(item.getUpdated())
+				.writer(item.getMember().getNickName())
+				.category(item.getCategory().getName())
 				.imageItemUrls(imageItems == null ? new ArrayList<>() :
-					imageItems.stream().map(ImageItem::getUrl)
+					imageItems.stream()
+						.map(x -> ImageDto.Response.builder()
+							.id(x.getId())
+							.url(x.getUrl())
+							.build())
 						.collect(Collectors.toList()))
 				.imageCheckUrls(imageChecks == null ? new ArrayList<>() :
-					imageChecks.stream().map(ImageCheck::getUrl)
+					imageChecks.stream()
+						.map(x -> ImageDto.Response.builder()
+							.id(x.getId())
+							.url(x.getUrl())
+							.build())
 						.collect(Collectors.toList()))
 				.styles(styleItems == null ? new ArrayList<>() :
 					styleItems.stream().map(x -> x.getStyle().getName())

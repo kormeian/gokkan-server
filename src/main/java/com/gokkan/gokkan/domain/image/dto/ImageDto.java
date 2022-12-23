@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.image.dto;
 
 import com.sun.istack.NotNull;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,11 +17,11 @@ public class ImageDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	public static class CreateRequest {
+	public static class UpdateRequest {
 
 		@NotNull
-		Long itemId;
-		List<String> urls;
+		Long imageId;
+		String url;
 	}
 
 	@Getter
@@ -31,10 +30,9 @@ public class ImageDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	public static class UpdateRequest {
+	public static class Response {
 
-		@NotNull
-		Long imageId;
+		Long id;
 		String url;
 	}
 }

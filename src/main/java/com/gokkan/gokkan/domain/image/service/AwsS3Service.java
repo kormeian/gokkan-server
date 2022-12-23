@@ -29,7 +29,6 @@ public class AwsS3Service {
 	@Value("${cloud.aws.baseUrl}")
 	private String baseUrl;
 
-
 	public String save(MultipartFile multipartFile) {
 		if (multipartFile.isEmpty()) {
 			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
@@ -52,10 +51,6 @@ public class AwsS3Service {
 	}
 
 	public void check(MultipartFile multipartFiles) {
-		if (multipartFiles.isEmpty()) {
-			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
-		}
-
 		String filename = multipartFiles.getOriginalFilename();
 		if (filename != null) {
 			checkName(filename);
@@ -64,32 +59,41 @@ public class AwsS3Service {
 		}
 	}
 
-
 	public List<String> save(List<MultipartFile> multipartFiles) {
-		List<String> urls = new ArrayList<>();
-
-		if (multipartFiles.isEmpty()) {
-			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
+		if (multipartFiles.get(0).isEmpty()) {
+			return new ArrayList<>();
 		}
 
-		multipartFiles.forEach(file -> {
-			String fileName = createFileName(file.getOriginalFilename());
-			ObjectMetadata objectMetadata = new ObjectMetadata();
-			objectMetadata.setContentLength(file.getSize());
-			objectMetadata.setContentType(file.getContentType());
+		List<String> urls = new ArrayList<>();
 
-			try (InputStream inputStream = file.getInputStream()) {
-				amazonS3.putObject(
-					new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-						.withCannedAcl(CannedAccessControlList.PublicRead));
-			} catch (IOException e) {
-				throw new RestApiException(ImageErrorCode.INTERNAL_SERVER_ERROR);
-			}
-
-			urls.add(baseUrl + fileName);
-		});
+		for (MultipartFile multipartFile : multipartFiles) {
+			urls.add(save(multipartFile));
+		}
 
 		return urls;
+	}
+
+	public void check(List<MultipartFile> multipartFiles) {
+		if (multipartFiles.get(0).isEmpty()) {
+			return;
+		}
+		for (MultipartFile multipartFile : multipartFiles) {
+			check(multipartFile);
+		}
+	}
+
+	public void checkImageCount(List<MultipartFile> multipartFiles, int savedCount) {
+		int multipartFiesSize = multipartFiles.size() == 1 ?
+			(multipartFiles.get(0).isEmpty() ? -1 : 1)
+			: multipartFiles.size();
+
+		if (multipartFiesSize == -1) {
+			return;
+		}
+
+		if (multipartFiesSize + savedCount > 5) {
+			throw new RestApiException(ImageErrorCode.TOO_MANY_IMAGE);
+		}
 	}
 
 	public boolean delete(String url) {
@@ -101,6 +105,18 @@ public class AwsS3Service {
 		return true;
 	}
 
+	private void checkName(String fileName) {
+		try {
+			String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
+				return;
+			}
+			throw new RestApiException(ImageErrorCode.INVALID_FORMAT_FILE);
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
+		}
+	}
+
 	private String createFileName(String fileName) {
 		return UUID.randomUUID().toString().concat(getFileExtension(fileName));
 	}
@@ -110,33 +126,6 @@ public class AwsS3Service {
 			String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
 			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
 				return extension;
-			}
-			throw new RestApiException(ImageErrorCode.INVALID_FORMAT_FILE);
-		} catch (StringIndexOutOfBoundsException e) {
-			throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
-		}
-	}
-
-	public void check(List<MultipartFile> multipartFiles) {
-		if (multipartFiles.isEmpty()) {
-			throw new RestApiException(ImageErrorCode.EMPTY_FILE);
-		}
-
-		multipartFiles.forEach(file -> {
-			String filename = file.getOriginalFilename();
-			if (filename != null) {
-				checkName(filename);
-			} else {
-				throw new RestApiException(ImageErrorCode.MISMATCH_FILE_TYPE);
-			}
-		});
-	}
-
-	private void checkName(String fileName) {
-		try {
-			String extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
-			if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")) {
-				return;
 			}
 			throw new RestApiException(ImageErrorCode.INVALID_FORMAT_FILE);
 		} catch (StringIndexOutOfBoundsException e) {

@@ -30,66 +30,114 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
 
-	private final String name1 = "test style1";
-	private final String name2 = "test style2";
-	private final List<String> names = List.of(name1, name2);
-	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
 	@Mock
 	private StyleRepository styleRepository;
 	@InjectMocks
 	private StyleItemService styleItemService;
+	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 
-	private static Item getItem() {
-		return Item.builder()
-			.name("test name")
-			.startPrice(100L)
-			.length(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.state(State.ASSESSING)
-			.created(LocalDateTime.now())
-			.updated(LocalDateTime.now())
-			.imageItems(new ArrayList<>())
-			.imageChecks(new ArrayList<>())
-			.build();
-	}
-
-	@DisplayName("01_00. create success")
+	@DisplayName("01_00. createNotDuplicate success not delete all duplicate")
 	@Test
 	public void test_01_00() {
 		//given
-		Style style = getStyle(name1);
-		given(styleRepository.findByName(any())).willReturn(Optional.of(style));
+		Style style1 = getStyle(name1);
+		Style style2 = getStyle(name2);
+		given(styleRepository.existsByName(name1)).willReturn(true);
+		given(styleRepository.existsByName(name2)).willReturn(true);
 
 		//when
-		List<StyleItem> styleItems = styleItemService.create(names);
-
-		verify(styleItemRepository, times(0)).save(styleItemCaptor.capture());
+		List<StyleItem> styleItems = styleItemService.createNotDuplicate(
+			List.of(name1, name2),
+			List.of(getStyleItem(style1), getStyleItem(style2)));
 
 		//then
 		assertEquals(styleItems.get(0).getStyle().getName(), names.get(0));
+		assertEquals(styleItems.get(1).getStyle().getName(), names.get(1));
 	}
 
-	@DisplayName("01_01. create fail not found style")
+	@DisplayName("01_01. createNotDuplicate success do delete not duplicate")
 	@Test
 	public void test_01_01() {
 		//given
-		given(styleRepository.findByName(any())).willReturn(Optional.empty());
+		Style style1 = getStyle(name1);
+		Style style2 = getStyle(name2);
+		given(styleRepository.existsByName(name1)).willReturn(true);
+		given(styleRepository.findByName(name1)).willReturn(Optional.of(style1));
+
+		//when
+
+		List<StyleItem> styleItems = styleItemService.createNotDuplicate(
+			List.of(name1),
+			List.of(getStyleItem(style2)));
+
+		//then
+		assertEquals(styleItems.size(), 1);
+		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+	}
+
+	@DisplayName("01_02. createNotDuplicate success some delete some duplicate")
+	@Test
+	public void test_01_02() {
+		//given
+		Style style1 = getStyle(name1);
+		Style style2 = getStyle(name2);
+		Style style3 = getStyle(name3);
+		Style style4 = getStyle(name4);
+		given(styleRepository.existsByName(name1)).willReturn(true);
+		given(styleRepository.existsByName(name2)).willReturn(true);
+		given(styleRepository.existsByName(name3)).willReturn(true);
+
+		given(styleRepository.findByName(name1)).willReturn(Optional.of(style1));
+
+		//when
+
+		List<StyleItem> styleItems = styleItemService.createNotDuplicate(
+			List.of(name1, name2, name3),
+			List.of(getStyleItem(style2), getStyleItem(style3), getStyleItem(style4)));
+		styleItems.sort((o1, o2) -> o1.getStyle().getName().compareTo(o2.getStyle().getName()));
+
+		//then
+		assertEquals(styleItems.size(), 3);
+		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+		assertEquals(styleItems.get(1).getStyle().getName(), style2.getName());
+		assertEquals(styleItems.get(2).getStyle().getName(), style3.getName());
+	}
+
+	@DisplayName("01_03. createNotDuplicate success not delete not duplicate")
+	@Test
+	public void test_01_03() {
+		//given
+		Style style1 = getStyle(name1);
+		Style style2 = getStyle(name2);
+		given(styleRepository.existsByName(name1)).willReturn(true);
+		given(styleRepository.existsByName(name2)).willReturn(true);
+
+		given(styleRepository.findByName(name1)).willReturn(Optional.of(style1));
+		given(styleRepository.findByName(name2)).willReturn(Optional.of(style2));
+
+		//when
+
+		List<StyleItem> styleItems = styleItemService.createNotDuplicate(
+			List.of(name1, name2),
+			new ArrayList<>());
+
+		//then
+		assertEquals(styleItems.size(), 2);
+		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+		assertEquals(styleItems.get(1).getStyle().getName(), style2.getName());
+	}
+
+	@DisplayName("01_04. create fail not found style")
+	@Test
+	public void test_01_04() {
+		//given
+		given(styleRepository.existsByName(any())).willReturn(false);
 
 		//when
 		RestApiException restApiException = assertThrows(RestApiException.class,
-			() -> styleItemService.create(names));
+			() -> styleItemService.createNotDuplicate(names, new ArrayList<>()));
 
 		//then
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE);
@@ -148,6 +196,13 @@ class StyleItemServiceTest {
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE_ITEM);
 	}
 
+
+	private final String name1 = "test style1";
+	private final String name2 = "test style2";
+	private final String name3 = "test style3";
+	private final String name4 = "test style4";
+	private final List<String> names = List.of(name1, name2);
+
 	private Style getStyle(String styleName) {
 		return Style.builder()
 			.name(styleName)
@@ -158,6 +213,30 @@ class StyleItemServiceTest {
 		return StyleItem.builder()
 			.style(style)
 			.item(getItem())
+			.build();
+	}
+
+	private static Item getItem() {
+		return Item.builder()
+			.name("test name")
+			.startPrice(100L)
+			.length(100L)
+			.width(100L)
+			.depth(100L)
+			.height(100L)
+			.material("나무")
+			.conditionGrade("test conditionGrade")
+			.conditionDescription("test conditionDescription")
+			.text("test text")
+			.madeIn("test madeIn")
+			.designer("test designer")
+			.brand("test brand")
+			.productionYear(2023)
+			.state(State.ASSESSING)
+			.created(LocalDateTime.now())
+			.updated(LocalDateTime.now())
+			.imageItems(new ArrayList<>())
+			.imageChecks(new ArrayList<>())
 			.build();
 	}
 }

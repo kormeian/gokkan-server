@@ -7,7 +7,6 @@ import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -76,9 +75,8 @@ public class Item {
 	@Column(length = 20)
 	private String brand;
 	@Column(length = 4)
-	private int productionYear;
+	private Integer productionYear;
 	private String thumbnail;
-	private boolean assessed;
 
 	private LocalDateTime created;
 	private LocalDateTime updated;
@@ -92,28 +90,28 @@ public class Item {
 
 	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
-	private List<ImageCheck> imageChecks = new ArrayList<>();
+	private List<ImageCheck> imageChecks;
 
 	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
-	private List<ImageItem> imageItems = new ArrayList<>();
+	private List<ImageItem> imageItems;
 
 	@BatchSize(size = 5)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
-	private List<StyleItem> styleItems = new ArrayList<>();
+	private List<StyleItem> styleItems;
 
 	public void addImageItems(List<ImageItem> imageItems) {
 		for (ImageItem imageItem : imageItems) {
 			imageItem.setItem(this);
 		}
-		this.setImageItems(imageItems);
+		this.getImageItems().addAll(imageItems);
 	}
 
 	public void addImageChecks(List<ImageCheck> imageChecks) {
 		for (ImageCheck imageCheck : imageChecks) {
 			imageCheck.setItem(this);
 		}
-		this.setImageChecks(imageChecks);
+		this.getImageChecks().addAll(imageChecks);
 	}
 
 	public void addStyleItem(List<StyleItem> styleItems) {
