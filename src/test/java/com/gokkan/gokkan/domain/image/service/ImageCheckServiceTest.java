@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
+import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -27,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ImageCheckServiceTest {
 
-	static List<String> urls = List.of("u1", "u2", "u3");
 	static ArgumentCaptor<ImageCheck> imageCheckCaptor = ArgumentCaptor.forClass(ImageCheck.class);
 	@Mock
 	private ImageCheckRepository imageCheckRepository;
@@ -59,32 +59,6 @@ class ImageCheckServiceTest {
 		for (int i = 0; i < urls.size(); i++) {
 			assertEquals(imageChecks.get(i).getUrl(), urls.get(i));
 		}
-	}
-
-	@DisplayName("01_02. save fail empty url")
-	@Test
-	public void test_01_02() {
-		//given
-
-		//when
-		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageCheckService.create(new ArrayList<>()));
-
-		//then
-		assertEquals(imageException.getErrorCode(), ImageErrorCode.EMPTY_URL);
-	}
-
-	@DisplayName("01_03. save fail invalid url")
-	@Test
-	public void test_01_03() {
-		//given
-
-		//when
-		RestApiException imageException = assertThrows(RestApiException.class,
-			() -> imageCheckService.create(new ArrayList<>(List.of("", ""))));
-
-		//then
-		assertEquals(imageException.getErrorCode(), ImageErrorCode.INVALID_FORMAT_URL);
 	}
 
 	@DisplayName("02_00. delete success")
@@ -119,4 +93,62 @@ class ImageCheckServiceTest {
 		//then
 		assertEquals(imageException.getErrorCode(), ImageErrorCode.NOT_FOUND_IMAGE_CHECK);
 	}
+
+	@DisplayName("03_00. checkImageCheckDeleted success ")
+	@Test
+	public void test_03_00() {
+		//given
+
+		//when
+		List<ImageCheck> imageChecks = imageCheckService.checkImageCheckDeleted(
+			List.of(updateRequest1, updateRequest2), List.of(imageCheck1, imageCheck2)
+		);
+
+		//then
+		assertEquals(imageChecks.size(), 2);
+		assertEquals(imageChecks.get(0).getUrl(), url1);
+		assertEquals(imageChecks.get(1).getUrl(), url2);
+	}
+
+	@DisplayName("03_01. checkImageCheckDeleted success ")
+	@Test
+	public void test_03_01() {
+		//given
+
+		//when
+		List<ImageCheck> imageChecks = imageCheckService.checkImageCheckDeleted(
+			List.of(updateRequest1, updateRequest2), List.of(imageCheck1, imageCheck2, imageCheck3)
+		);
+
+		//then
+		assertEquals(imageChecks.size(), 2);
+		assertEquals(imageChecks.get(0).getUrl(), url1);
+		assertEquals(imageChecks.get(1).getUrl(), url2);
+	}
+
+	@DisplayName("03_02. checkImageCheckDeleted success ")
+	@Test
+	public void test_03_02() {
+		//given
+
+		//when
+		List<ImageCheck> imageChecks = imageCheckService.checkImageCheckDeleted(
+			new ArrayList<>(), List.of(imageCheck1, imageCheck2, imageCheck3)
+		);
+
+		//then
+		assertEquals(imageChecks.size(), 0);
+	}
+
+	String url1 = "test url1";
+	String url2 = "test url2";
+	String url3 = "test url3";
+
+	ImageDto.UpdateRequest updateRequest1 = ImageDto.UpdateRequest.builder().imageId(1L).build();
+	ImageDto.UpdateRequest updateRequest2 = ImageDto.UpdateRequest.builder().imageId(2L).build();
+	ImageCheck imageCheck1 = ImageCheck.builder().id(1L).url(url1).build();
+	ImageCheck imageCheck2 = ImageCheck.builder().id(2L).url(url2).build();
+	ImageCheck imageCheck3 = ImageCheck.builder().id(3L).url(url3).build();
+
+	static List<String> urls = List.of("u1", "u2", "u3");
 }

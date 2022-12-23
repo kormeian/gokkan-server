@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.image.service;
 
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
+import com.gokkan.gokkan.domain.image.dto.ImageDto.UpdateRequest;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -20,16 +21,8 @@ public class ImageCheckService {
 
 
 	public List<ImageCheck> create(List<String> urls) {
-		if (urls.size() == 0) {
-			throw new RestApiException(ImageErrorCode.EMPTY_URL);
-		}
-
 		List<ImageCheck> imageChecks = new ArrayList<>();
 		for (String url : urls) {
-			if (url == null || url.length() == 0) {
-				throw new RestApiException(ImageErrorCode.INVALID_FORMAT_URL);
-			}
-
 			imageChecks.add(
 				ImageCheck.builder()
 					.url(url)
@@ -58,9 +51,51 @@ public class ImageCheckService {
 	}
 
 
+	public void deleteAllImageItems(List<ImageCheck> saved) {
+		for (ImageCheck imageCheck : saved) {
+			delete(imageCheck);
+		}
+	}
+
+
 	private ImageCheck getImageCheck(Long imageCheckId) {
 		return imageCheckRepository.findById(imageCheckId)
 			.orElseThrow(() -> new RestApiException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
 	}
 
+	public List<ImageCheck> checkImageCheckDeleted(List<UpdateRequest> urls,
+		List<ImageCheck> saved) {
+		List<ImageCheck> imageChecks = new ArrayList<>();
+		boolean[] deleted = new boolean[saved.size()];
+		int deletedCount = saved.size() - urls.size();
+
+		if (deletedCount == 0) {
+			return saved;
+		} else if (deletedCount == saved.size()) {
+			deleteAllImageItems(saved);
+			return new ArrayList<>();
+		} else {
+			int nextStartIndex = 0;
+
+			for (ImageCheck imageCheck : saved) {
+				for (int j = nextStartIndex; j < urls.size(); j++) {
+					if (imageCheck.getId().equals(urls.get(j).getImageId())) {
+						deleted[j] = true;
+						nextStartIndex = j;
+						break;
+					}
+
+				}
+			}
+
+			for (int i = 0; i < deleted.length; i++) {
+				if (deleted[i]) {
+					imageChecks.add(saved.get(i));
+				} else {
+					delete(saved.get(i));
+				}
+			}
+			return imageChecks;
+		}
+	}
 }
