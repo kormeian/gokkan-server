@@ -26,11 +26,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ItemService {
 
@@ -51,6 +53,7 @@ public class ItemService {
 		List<MultipartFile> imageItemFiles,
 		List<MultipartFile> imageCheckFiles,
 		Member member) {
+		log.info("create item id : " + request.getItemId());
 		Item item = updateItem(request, imageItemFiles, imageCheckFiles, member);
 		item.setState(State.ASSESSING);
 		return Response.toResponse(itemRepository.save(item));
@@ -58,6 +61,7 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public Response readDetail(Long itemId) {
+		log.info("readDetail item id : " + itemId);
 		Item item = getItem(itemId);
 		itemStateCheckForRead(item.getState(),
 			new ArrayList<>(List.of(State.COMPLETE, State.ASSESSING)));
@@ -66,6 +70,7 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public Response readTempDetail(Long itemId, Member member) {
+		log.info("readTempDetail item id : " + itemId);
 		Item item = getItem(itemId);
 		memberLoginCheck(member);
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
@@ -76,6 +81,7 @@ public class ItemService {
 
 	@Transactional
 	public boolean delete(Long itemId, Member member) {
+		log.info("delete item id : " + itemId);
 		memberLoginCheck(member);
 		Item item = getItem(itemId);
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
@@ -92,6 +98,7 @@ public class ItemService {
 		List<MultipartFile> imageItemFiles,
 		List<MultipartFile> imageCheckFiles,
 		Member member) {
+		log.info("update item id : " + request.getItemId());
 		return Response.toResponse(
 			itemRepository.save(updateItem(request, imageItemFiles, imageCheckFiles, member)));
 	}
@@ -99,6 +106,7 @@ public class ItemService {
 
 	public Long createTemporary(Member member) {
 		memberLoginCheck(member);
+		log.info("createTemporary member id : " + member.getId());
 		return itemRepository.save(
 				Item.builder()
 					.member(member)
@@ -112,6 +120,7 @@ public class ItemService {
 	private Item updateItem(UpdateRequest request, List<MultipartFile> imageItemFiles,
 		List<MultipartFile> imageCheckFiles, Member member) {
 		memberLoginCheck(member);
+		log.info("login member id : " + member.getUserId());
 		Item item = getItem(request.getItemId());
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
 		itemStateCheckForUpdateAndDelete(item.getState());
@@ -147,6 +156,7 @@ public class ItemService {
 		List<MultipartFile> imageCheckFiles,
 		int imageItemsUrlsCount,
 		int imageCheckUrlsCount) {
+		log.info("checkImageFiles");
 		awsS3Service.checkImageCount(imageItemFiles, imageItemsUrlsCount);
 		awsS3Service.checkImageCount(imageCheckFiles, imageCheckUrlsCount);
 		awsS3Service.check(imageItemFiles);
@@ -154,14 +164,20 @@ public class ItemService {
 	}
 
 	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		log.info("memberMatchCheck member id : " + memberId);
 		if (!memberId.equals(itemMemberId)) {
+			log.error("memberMatchCheck member id : " + memberId);
 			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
 		}
 	}
 
 	private Item getItem(Long itemId) {
+		log.info("getItem item id : " + itemId);
 		return itemRepository.findById(itemId)
-			.orElseThrow((() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM)));
+			.orElseThrow((() -> {
+				log.error("getItem item id : " + itemId);
+				return new RestApiException(ItemErrorCode.NOT_FOUND_ITEM);
+			}));
 	}
 
 	private void saveItemRelations(
@@ -169,7 +185,7 @@ public class ItemService {
 		List<ImageCheck> imageChecks,
 		List<StyleItem> styleItems,
 		Item item) {
-
+		log.info("saveItemRelations");
 		item.addStyleItem(styleItems);
 		item.addImageItems(imageItems);
 		item.addImageChecks(imageChecks);
@@ -181,12 +197,16 @@ public class ItemService {
 
 	private static void memberLoginCheck(Member member) {
 		if (member == null) {
+			log.error("memberLoginCheck");
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		} else {
+			log.info("member id : " + member.getId());
 		}
 	}
 
 	private static void itemStateCheckForUpdateAndDelete(State state) {
 		if (state == State.COMPLETE || state == State.ASSESSING) {
+			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
 			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
 		}
 	}
@@ -197,6 +217,7 @@ public class ItemService {
 				return;
 			}
 		}
+		log.error("itemStateCheckForRead state : " + itemState.getDescription());
 		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 }

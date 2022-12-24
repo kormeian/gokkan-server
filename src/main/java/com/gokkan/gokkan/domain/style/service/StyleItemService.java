@@ -9,10 +9,12 @@ import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StyleItemService {
 
@@ -20,10 +22,9 @@ public class StyleItemService {
 	private final StyleRepository styleRepository;
 
 	public List<StyleItem> createNotDuplicate(List<String> names, List<StyleItem> saved) {
+		log.info("createNotDuplicate");
 		for (String name : names) {
-			if (!styleRepository.existsByName(name)) {
-				throw new RestApiException(StyleErrorCode.NOT_FOUND_STYLE);
-			}
+			styleExistCheck(name);
 		}
 
 		boolean[] deleted = new boolean[saved.size()];        // true -> 삭제 해야할 것 			false -> 삭제 안하고 저장 해 놓을것
@@ -58,24 +59,42 @@ public class StyleItemService {
 		return styleItems;
 	}
 
+	private void styleExistCheck(String name) {
+		log.info("styleExistCheck style name : " + name);
+		if (!styleRepository.existsByName(name)) {
+			log.error("styleExistCheck style name : " + name);
+			throw new RestApiException(StyleErrorCode.NOT_FOUND_STYLE);
+		}
+	}
+
 	@Transactional
 	public StyleItem update(Long id, String name) {
+		log.info("update style item id : " + id);
 		StyleItem styleItem = getStyleItem(id);
 		styleItem.setStyle(getStyle(name));
 		return styleItemRepository.save(styleItem);
 	}
 
 	private StyleItem getStyleItem(Long id) {
+		log.info("getStyleItem style item id : " + id);
 		return styleItemRepository.findById(id)
-			.orElseThrow(() -> new RestApiException(StyleErrorCode.NOT_FOUND_STYLE_ITEM));
+			.orElseThrow(() -> {
+				log.error("getStyleItem style item id : " + id);
+				return new RestApiException(StyleErrorCode.NOT_FOUND_STYLE_ITEM);
+			});
 	}
 
 	private Style getStyle(String name) {
+		log.info("getStyle style name : " + name);
 		return styleRepository.findByName(name)
-			.orElseThrow(() -> new RestApiException(StyleErrorCode.NOT_FOUND_STYLE));
+			.orElseThrow(() -> {
+				log.error("getStyle style name : " + name);
+				return new RestApiException(StyleErrorCode.NOT_FOUND_STYLE);
+			});
 	}
 
 	public void deleteAll(List<StyleItem> styleItems) {
+		log.info("deleteAll List<StyleItem> size : " + styleItems.size());
 		styleItemRepository.deleteAll(styleItems);
 	}
 }

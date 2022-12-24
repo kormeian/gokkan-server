@@ -8,10 +8,12 @@ import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class ImageCheckService {
@@ -21,6 +23,7 @@ public class ImageCheckService {
 
 
 	public List<ImageCheck> create(List<String> urls) {
+		log.info("create List<String> size : " + urls.size());
 		List<ImageCheck> imageChecks = new ArrayList<>();
 		for (String url : urls) {
 			imageChecks.add(
@@ -34,6 +37,7 @@ public class ImageCheckService {
 	}
 
 	public boolean delete(Long imageCheckId) {
+		log.info("delete imageCheckId : " + imageCheckId);
 		ImageCheck imageCheck = getImageCheck(imageCheckId);
 		String url = imageCheck.getUrl();
 		imageCheckRepository.delete(imageCheck);
@@ -43,6 +47,7 @@ public class ImageCheckService {
 	}
 
 	public boolean delete(ImageCheck imageCheck) {
+		log.info("delete imageCheck url : " + imageCheck.getUrl());
 		String url = imageCheck.getUrl();
 		imageCheckRepository.delete(imageCheck);
 		awsS3Service.delete(url);
@@ -52,6 +57,7 @@ public class ImageCheckService {
 
 
 	public void deleteAllImageItems(List<ImageCheck> saved) {
+		log.info("deleteAllImageItems List<ImageCheck> : " + saved.size());
 		for (ImageCheck imageCheck : saved) {
 			delete(imageCheck);
 		}
@@ -59,12 +65,14 @@ public class ImageCheckService {
 
 
 	private ImageCheck getImageCheck(Long imageCheckId) {
+		log.info("getImageCheck imageCheckId : " + imageCheckId);
 		return imageCheckRepository.findById(imageCheckId)
 			.orElseThrow(() -> new RestApiException(ImageErrorCode.NOT_FOUND_IMAGE_CHECK));
 	}
 
 	public List<ImageCheck> checkImageCheckDeleted(List<UpdateRequest> urls,
 		List<ImageCheck> saved) {
+		log.info("checkImageCheckDeleted");
 		List<ImageCheck> imageChecks = new ArrayList<>();
 		boolean[] deleted = new boolean[saved.size()];
 		int deletedCount = saved.size() - urls.size();
