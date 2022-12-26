@@ -12,7 +12,10 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.enableSimpleBroker("/queue", "/topic");
+//		registry.enableSimpleBroker("/queue", "/topic");
+		registry.enableStompBrokerRelay("/topic")
+			.setRelayHost("3.38.59.40")
+			.setRelayPort(61613);
 		//queue = 메시지가 1대1로 송신될 때
 		//topic = 메시지가 1대다로 송신될 때, subscribe
 		registry.setApplicationDestinationPrefixes("/auction");
