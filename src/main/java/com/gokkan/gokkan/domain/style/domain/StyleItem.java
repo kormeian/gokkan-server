@@ -30,6 +30,9 @@ public class StyleItem {
 	@Column(name = "style_item_id")
 	private Long id;
 
+	@Column(length = 20)
+	private String name;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "style_id")
 	private Style style;

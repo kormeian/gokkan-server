@@ -17,6 +17,7 @@ import com.gokkan.gokkan.domain.style.repository.StyleRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +55,9 @@ class StyleItemServiceTest {
 
 		//then
 		assertEquals(styleItems.get(0).getStyle().getName(), names.get(0));
+		assertEquals(styleItems.get(0).getName(), names.get(0));
 		assertEquals(styleItems.get(1).getStyle().getName(), names.get(1));
+		assertEquals(styleItems.get(1).getName(), names.get(1));
 	}
 
 	@DisplayName("01_01. createNotDuplicate success do delete not duplicate")
@@ -75,6 +78,7 @@ class StyleItemServiceTest {
 		//then
 		assertEquals(styleItems.size(), 1);
 		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+		assertEquals(styleItems.get(0).getName(), style1.getName());
 	}
 
 	@DisplayName("01_02. createNotDuplicate success some delete some duplicate")
@@ -96,13 +100,16 @@ class StyleItemServiceTest {
 		List<StyleItem> styleItems = styleItemService.createNotDuplicate(
 			List.of(name1, name2, name3),
 			List.of(getStyleItem(style2), getStyleItem(style3), getStyleItem(style4)));
-		styleItems.sort((o1, o2) -> o1.getStyle().getName().compareTo(o2.getStyle().getName()));
+		styleItems.sort(Comparator.comparing(o -> o.getStyle().getName()));
 
 		//then
 		assertEquals(styleItems.size(), 3);
 		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+		assertEquals(styleItems.get(0).getName(), style1.getName());
 		assertEquals(styleItems.get(1).getStyle().getName(), style2.getName());
+		assertEquals(styleItems.get(1).getName(), style2.getName());
 		assertEquals(styleItems.get(2).getStyle().getName(), style3.getName());
+		assertEquals(styleItems.get(2).getName(), style3.getName());
 	}
 
 	@DisplayName("01_03. createNotDuplicate success not delete not duplicate")
@@ -126,7 +133,9 @@ class StyleItemServiceTest {
 		//then
 		assertEquals(styleItems.size(), 2);
 		assertEquals(styleItems.get(0).getStyle().getName(), style1.getName());
+		assertEquals(styleItems.get(0).getName(), style1.getName());
 		assertEquals(styleItems.get(1).getStyle().getName(), style2.getName());
+		assertEquals(styleItems.get(1).getName(), style2.getName());
 	}
 
 	@DisplayName("01_04. create fail not found style")
@@ -161,6 +170,7 @@ class StyleItemServiceTest {
 		//then
 		StyleItem updateStyleItem = styleItemCaptor.getValue();
 		assertEquals(updateStyleItem.getStyle().getName(), "update");
+		assertEquals(updateStyleItem.getName(), "update");
 	}
 
 	@DisplayName("02_01. update fail not found style")
@@ -212,6 +222,7 @@ class StyleItemServiceTest {
 	private StyleItem getStyleItem(Style style) {
 		return StyleItem.builder()
 			.style(style)
+			.name(style.getName())
 			.item(getItem())
 			.build();
 	}
