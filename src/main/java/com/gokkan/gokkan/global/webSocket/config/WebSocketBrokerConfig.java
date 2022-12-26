@@ -23,7 +23,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/gokkan")
 			//WebSocket 또는 SockJS Client가 웹소켓 핸드셰이크 커넥션을 생성할 경로
-			.setAllowedOrigins("*")
+			.setAllowedOriginPatterns("*")
 			.withSockJS();
 	}
 }
