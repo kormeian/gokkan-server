@@ -14,7 +14,7 @@ public class MessageController {
 
 	@MessageMapping("/{auctionId}")
 	//@SendTo("/topic/greeting")
-	public void message(@PathVariable String auctionId, Long price) {
+	public void test(@PathVariable Long auctionId, Long price) {
 
 		String message = "auctionId : " + auctionId + " 경매가 " + price + "원으로 변경되었습니다.";
 		//return "auctionId : " + auctionId + " price : " + price;
