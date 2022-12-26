@@ -44,20 +44,20 @@ public class Item {
 	private String name;
 
 	@Column(length = 10)
-	private Long startPrice;
+	private long startPrice;
 
 	@Column(length = 10)
 	@Enumerated(EnumType.STRING)
 	private State state;
 
 	@Column(length = 5)
-	private Long length;
+	private long length;
 	@Column(length = 5)
-	private Long width;
+	private long width;
 	@Column(length = 5)
-	private Long depth;
+	private long depth;
 	@Column(length = 5)
-	private Long height;
+	private long height;
 	private String material;
 
 	@Column(length = 3)
@@ -75,7 +75,7 @@ public class Item {
 	@Column(length = 20)
 	private String brand;
 	@Column(length = 4)
-	private Integer productionYear;
+	private int productionYear;
 	private String thumbnail;
 
 	private LocalDateTime created;
@@ -96,7 +96,7 @@ public class Item {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<ImageItem> imageItems;
 
-	@BatchSize(size = 5)
+	@BatchSize(size = 11)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.REMOVE)
 	private List<StyleItem> styleItems;
 

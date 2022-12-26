@@ -234,7 +234,7 @@ public class ItemDto {
 				.created(item.getCreated())
 				.updated(item.getUpdated())
 				.writer(item.getMember().getNickName())
-				.category(item.getCategory().getName())
+				.category(item.getCategory() == null ? null : item.getCategory().getName())
 				.imageItemUrls(imageItems == null ? new ArrayList<>() :
 					imageItems.stream()
 						.map(x -> ImageDto.Response.builder()
@@ -250,7 +250,7 @@ public class ItemDto {
 							.build())
 						.collect(Collectors.toList()))
 				.styles(styleItems == null ? new ArrayList<>() :
-					styleItems.stream().map(x -> x.getStyle().getName())
+					styleItems.stream().map(StyleItem::getName)
 						.collect(Collectors.toList()))
 				.build();
 

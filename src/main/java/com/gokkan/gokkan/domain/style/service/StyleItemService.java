@@ -52,6 +52,7 @@ public class StyleItemService {
 			if (!duplicate[i]) {
 				styleItems.add(StyleItem.builder()
 					.style(getStyle(names.get(i)))
+					.name(names.get(i))
 					.build());
 			}
 		}
@@ -72,6 +73,7 @@ public class StyleItemService {
 		log.info("update style item id : " + id);
 		StyleItem styleItem = getStyleItem(id);
 		styleItem.setStyle(getStyle(name));
+		styleItem.setName(name);
 		return styleItemRepository.save(styleItem);
 	}
 
