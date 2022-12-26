@@ -12,7 +12,7 @@ public class MessageController {
 
 	private final SimpMessageSendingOperations simpMessageSendingOperations;
 
-	@MessageMapping("/{auctionId}")
+	@MessageMapping("/topic/{auctionId}")
 	//@SendTo("/topic/greeting")
 	public void message(@PathVariable String auctionId, Long price) {
 
