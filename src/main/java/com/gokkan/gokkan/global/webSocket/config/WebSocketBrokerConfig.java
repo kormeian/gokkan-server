@@ -12,10 +12,10 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-//		registry.enableSimpleBroker("/queue", "/topic");
-		registry.enableStompBrokerRelay("/topic")
-			.setRelayHost("3.38.59.40")
-			.setRelayPort(61613);
+		registry.enableSimpleBroker("/queue", "/topic");
+//		registry.enableStompBrokerRelay("/topic")
+//			.setRelayHost("3.38.59.40")
+//			.setRelayPort(61613);
 		//queue = 메시지가 1대1로 송신될 때
 		//topic = 메시지가 1대다로 송신될 때, subscribe
 		registry.setApplicationDestinationPrefixes("/auction");
@@ -24,7 +24,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/gokkan2")
+		registry.addEndpoint("/gokkan")
 			//WebSocket 또는 SockJS Client가 웹소켓 핸드셰이크 커넥션을 생성할 경로
 			.setAllowedOriginPatterns("*")
 			.withSockJS();
