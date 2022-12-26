@@ -48,7 +48,8 @@ public class Auction {
 	private Member member;
 
 	@Builder
-	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice, Long currentPrice,
+	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice,
+		Long currentPrice,
 		AuctionStatus auctionStatus, ExpertComment expertComment, Member member) {
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
@@ -56,6 +57,14 @@ public class Auction {
 		this.currentPrice = currentPrice;
 		this.auctionStatus = auctionStatus;
 		this.expertComment = expertComment;
+		this.member = member;
+	}
+
+	public void setCurrentPrice(Long price) {
+		this.currentPrice = price;
+	}
+
+	public void setMember(Member member) {
 		this.member = member;
 	}
 }

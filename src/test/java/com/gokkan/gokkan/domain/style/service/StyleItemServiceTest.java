@@ -31,13 +31,42 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class StyleItemServiceTest {
 
+	private final String name1 = "test style1";
+	private final String name2 = "test style2";
+	private final String name3 = "test style3";
+	private final String name4 = "test style4";
+	private final List<String> names = List.of(name1, name2);
+	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
 	@Mock
 	private StyleItemRepository styleItemRepository;
 	@Mock
 	private StyleRepository styleRepository;
 	@InjectMocks
 	private StyleItemService styleItemService;
-	ArgumentCaptor<StyleItem> styleItemCaptor = ArgumentCaptor.forClass(StyleItem.class);
+
+	private static Item getItem() {
+		return Item.builder()
+			.name("test name")
+			.startPrice(100L)
+			.length(100L)
+			.width(100L)
+			.depth(100L)
+			.height(100L)
+			.material("나무")
+			.conditionGrade("test conditionGrade")
+			.conditionDescription("test conditionDescription")
+			.text("test text")
+			.madeIn("test madeIn")
+			.designer("test designer")
+			.brand("test brand")
+			.productionYear(2023)
+			.state(State.ASSESSING)
+			.created(LocalDateTime.now())
+			.updated(LocalDateTime.now())
+			.imageItems(new ArrayList<>())
+			.imageChecks(new ArrayList<>())
+			.build();
+	}
 
 	@DisplayName("01_00. createNotDuplicate success not delete all duplicate")
 	@Test
@@ -206,13 +235,6 @@ class StyleItemServiceTest {
 		assertEquals(restApiException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE_ITEM);
 	}
 
-
-	private final String name1 = "test style1";
-	private final String name2 = "test style2";
-	private final String name3 = "test style3";
-	private final String name4 = "test style4";
-	private final List<String> names = List.of(name1, name2);
-
 	private Style getStyle(String styleName) {
 		return Style.builder()
 			.name(styleName)
@@ -224,30 +246,6 @@ class StyleItemServiceTest {
 			.style(style)
 			.name(style.getName())
 			.item(getItem())
-			.build();
-	}
-
-	private static Item getItem() {
-		return Item.builder()
-			.name("test name")
-			.startPrice(100L)
-			.length(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.state(State.ASSESSING)
-			.created(LocalDateTime.now())
-			.updated(LocalDateTime.now())
-			.imageItems(new ArrayList<>())
-			.imageChecks(new ArrayList<>())
 			.build();
 	}
 }

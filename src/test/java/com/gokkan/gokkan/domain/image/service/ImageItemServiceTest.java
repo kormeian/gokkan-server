@@ -29,6 +29,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ImageItemServiceTest {
 
 	static ArgumentCaptor<ImageItem> imageItemCaptor = ArgumentCaptor.forClass(ImageItem.class);
+	static List<String> urls = List.of("u1", "u2", "u3");
+	String url1 = "test url1";
+	String url2 = "test url2";
+	String url3 = "test url3";
+	ImageDto.UpdateRequest updateRequest1 = ImageDto.UpdateRequest.builder().imageId(1L).build();
+	ImageDto.UpdateRequest updateRequest2 = ImageDto.UpdateRequest.builder().imageId(2L).build();
+	ImageItem imageItem1 = ImageItem.builder().id(1L).url(url1).build();
+	ImageItem imageItem2 = ImageItem.builder().id(2L).url(url2).build();
+	ImageItem imageItem3 = ImageItem.builder().id(3L).url(url3).build();
 	@Mock
 	private ImageItemRepository imageItemRepository;
 	@Mock
@@ -139,16 +148,4 @@ class ImageItemServiceTest {
 		//then
 		assertEquals(imageItems.size(), 0);
 	}
-
-	String url1 = "test url1";
-	String url2 = "test url2";
-	String url3 = "test url3";
-
-	ImageDto.UpdateRequest updateRequest1 = ImageDto.UpdateRequest.builder().imageId(1L).build();
-	ImageDto.UpdateRequest updateRequest2 = ImageDto.UpdateRequest.builder().imageId(2L).build();
-	ImageItem imageItem1 = ImageItem.builder().id(1L).url(url1).build();
-	ImageItem imageItem2 = ImageItem.builder().id(2L).url(url2).build();
-	ImageItem imageItem3 = ImageItem.builder().id(3L).url(url3).build();
-
-	static List<String> urls = List.of("u1", "u2", "u3");
 }

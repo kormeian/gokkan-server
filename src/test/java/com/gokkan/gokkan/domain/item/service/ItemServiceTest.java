@@ -55,6 +55,31 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
 
+	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
+	Category root = Category.builder()
+		.id(0L)
+		.parent(null)
+		.level(0)
+		.name("root")
+		.children(new ArrayList<>())
+		.build();
+	String png = "png";
+	String url1 = "url1";
+	String url2 = "url2";
+	String url3 = "url3";
+	String url4 = "url4";
+	String style1 = "style1";
+	String style2 = "style2";
+	String style3 = "style3";
+	String style4 = "style4";
+	String categoryName1 = "test category1";
+	String categoryName2 = "test category2";
+	Member member = Member.builder()
+		.userId("userId")
+		.email("member@email.com")
+		.name("name")
+		.providerType(ProviderType.KAKAO)
+		.build();
 	@Mock
 	private ItemRepository itemRepository;
 	@Mock
@@ -73,11 +98,37 @@ class ItemServiceTest {
 	private ImageCheckService imageCheckService;
 	@Mock
 	private AwsS3Service awsS3Service;
-
 	@InjectMocks
 	private ItemService itemService;
 
-	ArgumentCaptor<Item> itemCaptor = ArgumentCaptor.forClass(Item.class);
+	private static Category getCategory(String name, Category parent) {
+		return Category.builder()
+			.name(name)
+			.parent(parent)
+			.children(new ArrayList<>())
+			.level(parent.getLevel() + 1)
+			.build();
+	}
+
+	private static ImageItem getImageItem(Long id, String url) {
+		return ImageItem.builder()
+			.id(id)
+			.url(url)
+			.build();
+	}
+
+	private static ImageCheck getImageCheck(Long id, String url) {
+		return ImageCheck.builder()
+			.id(id)
+			.url(url)
+			.build();
+	}
+
+	private static ImageDto.UpdateRequest getImageUpdateRequest(Long id) {
+		return ImageDto.UpdateRequest.builder()
+			.imageId(id)
+			.build();
+	}
 
 	@DisplayName("01_00. create success from empty image saved")
 	@Test
@@ -472,6 +523,7 @@ class ItemServiceTest {
 		//then
 		assertEquals(response.getName(), item.getName());
 	}
+
 	@DisplayName("02_00_2. readDetail success, state COMPLETE ")
 	@Test
 	public void test_02_00_2() {
@@ -617,7 +669,6 @@ class ItemServiceTest {
 		given(itemRepository.findById(anyLong())).willReturn(
 			Optional.of(item));
 
-
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
@@ -637,7 +688,6 @@ class ItemServiceTest {
 		given(itemRepository.findById(anyLong())).willReturn(
 			Optional.of(item));
 
-
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
@@ -647,7 +697,6 @@ class ItemServiceTest {
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.CAN_NOT_FIX_STATE);
 	}
-
 
 	@DisplayName("04_00. update success from empty image saved")
 	@Test
@@ -1042,6 +1091,7 @@ class ItemServiceTest {
 		//then
 		assertEquals(response.getName(), item.getName());
 	}
+
 	@DisplayName("05_00_2. readTempDetail success, state RETURN ")
 	@Test
 	public void test_05_00_2() {
@@ -1146,56 +1196,6 @@ class ItemServiceTest {
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
 	}
 
-	Category root = Category.builder()
-		.id(0L)
-		.parent(null)
-		.level(0)
-		.name("root")
-		.children(new ArrayList<>())
-		.build();
-
-	String png = "png";
-	String url1 = "url1";
-	String url2 = "url2";
-	String url3 = "url3";
-	String url4 = "url4";
-	String style1 = "style1";
-	String style2 = "style2";
-	String style3 = "style3";
-	String style4 = "style4";
-	String categoryName1 = "test category1";
-	String categoryName2 = "test category2";
-
-	Member member = Member.builder()
-		.userId("userId")
-		.email("member@email.com")
-		.name("name")
-		.providerType(ProviderType.KAKAO)
-		.build();
-
-	private static Category getCategory(String name, Category parent) {
-		return Category.builder()
-			.name(name)
-			.parent(parent)
-			.children(new ArrayList<>())
-			.level(parent.getLevel() + 1)
-			.build();
-	}
-
-	private static ImageItem getImageItem(Long id, String url) {
-		return ImageItem.builder()
-			.id(id)
-			.url(url)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(Long id, String url) {
-		return ImageCheck.builder()
-			.id(id)
-			.url(url)
-			.build();
-	}
-
 	private Item getEmptyItem() {
 		return Item.builder()
 			.id(1L)
@@ -1244,12 +1244,6 @@ class ItemServiceTest {
 			.style(Style.builder()
 				.name(styleName)
 				.build())
-			.build();
-	}
-
-	private static ImageDto.UpdateRequest getImageUpdateRequest(Long id) {
-		return ImageDto.UpdateRequest.builder()
-			.imageId(id)
 			.build();
 	}
 

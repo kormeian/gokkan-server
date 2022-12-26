@@ -7,13 +7,17 @@ import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ public class BidService {
 	private final AuctionRepository auctionRepository;
 	private final RedissonClient redissonClient;
 	private final RedisTemplate<String, String> redisTemplate;
+
 
 	public void bidding(Member member, Long auctionId, Long price) {
 		Auction auction = auctionRepository.findById(auctionId)
@@ -44,8 +49,12 @@ public class BidService {
 			}
 
 			List<History> history = getHistory(auctionId);
-			//TODO: history가 없을 경우에 대한 처리
-			final Long currentPrice = getCurrentPrice(auctionId);
+			Long currentPrice;
+			if (history.isEmpty()) {
+				currentPrice = auction.getCurrentPrice();
+			} else {
+				currentPrice = getCurrentPrice(history);
+			}
 
 			if (currentPrice >= price) {
 				throw new RestApiException(
@@ -53,8 +62,22 @@ public class BidService {
 			}
 
 			log.info("현재 진행중인 사람 : {} & 입찰가 : {}원", member.getId(), price);
-			setPrice(auctionId, member.getId(), currentPrice);
-		} catch (InterruptedException e) {
+			History currentHistory = setPrice(auctionId, member.getId(), currentPrice);
+			//TODO: 경매 히스토리 저장
+			history.add(0, currentHistory);
+			auction.setCurrentPrice(price);
+			auction.setMember(member);
+			auctionRepository.save(auction);
+			JSONObject jsonObject = new JSONObject();
+			JSONArray jsonArray = new JSONArray();
+			for (History h : history) {
+				jsonArray.add(h.getMemberId() + "_" + h.getPrice());
+			}
+			jsonObject.put("history", jsonArray);
+			jsonObject.put("currentPrice", price);
+			simpMessageSendingOperations.convertAndSend("/topic/auction/" + auctionId,
+				jsonObject.toString());
+		} catch (InterruptedException | JSONException e) {
 			e.printStackTrace();
 		} finally {
 			if (lock != null && lock.isLocked()) {
@@ -69,18 +92,24 @@ public class BidService {
 		List<String> StringHistory = redisTemplate.opsForList()
 			.range(String.valueOf(auctionId), 0, -1);
 		if (StringHistory == null || StringHistory.isEmpty()) {
-			return null;
+			return new ArrayList<>();
 		}
 		return StringHistory.stream()
-			.map(new History()::toHistory)
+			.map(History::toHistory)
 			.collect(Collectors.toList());
 	}
 
-	private void setPrice(Long auctionId, Long id, Long currentPrice) {
+	private History setPrice(Long auctionId, Long memberId, Long currentPrice) {
+		redisTemplate.opsForList()
+			.leftPush(String.valueOf(auctionId), memberId + "_" + currentPrice);
+		return History.builder()
+			.memberId(memberId)
+			.price(currentPrice)
+			.build();
 	}
 
-	private Long getCurrentPrice(Long auctionId) {
-		return 0L;
+	private Long getCurrentPrice(List<History> history) {
+		return history.get(0).getPrice();
 	}
 
 
