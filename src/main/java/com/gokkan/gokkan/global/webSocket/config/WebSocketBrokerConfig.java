@@ -29,6 +29,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 			//WebSocket 또는 SockJS Client가 웹소켓 핸드셰이크 커넥션을 생성할 경로
 			.addInterceptors(new StompHandshakeInterceptor())
 			.setAllowedOriginPatterns("*")
+//			.setAllowedOrigins("*")
 			.withSockJS();
 	}
 }

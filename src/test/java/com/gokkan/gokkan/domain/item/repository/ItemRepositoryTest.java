@@ -1,6 +1,6 @@
 package com.gokkan.gokkan.domain.item.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
@@ -36,9 +36,17 @@ import org.springframework.context.annotation.Import;
 @Import(QueryDslConfig.class)
 class ItemRepositoryTest {
 
+	String url1 = "url1";
+	String url2 = "url2";
+	String url3 = "url3";
+	String url4 = "url4";
+	String style1 = "style1";
+	String style2 = "style2";
+	String style3 = "style3";
+	String style4 = "style4";
+	String categoryName1 = "test category1";
 	@Autowired
 	private ItemRepository itemRepository;
-
 	@Autowired
 	private ImageItemRepository imageItemRepository;
 	@Autowired
@@ -55,6 +63,13 @@ class ItemRepositoryTest {
 	private ExpertInfoRepository expertInfoRepository;
 	@Autowired
 	private ExpertStyleRepository expertStyleRepository;
+
+	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
+		return ExpertStyle.builder()
+			.expertInfo(expertInfo)
+			.style(styleSaved1)
+			.build();
+	}
 
 	@DisplayName("01_00. searchAllMyItem success size 2")
 	@Test
@@ -227,16 +242,6 @@ class ItemRepositoryTest {
 		}
 	}
 
-	String url1 = "url1";
-	String url2 = "url2";
-	String url3 = "url3";
-	String url4 = "url4";
-	String style1 = "style1";
-	String style2 = "style2";
-	String style3 = "style3";
-	String style4 = "style4";
-	String categoryName1 = "test category1";
-
 	private Member getMember(String userId, String email) {
 		return memberRepository.save(Member.builder()
 			.userId(userId)
@@ -308,12 +313,5 @@ class ItemRepositoryTest {
 			.name("test name")
 			.info("test info")
 			.build());
-	}
-
-	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
-		return ExpertStyle.builder()
-			.expertInfo(expertInfo)
-			.style(styleSaved1)
-			.build();
 	}
 }

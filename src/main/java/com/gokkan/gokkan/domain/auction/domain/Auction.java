@@ -2,15 +2,18 @@ package com.gokkan.gokkan.domain.auction.domain;
 
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -37,17 +40,31 @@ public class Auction {
 	private AuctionStatus auctionStatus;
 
 	@JoinColumn(name = "expert_comment_id")
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private ExpertComment expertComment;
+
+	@JoinColumn(name = "member_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member member;
 
 	@Builder
 	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice,
-		Long currentPrice, AuctionStatus auctionStatus, ExpertComment expertComment) {
+		Long currentPrice,
+		AuctionStatus auctionStatus, ExpertComment expertComment, Member member) {
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 		this.startPrice = startPrice;
 		this.currentPrice = currentPrice;
 		this.auctionStatus = auctionStatus;
 		this.expertComment = expertComment;
+		this.member = member;
+	}
+
+	public void setCurrentPrice(Long price) {
+		this.currentPrice = price;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
 	}
 }
