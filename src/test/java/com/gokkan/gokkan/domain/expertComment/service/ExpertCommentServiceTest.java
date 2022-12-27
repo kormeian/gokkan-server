@@ -176,14 +176,15 @@ class ExpertCommentServiceTest {
 	@Test
 	@DisplayName("전문가 의견 조회 성공")
 	void getExpertComment_success() {
-	    //given
+		//given
 		given(itemRepository.findById(any())).willReturn(Optional.of(getItem(State.COMPLETE)));
-		given(expertCommentRepository.findByItem(any())).willReturn(Optional.of(getExpertComment()));
+		given(expertCommentRepository.findByItem(any())).willReturn(
+			Optional.of(getExpertComment()));
 
-	    //when
+		//when
 		ResponseExpertComment responseExpertComment = expertCommentService.getExpertComment(1L);
 
-	    //then
+		//then
 		assertThat(responseExpertComment.getName()).isEqualTo("name");
 		assertThat(responseExpertComment.getComment()).isEqualTo("comment");
 		assertThat(responseExpertComment.getMinPrice()).isEqualTo(1000L);

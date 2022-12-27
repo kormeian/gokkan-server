@@ -50,10 +50,10 @@ public class ExpertCommentDto {
 
 		private final String name;
 		private final String profileImageUrl;
-		private String styles;
 		private final String comment;
 		private final Long minPrice;
 		private final Long maxPrice;
+		private String styles;
 
 		@Builder
 		public ResponseExpertComment(String name, String profileImageUrl, String comment,
@@ -65,7 +65,7 @@ public class ExpertCommentDto {
 			this.maxPrice = maxPrice;
 		}
 
-		public void setStyles(List<ExpertStyle> expertStyles){
+		public void setStyles(List<ExpertStyle> expertStyles) {
 			StringBuffer stringBuffer = new StringBuffer();
 			for (int i = 0; i < expertStyles.size(); i++) {
 				stringBuffer.append(expertStyles.get(i).getStyleName());

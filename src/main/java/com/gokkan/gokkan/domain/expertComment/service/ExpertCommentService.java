@@ -19,8 +19,6 @@ import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -81,8 +79,9 @@ public class ExpertCommentService {
 		log.info("전문가 코멘트 조회 itemId : " + itemId);
 		Item item = itemRepository.findById(itemId).orElseThrow(() -> new RestApiException(
 			ItemErrorCode.NOT_FOUND_ITEM));
-		ExpertComment expertComment = expertCommentRepository.findByItem(item).orElseThrow(() -> new RestApiException(
-			ExpertCommentErrorCode.NOT_FOUND_EXPERT_COMMENT));
+		ExpertComment expertComment = expertCommentRepository.findByItem(item)
+			.orElseThrow(() -> new RestApiException(
+				ExpertCommentErrorCode.NOT_FOUND_EXPERT_COMMENT));
 		ExpertInfo expertInfo = expertComment.getExpertInfo();
 		ResponseExpertComment responseExpertComment = ResponseExpertComment.builder()
 			.name(expertInfo.getName())

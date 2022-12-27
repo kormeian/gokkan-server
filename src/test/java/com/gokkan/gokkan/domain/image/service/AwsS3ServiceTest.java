@@ -25,9 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class AwsS3ServiceTest {
 
+	private final String png = "png";
 	@Mock
 	private AmazonS3 amazonS3;
-
 	@InjectMocks
 	private AwsS3Service awsS3Service;
 
@@ -116,9 +116,6 @@ class AwsS3ServiceTest {
 		//then
 		assertEquals(restApiException.getErrorCode(), ImageErrorCode.TOO_MANY_IMAGE);
 	}
-
-
-	private final String png = "png";
 
 	private MultipartFile getMultipartFiles(String extension) throws IOException {
 
