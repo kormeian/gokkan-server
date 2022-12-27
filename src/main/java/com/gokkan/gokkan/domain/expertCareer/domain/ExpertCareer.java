@@ -25,8 +25,8 @@ public class ExpertCareer {
 	@Column(name = "expert_career_id")
 	private Long id;
 
-	@JoinColumn(name = "expert_info_id")
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "expert_info_id")
 	private ExpertInfo expertInfo;
 
 	private LocalDate startDate;

@@ -13,8 +13,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ExpertStyle {
@@ -24,21 +26,21 @@ public class ExpertStyle {
 	@Column(name = "expert_style_id")
 	private Long id;
 
-	@JoinColumn(name = "expert_info_id")
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "expert_info_id")
+	@ToString.Exclude
 	private ExpertInfo expertInfo;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "style_id")
 	private Style style;
 
+	private String name;
+
 	@Builder
 	public ExpertStyle(ExpertInfo expertInfo, Style style) {
 		this.expertInfo = expertInfo;
 		this.style = style;
-	}
-
-	public String getStyleName() {
-		return style.getName();
+		this.name = style.getName();
 	}
 }

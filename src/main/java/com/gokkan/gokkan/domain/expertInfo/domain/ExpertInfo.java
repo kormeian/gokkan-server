@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,9 +19,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
+@ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpertInfo {
@@ -35,11 +38,11 @@ public class ExpertInfo {
 	private Member member;
 
 	@BatchSize(size = 10)
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "expertInfo", cascade = CascadeType.REMOVE)
 	private List<ExpertStyle> expertStyles = new ArrayList<>();
 
 	@BatchSize(size = 10)
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "expertInfo", cascade = CascadeType.REMOVE)
 	private List<ExpertCareer> expertCareers = new ArrayList<>();
 
 	private String name;
