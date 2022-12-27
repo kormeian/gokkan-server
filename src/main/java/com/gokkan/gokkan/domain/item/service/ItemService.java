@@ -12,6 +12,7 @@ import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
@@ -220,4 +221,18 @@ public class ItemService {
 		log.error("itemStateCheckForRead state : " + itemState.getDescription());
 		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> myItems(Member member, List<State> states) {
+		log.info("myItems member id : " + member.getUserId());
+		return ListResponse.toResponse(itemRepository.searchAllMyItem(states, member));
+	}
+
+//	@Transactional(readOnly = true)
+//	public List<ListResponse> itemsForExport(Member member) {
+//		if (!member.getRole().equals(Role.ADMIN)) {
+//			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
+//		}
+//		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
+//	}
 }
