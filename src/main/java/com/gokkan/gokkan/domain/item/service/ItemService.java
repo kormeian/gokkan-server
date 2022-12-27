@@ -23,6 +23,7 @@ import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -228,11 +229,11 @@ public class ItemService {
 		return ListResponse.toResponse(itemRepository.searchAllMyItem(states, member));
 	}
 
-//	@Transactional(readOnly = true)
-//	public List<ListResponse> itemsForExport(Member member) {
-//		if (!member.getRole().equals(Role.ADMIN)) {
-//			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
-//		}
-//		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
-//	}
+	@Transactional(readOnly = true)
+	public List<ListResponse> itemsForExport(Member member) {
+		if (!member.getRole().equals(Role.ADMIN)) {
+			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
+		}
+		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
+	}
 }
