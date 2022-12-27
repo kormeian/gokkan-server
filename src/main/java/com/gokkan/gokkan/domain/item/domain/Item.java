@@ -51,8 +51,6 @@ public class Item {
 	private State state;
 
 	@Column(length = 5)
-	private long length;
-	@Column(length = 5)
 	private long width;
 	@Column(length = 5)
 	private long depth;

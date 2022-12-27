@@ -87,7 +87,9 @@ class StyleItemServiceTest {
 		//given
 		Style style1 = getStyle(name1);
 		Style style2 = getStyle(name2);
+		String name3 = "test style3";
 		Style style3 = getStyle(name3);
+		String name4 = "test style4";
 		Style style4 = getStyle(name4);
 		given(styleRepository.existsByName(name1)).willReturn(true);
 		given(styleRepository.existsByName(name2)).willReturn(true);
@@ -209,8 +211,6 @@ class StyleItemServiceTest {
 
 	private final String name1 = "test style1";
 	private final String name2 = "test style2";
-	private final String name3 = "test style3";
-	private final String name4 = "test style4";
 	private final List<String> names = List.of(name1, name2);
 
 	private Style getStyle(String styleName) {
@@ -231,7 +231,6 @@ class StyleItemServiceTest {
 		return Item.builder()
 			.name("test name")
 			.startPrice(100L)
-			.length(100L)
 			.width(100L)
 			.depth(100L)
 			.height(100L)

@@ -136,7 +136,6 @@ class ItemServiceTest {
 		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
 		assertEquals(item.getStyleItems().size(), 0);
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -220,7 +219,6 @@ class ItemServiceTest {
 			item.getStyleItems().get(0).getStyle().getName(),
 			updateRequest.getStyles().get(0));
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -321,7 +319,6 @@ class ItemServiceTest {
 			item.getStyleItems().get(0).getStyle().getName(),
 			updateRequest.getStyles().get(0));
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -706,7 +703,6 @@ class ItemServiceTest {
 		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
 		assertEquals(item.getStyleItems().size(), 0);
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -732,7 +728,7 @@ class ItemServiceTest {
 
 	@DisplayName("04_01. update success from not empty item not change image, style")
 	@Test
-	public void test_04_01() throws IOException {
+	public void test_04_01() {
 		//given
 		UpdateRequest updateRequest = getUpdateRequest(
 			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
@@ -790,7 +786,6 @@ class ItemServiceTest {
 			item.getStyleItems().get(0).getStyle().getName(),
 			updateRequest.getStyles().get(0));
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -891,7 +886,6 @@ class ItemServiceTest {
 			item.getStyleItems().get(0).getStyle().getName(),
 			updateRequest.getStyles().get(0));
 
-		assertEquals(item.getLength(), updateRequest.getLength());
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
 		assertEquals(item.getHeight(), updateRequest.getHeight());
@@ -934,7 +928,7 @@ class ItemServiceTest {
 
 	@DisplayName("04_03. update fail MEMBER_NOT_LOGIN")
 	@Test
-	public void test_04_03() throws IOException {
+	public void test_04_03() {
 		//given
 		UpdateRequest updateRequest = getUpdateRequest(
 			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
@@ -953,7 +947,7 @@ class ItemServiceTest {
 
 	@DisplayName("04_04. update fail MEMBER_MISMATCH")
 	@Test
-	public void test_04_04() throws IOException {
+	public void test_04_04() {
 		//given
 		UpdateRequest updateRequest = getUpdateRequest(
 			new ArrayList<>(Arrays.asList(getImageUpdateRequest(1L), getImageUpdateRequest(2L))),
@@ -1161,10 +1155,7 @@ class ItemServiceTest {
 	String url4 = "url4";
 	String style1 = "style1";
 	String style2 = "style2";
-	String style3 = "style3";
-	String style4 = "style4";
 	String categoryName1 = "test category1";
-	String categoryName2 = "test category2";
 
 	Member member = Member.builder()
 		.userId("userId")
@@ -1218,7 +1209,6 @@ class ItemServiceTest {
 			.member(member)
 			.category(getCategory(categoryName1, root))
 			.startPrice(100L)
-			.length(100L)
 			.width(100L)
 			.depth(100L)
 			.height(100L)
@@ -1273,7 +1263,6 @@ class ItemServiceTest {
 			.name("update name")
 			.category(categoryName1)
 			.startPrice(200)
-			.length(200L)
 			.width(200L)
 			.depth(200L)
 			.height(200L)
