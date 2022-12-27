@@ -169,7 +169,6 @@ class ItemRepositoryTest {
 			.member(member)
 			.category(category)
 			.startPrice(100L)
-			.length(100L)
 			.width(100L)
 			.depth(100L)
 			.height(100L)

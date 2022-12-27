@@ -49,8 +49,6 @@ public class ItemDto {
 		private List<String> styles;
 
 		@NotNull
-		private Long length;
-		@NotNull
 		private Long width;
 		@NotNull
 		private Long depth;
@@ -78,7 +76,6 @@ public class ItemDto {
 				.name(this.name)
 				.category(category)
 				.startPrice(this.startPrice)
-				.length(this.length)
 				.width(this.width)
 				.depth(this.depth)
 				.height(this.height)
@@ -123,7 +120,6 @@ public class ItemDto {
 
 		private List<String> styles;
 
-		private Long length;
 		private Long width;
 		private Long depth;
 		private Long height;
@@ -146,7 +142,6 @@ public class ItemDto {
 				.name(this.name)
 				.category(category)
 				.startPrice(this.startPrice)
-				.length(this.length)
 				.width(this.width)
 				.depth(this.depth)
 				.height(this.height)
@@ -186,7 +181,6 @@ public class ItemDto {
 
 		private String state;
 
-		private Long length;
 		private Long width;
 		private Long depth;
 		private Long height;
@@ -221,7 +215,6 @@ public class ItemDto {
 				.thumbnail(item.getThumbnail())
 				.startPrice(item.getStartPrice())
 				.state(item.getState().getDescription())
-				.length(item.getLength())
 				.width(item.getWidth())
 				.depth(item.getDepth())
 				.height(item.getHeight())
@@ -255,10 +248,6 @@ public class ItemDto {
 					styleItems.stream().map(StyleItem::getName)
 						.collect(Collectors.toList()))
 				.build();
-		}
-
-		public static List<Response> toResponse(List<Item> items) {
-			return items.stream().map(Response::toResponse).collect(Collectors.toList());
 		}
 	}
 
