@@ -124,12 +124,12 @@ public class ItemController {
 		return ResponseEntity.ok(itemService.myItems(member, states));
 	}
 
-//	@Operation(summary = "상품 list 조회", description = "전문가 스타일에 맞는 상품 list 반환")
-//	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
-//	@GetMapping("/items")
-//	public ResponseEntity<?> items(
-//		@Parameter(hidden = true)
-//		@CurrentMember Member member) {
-//		return ResponseEntity.ok(itemService.itemsForExport(member));
-//	}
+	@Operation(summary = "상품 list 조회", description = "전문가 스타일에 맞는 상품 list 반환")
+	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
+	@GetMapping("/expert-items")
+	public ResponseEntity<?> items(
+		@Parameter(hidden = true)
+		@CurrentMember Member member) {
+		return ResponseEntity.ok(itemService.itemsForExport(member));
+	}
 }
