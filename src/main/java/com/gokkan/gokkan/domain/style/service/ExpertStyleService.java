@@ -92,7 +92,7 @@ public class ExpertStyleService {
 //			.stream().map(
 //				ExpertStyle::getStyleName).collect(Collectors.toList());
 		List<String> allByExpertInfo = expertInfo.getExpertStyles().stream().map(
-			ExpertStyle::getName).collect(Collectors.toList());
+			ExpertStyle::getStyleName).collect(Collectors.toList());
 		if (allByExpertInfo.isEmpty()) {
 			throw new RestApiException(StyleErrorCode.NOT_FOUND_STYLE);
 		}

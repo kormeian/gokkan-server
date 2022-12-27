@@ -35,12 +35,12 @@ public class ExpertStyle {
 	@JoinColumn(name = "style_id")
 	private Style style;
 
-	private String name;
+	private String styleName;
 
 	@Builder
 	public ExpertStyle(ExpertInfo expertInfo, Style style) {
 		this.expertInfo = expertInfo;
 		this.style = style;
-		this.name = style.getName();
+		this.styleName = style.getName();
 	}
 }

@@ -24,7 +24,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	public List<Item> searchAllItemForExport(Member member) {
 		// 전문가 스타일 불러오기
 		List<String> expertStyleNames = jpaQueryFactory
-			.select(expertStyle.name).from(expertStyle)
+			.select(expertStyle.styleName).from(expertStyle)
 			.innerJoin(expertStyle.expertInfo, expertInfo)
 			.where(expertInfo.member.eq(member))
 			.fetch();
