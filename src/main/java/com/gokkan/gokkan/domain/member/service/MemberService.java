@@ -78,7 +78,7 @@ public class MemberService {
 
 	public void logout(Member member) {
 		log.info("로그아웃 시작 이름 : " + member.getName());
-		memberRefreshTokenRepository.deleteByMember(member);
+		memberRefreshTokenRepository.deleteByUserId(member.getUserId());
 		log.info("리프레시 토큰 삭제 완료");
 		log.info("로그아웃 완료");
 	}
