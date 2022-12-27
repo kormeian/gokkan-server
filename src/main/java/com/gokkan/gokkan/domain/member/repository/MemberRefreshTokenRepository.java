@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.member.repository;
 
+import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,5 +13,6 @@ public interface MemberRefreshTokenRepository extends JpaRepository<MemberRefres
 
 	Optional<MemberRefreshToken> findByRefreshToken(String refreshToken);
 
+	void deleteByMember(Member member);
 }
 
