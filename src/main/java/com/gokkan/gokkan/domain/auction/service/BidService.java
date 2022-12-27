@@ -5,19 +5,22 @@ import com.gokkan.gokkan.domain.auction.domain.History;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
+import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
+import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class BidService {
 	private final AuctionRepository auctionRepository;
 	private final RedissonClient redissonClient;
 	private final RedisTemplate<String, String> redisTemplate;
+	private final AuctionHistoryRepository auctionHistoryRepository;
 
 
 	public void bidding(Member member, Long auctionId, Long price) {
@@ -62,8 +66,14 @@ public class BidService {
 			}
 
 			log.info("현재 진행중인 사람 : {} & 입찰가 : {}원", member.getId(), price);
-			History currentHistory = setPrice(auctionId, member.getId(), currentPrice);
-			//TODO: 경매 히스토리 저장
+			History currentHistory = setPrice(auctionId, member.getId(), price);
+			auctionHistoryRepository.save(
+				AuctionHistory.builder()
+					.member(member)
+					.auction(auction)
+					.price(price)
+					.bidDateTime(LocalDateTime.now())
+					.build());
 			history.add(0, currentHistory);
 			auction.setCurrentPrice(price);
 			auction.setMember(member);
