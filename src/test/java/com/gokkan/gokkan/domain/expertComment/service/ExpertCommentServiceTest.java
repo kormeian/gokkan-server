@@ -10,6 +10,7 @@ import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
 import com.gokkan.gokkan.domain.expertComment.domain.dto.ExpertCommentDto.RequestCreateExpertComment;
+import com.gokkan.gokkan.domain.expertComment.domain.dto.ExpertCommentDto.ResponseExpertComment;
 import com.gokkan.gokkan.domain.expertComment.exception.ExpertCommentErrorCode;
 import com.gokkan.gokkan.domain.expertComment.repository.ExpertCommentRepository;
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
@@ -171,6 +172,57 @@ class ExpertCommentServiceTest {
 		assertThat(restApiException.getErrorCode()).isEqualTo(
 			ExpertCommentErrorCode.ITEM_STATE_NOT_ASSESSING);
 	}
+
+	@Test
+	@DisplayName("전문가 의견 조회 성공")
+	void getExpertComment_success() {
+		//given
+		given(itemRepository.findById(any())).willReturn(Optional.of(getItem(State.COMPLETE)));
+		given(expertCommentRepository.findByItem(any())).willReturn(
+			Optional.of(getExpertComment()));
+
+		//when
+		ResponseExpertComment responseExpertComment = expertCommentService.getExpertComment(1L);
+
+		//then
+		assertThat(responseExpertComment.getName()).isEqualTo("name");
+		assertThat(responseExpertComment.getComment()).isEqualTo("comment");
+		assertThat(responseExpertComment.getMinPrice()).isEqualTo(1000L);
+		assertThat(responseExpertComment.getMaxPrice()).isEqualTo(2000L);
+	}
+
+	@Test
+	@DisplayName("전문가 의견 조회 실패 - 상품 정보 없음")
+	void getExpertComment_error_notFoundItem() {
+		//given
+		given(itemRepository.findById(any())).willReturn(Optional.empty());
+
+		//when
+		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
+			expertCommentService.getExpertComment(1L);
+		});
+
+		//then
+		assertThat(restApiException.getErrorCode()).isEqualTo(ItemErrorCode.NOT_FOUND_ITEM);
+	}
+
+	@Test
+	@DisplayName("전문가 의견 조회 실패 - 전문가 의견 정보 없음")
+	void getExpertComment_error_notFoundExpertComment() {
+		//given
+		given(itemRepository.findById(any())).willReturn(Optional.of(getItem(State.COMPLETE)));
+		given(expertCommentRepository.findByItem(any())).willReturn(Optional.empty());
+
+		//when
+		RestApiException restApiException = assertThrows(RestApiException.class, () -> {
+			expertCommentService.getExpertComment(1L);
+		});
+
+		//then
+		assertThat(restApiException.getErrorCode()).isEqualTo(
+			ExpertCommentErrorCode.NOT_FOUND_EXPERT_COMMENT);
+	}
+
 
 	private Auction getAuction() {
 		return Auction.builder()

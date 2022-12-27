@@ -4,7 +4,9 @@ import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
+import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -46,15 +48,32 @@ public class ExpertCommentDto {
 	@Getter
 	public static class ResponseExpertComment {
 
-		private final Long itemId;
-		private final String itemName;
-		private final String itemThumbnail;
+		private final String name;
+		private final String profileImageUrl;
+		private final String comment;
+		private final Long minPrice;
+		private final Long maxPrice;
+		private String styles;
 
 		@Builder
-		public ResponseExpertComment(Long itemId, String itemName, String itemThumbnail) {
-			this.itemId = itemId;
-			this.itemName = itemName;
-			this.itemThumbnail = itemThumbnail;
+		public ResponseExpertComment(String name, String profileImageUrl, String comment,
+			Long minPrice, Long maxPrice) {
+			this.name = name;
+			this.profileImageUrl = profileImageUrl;
+			this.comment = comment;
+			this.minPrice = minPrice;
+			this.maxPrice = maxPrice;
+		}
+
+		public void setStyles(List<ExpertStyle> expertStyles) {
+			StringBuffer stringBuffer = new StringBuffer();
+			for (int i = 0; i < expertStyles.size(); i++) {
+				stringBuffer.append(expertStyles.get(i).getStyleName());
+				if (i != expertStyles.size() - 1) {
+					stringBuffer.append(", ");
+				}
+			}
+			this.styles = stringBuffer.toString();
 		}
 	}
 }
