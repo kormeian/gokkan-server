@@ -4,6 +4,7 @@ import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
+import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 	private final AwsS3Service awsS3Service;
 
 	@Transactional
@@ -72,6 +74,13 @@ public class MemberService {
 	public boolean checkDuplicateNickName(String nickName) {
 		log.info("닉네임 중복 체크");
 		return memberRepository.existsByNickName(nickName);
+	}
+
+	public void logout(Member member) {
+		log.info("로그아웃 시작 이름 : " + member.getName());
+		memberRefreshTokenRepository.deleteByMember(member);
+		log.info("리프레시 토큰 삭제 완료");
+		log.info("로그아웃 완료");
 	}
 }
 
