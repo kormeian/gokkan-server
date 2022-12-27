@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.domain.auction.domain;
 
-import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;

@@ -1,12 +1,12 @@
 package com.gokkan.gokkan.domain.auction.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
+import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.History;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
-import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
-import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
 import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
+import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;

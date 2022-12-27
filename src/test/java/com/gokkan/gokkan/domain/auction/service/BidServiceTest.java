@@ -1,17 +1,5 @@
 package com.gokkan.gokkan.domain.auction.service;
 
-import com.gokkan.gokkan.domain.auction.domain.Auction;
-import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
-import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
-import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
-import com.gokkan.gokkan.global.security.oauth.entity.Role;
-import java.time.LocalDateTime;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 //@SpringBootTest
 //class BidServiceTest {
 //
