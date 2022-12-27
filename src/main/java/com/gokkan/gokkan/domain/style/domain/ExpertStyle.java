@@ -32,13 +32,13 @@ public class ExpertStyle {
 	@JoinColumn(name = "style_id")
 	private Style style;
 
+	private String styleName;
+
 	@Builder
-	public ExpertStyle(ExpertInfo expertInfo, Style style) {
+	public ExpertStyle(ExpertInfo expertInfo, Style style, String styleName) {
 		this.expertInfo = expertInfo;
 		this.style = style;
+		this.styleName = styleName;
 	}
 
-	public String getStyleName() {
-		return style.getName();
-	}
 }

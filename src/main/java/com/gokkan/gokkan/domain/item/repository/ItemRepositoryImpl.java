@@ -1,6 +1,6 @@
 package com.gokkan.gokkan.domain.item.repository;
 
-import static com.gokkan.gokkan.domain.expertInfo.domain.QExpertInfo.*;
+import static com.gokkan.gokkan.domain.expertInfo.domain.QExpertInfo.expertInfo;
 import static com.gokkan.gokkan.domain.item.domain.QItem.item;
 
 import com.gokkan.gokkan.domain.item.domain.Item;

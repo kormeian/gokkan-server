@@ -19,8 +19,6 @@ import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,15 +75,26 @@ public class ExpertCommentService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ResponseExpertComment> getExpertComments(Long expertInfoId) {
-		log.info("전문가 코멘트 조회");
-		ExpertInfo expertInfo = expertInfoRepository.findById(expertInfoId)
-			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
-		List<ExpertComment> expertComments = expertCommentRepository.findAllByExpertInfo(
-			expertInfo);
-		//TODO : DTO로 변환
-		return new ArrayList<>();
+	public ResponseExpertComment getExpertComment(Long itemId) {
+		log.info("전문가 코멘트 조회 itemId : " + itemId);
+		Item item = itemRepository.findById(itemId).orElseThrow(() -> new RestApiException(
+			ItemErrorCode.NOT_FOUND_ITEM));
+		ExpertComment expertComment = expertCommentRepository.findByItem(item)
+			.orElseThrow(() -> new RestApiException(
+				ExpertCommentErrorCode.NOT_FOUND_EXPERT_COMMENT));
+		ExpertInfo expertInfo = expertComment.getExpertInfo();
+		ResponseExpertComment responseExpertComment = ResponseExpertComment.builder()
+			.name(expertInfo.getName())
+			.profileImageUrl(expertInfo.getMember().getProfileImageUrl())
+			.comment(expertComment.getComment())
+			.minPrice(expertComment.getMinPrice())
+			.maxPrice(expertComment.getMaxPrice())
+			.build();
+		responseExpertComment.setStyles(expertInfo.getExpertStyles());
+		log.info("전문가 코멘트 조회 완료");
+		return responseExpertComment;
 	}
+
 
 	private boolean isStateAssessing(State state) {
 		return state.equals(State.ASSESSING);

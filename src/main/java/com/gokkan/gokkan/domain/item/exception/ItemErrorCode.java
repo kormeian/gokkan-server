@@ -16,4 +16,4 @@ public enum ItemErrorCode implements ErrorCode {
 	;
 	private final HttpStatus httpStatus;
 	private final String message;
-	}
+}
