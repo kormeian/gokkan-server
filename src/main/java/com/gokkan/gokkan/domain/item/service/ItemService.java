@@ -12,6 +12,7 @@ import com.gokkan.gokkan.domain.image.service.AwsS3Service;
 import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
@@ -22,6 +23,7 @@ import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.gokkan.gokkan.domain.style.repository.StyleItemRepository;
 import com.gokkan.gokkan.domain.style.service.StyleItemService;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import com.gokkan.gokkan.global.security.oauth.entity.Role;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,5 +220,19 @@ public class ItemService {
 		styleItemRepository.saveAll(styleItems);
 		imageItemRepository.saveAll(imageItems);
 		imageCheckRepository.saveAll(imageChecks);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> myItems(Member member, List<State> states) {
+		log.info("myItems member id : " + member.getUserId());
+		return ListResponse.toResponse(itemRepository.searchAllMyItem(states, member));
+	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> itemsForExport(Member member) {
+		if (!member.getRole().equals(Role.ADMIN)) {
+			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
+		}
+		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
 	}
 }

@@ -49,8 +49,6 @@ public class ItemDto {
 		private List<String> styles;
 
 		@NotNull
-		private Long length;
-		@NotNull
 		private Long width;
 		@NotNull
 		private Long depth;
@@ -78,7 +76,6 @@ public class ItemDto {
 				.name(this.name)
 				.category(category)
 				.startPrice(this.startPrice)
-				.length(this.length)
 				.width(this.width)
 				.depth(this.depth)
 				.height(this.height)
@@ -123,7 +120,6 @@ public class ItemDto {
 
 		private List<String> styles;
 
-		private Long length;
 		private Long width;
 		private Long depth;
 		private Long height;
@@ -146,7 +142,6 @@ public class ItemDto {
 				.name(this.name)
 				.category(category)
 				.startPrice(this.startPrice)
-				.length(this.length)
 				.width(this.width)
 				.depth(this.depth)
 				.height(this.height)
@@ -180,12 +175,12 @@ public class ItemDto {
 		private Long id;
 
 		private String name;
+		private String thumbnail;
 
 		private long startPrice;
 
 		private String state;
 
-		private Long length;
 		private Long width;
 		private Long depth;
 		private Long height;
@@ -217,9 +212,9 @@ public class ItemDto {
 			return Response.builder()
 				.id(item.getId())
 				.name(item.getName())
+				.thumbnail(item.getThumbnail())
 				.startPrice(item.getStartPrice())
 				.state(item.getState().getDescription())
-				.length(item.getLength())
 				.width(item.getWidth())
 				.depth(item.getDepth())
 				.height(item.getHeight())
@@ -253,7 +248,52 @@ public class ItemDto {
 					styleItems.stream().map(StyleItem::getName)
 						.collect(Collectors.toList()))
 				.build();
+		}
+	}
 
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@ToString
+	@Builder
+	@Schema(name = "상품 List 주요 정보 response")
+	public static class ListResponse {
+
+		private Long id;
+
+		private String name;
+
+		private String thumbnail;
+
+		private String state;
+
+		private String writer;
+		private String category;
+		private List<String> styles;
+
+		private LocalDateTime created;
+		private LocalDateTime updated;
+
+		public static ListResponse toResponse(Item item) {
+			List<StyleItem> styleItems = item.getStyleItems();
+			return ListResponse.builder()
+				.id(item.getId())
+				.name(item.getName())
+				.thumbnail(item.getThumbnail())
+				.state(item.getState().getDescription())
+				.created(item.getCreated())
+				.updated(item.getUpdated())
+				.writer(item.getMember().getNickName())
+				.category(item.getCategory() == null ? null : item.getCategory().getName())
+				.styles(styleItems == null ? new ArrayList<>() :
+					styleItems.stream().map(StyleItem::getName)
+						.collect(Collectors.toList()))
+				.build();
+		}
+
+		public static List<ListResponse> toResponse(List<Item> items) {
+			return items.stream().map(ListResponse::toResponse).collect(Collectors.toList());
 		}
 	}
 }

@@ -51,8 +51,6 @@ public class Item {
 	private State state;
 
 	@Column(length = 5)
-	private long length;
-	@Column(length = 5)
 	private long width;
 	@Column(length = 5)
 	private long depth;
@@ -60,7 +58,7 @@ public class Item {
 	private long height;
 	private String material;
 
-	@Column(length = 3)
+	@Column(length = 10)
 	private String conditionGrade;
 	@Column(length = 2000)
 	private String conditionDescription;

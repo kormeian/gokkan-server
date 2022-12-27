@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.item.controller;
 
 import com.gokkan.gokkan.domain.item.dto.ItemDto;
 import com.gokkan.gokkan.domain.item.service.ItemService;
+import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import io.swagger.v3.oas.annotations.Operation;
@@ -109,5 +110,26 @@ public class ItemController {
 		@CurrentMember Member member) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(itemService.createTemporary(member));
+	}
+
+
+	@Operation(summary = "나의 상품 list 조회", description = "요청한 states 에 맞는 상품 list 반환")
+	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
+	@GetMapping("/my-items")
+	public ResponseEntity<?> myItems(
+		@Parameter(hidden = true)
+		@CurrentMember Member member,
+		@Parameter(description = "상품 상태 list")
+		@RequestParam List<State> states) {
+		return ResponseEntity.ok(itemService.myItems(member, states));
+	}
+
+	@Operation(summary = "상품 list 조회", description = "전문가 스타일에 맞는 상품 list 반환")
+	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
+	@GetMapping("/expert-items")
+	public ResponseEntity<?> items(
+		@Parameter(hidden = true)
+		@CurrentMember Member member) {
+		return ResponseEntity.ok(itemService.itemsForExport(member));
 	}
 }
