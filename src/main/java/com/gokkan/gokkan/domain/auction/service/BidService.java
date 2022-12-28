@@ -85,7 +85,10 @@ public class BidService {
 			JSONObject jsonObject = new JSONObject();
 			JSONArray jsonArray = new JSONArray();
 			for (History h : history) {
-				jsonArray.add(h.getMemberId() + "_" + h.getPrice());
+				JSONObject object = new JSONObject();
+				object.put("memberId", h.getMemberId());
+				object.put("price", h.getPrice());
+				jsonArray.add(object);
 			}
 			jsonObject.put("history", jsonArray);
 			jsonObject.put("currentPrice", price);
