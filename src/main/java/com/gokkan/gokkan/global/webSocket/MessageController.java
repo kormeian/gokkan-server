@@ -1,5 +1,7 @@
 package com.gokkan.gokkan.global.webSocket;
 
+import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,6 +26,16 @@ public class MessageController {
 
 		String text = "auctionId : " + message.getAuctionId() + "의 경매가 현재가 : " + message.getPrice()
 			+ "원으로 변경되었습니다.";
+		simpMessageSendingOperations.convertAndSend("/topic/" + message.getAuctionId(), text);
+	}
+
+	@MessageMapping("/test3/{auctionId}")
+	public void test3(@CurrentMember Member member, @DestinationVariable Long auctionId,
+		Message message) {
+
+		String text = "memberId : " + member.getId() + "\n" +
+			"auctionId : " + auctionId + "\n" +
+			"price : " + message.getPrice();
 		simpMessageSendingOperations.convertAndSend("/topic/" + message.getAuctionId(), text);
 	}
 }
