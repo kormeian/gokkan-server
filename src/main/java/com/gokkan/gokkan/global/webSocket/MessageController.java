@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.global.webSocket;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import com.gokkan.gokkan.global.webSocket.interceptor.StompChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -43,7 +42,7 @@ public class MessageController {
 
 	@MessageMapping("/test4/{auctionId}")
 	public void test4(@DestinationVariable Long auctionId,
-		 Long price) {
+		Long price) {
 		String text = "auctionId : " + auctionId + "\n" +
 			"price : " + price;
 		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId, text);

@@ -1,23 +1,16 @@
 package com.gokkan.gokkan.global.webSocket.interceptor;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.domain.member.exception.AuthErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
-import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -31,22 +24,24 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 
 	private Member member;
 
-	private void setMember(Member tokenMember){
-		this.member = tokenMember;
-	}
-	public Member getMember(){
+	public Member getMember() {
 		return this.member;
+	}
+
+	private void setMember(Member tokenMember) {
+		this.member = tokenMember;
 	}
 
 	@Override
 	public Message<?> preSend(Message<?> message, MessageChannel channel) {
 		StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-		if(headerAccessor.getCommand() != StompCommand.SEND){
+		if (headerAccessor.getCommand() != StompCommand.SEND) {
 			return message;
 		}
 
-		String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader("Authorization"));
-		if(authorizationHeader == null || authorizationHeader.equals("null")){
+		String authorizationHeader = String.valueOf(
+			headerAccessor.getNativeHeader("Authorization"));
+		if (authorizationHeader == null || authorizationHeader.equals("null")) {
 			log.info("토큰 없음!");
 			return message;
 			//throw new RestApiException(AuthErrorCode.AUTHORIZATION_HEADER_NOT_FOUND);

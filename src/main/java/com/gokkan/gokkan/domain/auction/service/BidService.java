@@ -39,7 +39,7 @@ public class BidService {
 
 
 	public void bidding(Member member, Long auctionId, Long price) {
-		if(member == null){
+		if (member == null) {
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
 		}
 		Auction auction = auctionRepository.findById(auctionId)

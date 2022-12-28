@@ -75,6 +75,7 @@ public class MemberService {
 		log.info("닉네임 중복 체크");
 		return memberRepository.existsByNickName(nickName);
 	}
+
 	@Transactional
 	public void logout(Member member) {
 		log.info("로그아웃 시작 이름 : " + member.getName());

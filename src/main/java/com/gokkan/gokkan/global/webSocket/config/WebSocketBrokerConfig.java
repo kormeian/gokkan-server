@@ -18,6 +18,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
 	private final StompChannelInterceptor stompChannelInterceptor;
 	private final StompErrorHandler stompErrorHandler;
+
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		registry.enableSimpleBroker("/queue", "/topic");

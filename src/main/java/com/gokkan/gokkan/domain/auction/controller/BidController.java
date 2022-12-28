@@ -2,7 +2,6 @@ package com.gokkan.gokkan.domain.auction.controller;
 
 import com.gokkan.gokkan.domain.auction.service.BidService;
 import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import com.gokkan.gokkan.global.webSocket.interceptor.StompChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
