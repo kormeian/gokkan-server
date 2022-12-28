@@ -2,6 +2,7 @@ package com.gokkan.gokkan.global.webSocket;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
+import com.gokkan.gokkan.global.webSocket.interceptor.StompChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 public class MessageController {
 
 	private final SimpMessageSendingOperations simpMessageSendingOperations;
+	private final StompChannelInterceptor stompChannelInterceptor;
 
 	@MessageMapping("/test/{auctionId}/{price}")
 	public void test(@DestinationVariable Long auctionId, @DestinationVariable Long price) {
@@ -30,12 +32,20 @@ public class MessageController {
 	}
 
 	@MessageMapping("/test3/{auctionId}")
-	public void test3(@CurrentMember Member member, @DestinationVariable Long auctionId,
+	public void test3(@DestinationVariable Long auctionId,
 		Message message) {
-
+		Member member = stompChannelInterceptor.getMember();
 		String text = "memberId : " + member.getId() + "\n" +
 			"auctionId : " + auctionId + "\n" +
 			"price : " + message.getPrice();
-		simpMessageSendingOperations.convertAndSend("/topic/" + message.getAuctionId(), text);
+		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId, text);
+	}
+
+	@MessageMapping("/test4/{auctionId}")
+	public void test4(@DestinationVariable Long auctionId,
+		 Long price) {
+		String text = "auctionId : " + auctionId + "\n" +
+			"price : " + price;
+		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId, text);
 	}
 }
