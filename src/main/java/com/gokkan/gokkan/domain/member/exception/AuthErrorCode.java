@@ -16,7 +16,9 @@ public enum AuthErrorCode implements ErrorCode {
 	REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Refresh token not found"),
 	REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Refresh token expired"),
 	ACCESS_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Access Token invalid"),
-	REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh Token invalid");
+	TOKEN_IS_EMPTY(HttpStatus.UNAUTHORIZED, "Token is empty"),
+	REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh Token invalid"),
+	AUTHORIZATION_HEADER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Authorization header not found");
 
 	private final HttpStatus httpStatus;
 	private final String message;
