@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.item.controller;
 
-import com.gokkan.gokkan.domain.item.dto.ItemDto;
+import static com.gokkan.gokkan.domain.item.dto.ItemDto.*;
+
 import com.gokkan.gokkan.domain.item.service.ItemService;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
@@ -36,12 +37,12 @@ public class ItemController {
 	private final ItemService itemService;
 
 	@Operation(summary = "상품 생성 완료", description = "상품 생성, Amazon S3에 파일 업로드, 업로드 된 이미지 url 상품에 저장")
-	@ApiResponse(responseCode = "200", description = "생성된 상품 반환, 상품 상태 검수중으로 변경, 수정 불가", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@ApiResponse(responseCode = "200", description = "생성된 상품 반환, 상품 상태 검수중으로 변경, 수정 불가", content = @Content(schema = @Schema(implementation = Response.class)))
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
 	public ResponseEntity<?> create(
-		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = ItemDto.UpdateRequest.class)))
-		@RequestPart ItemDto.UpdateRequest request,
+		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
+		@RequestPart UpdateRequest request,
 		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
@@ -53,7 +54,7 @@ public class ItemController {
 	}
 
 	@Operation(summary = "상품 디테일 조회", description = "itemId에 해당하는 상품 디테일 조회, 상품 상태 임시저장/반려 상태는 읽지 못함")
-	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = Response.class)))
 	@GetMapping("/details")
 	public ResponseEntity<?> read(
 		@Parameter(description = "상품 아이디", required = true)
@@ -62,14 +63,23 @@ public class ItemController {
 	}
 
 	@Operation(summary = "임시 저장 상품 디테일 조회", description = "itemId에 해당하는 임시 저장 상품 디테일 조회")
-	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@ApiResponse(responseCode = "200", description = "조회한 상품 반환", content = @Content(schema = @Schema(implementation = Response.class)))
 	@GetMapping("/details/temp")
 	public ResponseEntity<?> tempRead(
 		@Parameter(description = "상품 아이디", required = true)
 		@RequestParam Long itemId,
 		@Parameter(hidden = true)
 		@CurrentMember Member member) {
-		return ResponseEntity.ok(itemService.readTempDetail(itemId, member));
+		return ResponseEntity.ok(itemService.readDetailTemp(itemId, member));
+	}
+
+	@Operation(summary = "경매 전용 상품 디테일 조회", description = "itemId에 해당하는 경매 전용 상품 디테일 조회")
+	@ApiResponse(responseCode = "200", description = "조회한 상품 반환, State = COMPLETE 아니면 에러 발생", content = @Content(schema = @Schema(implementation = ResponseForAuction.class)))
+	@GetMapping("/details/auction")
+	public ResponseEntity<?> auctionRead(
+		@Parameter(description = "상품 아이디", required = true)
+		@RequestParam Long itemId) {
+		return ResponseEntity.ok(itemService.readDetailAuction(itemId));
 	}
 
 	@Operation(summary = "상품 삭제", description = "itemId에 해당하는 상품 삭제")
@@ -84,12 +94,12 @@ public class ItemController {
 	}
 
 	@Operation(summary = "상품 수정", description = "상품 수정, Amazon S3에 파일 업로드, 수정된 이미지 url 상품에 저장")
-	@ApiResponse(responseCode = "201", description = "수정된 상품 반환, 상품은 임시 저장상태", content = @Content(schema = @Schema(implementation = ItemDto.Response.class)))
+	@ApiResponse(responseCode = "201", description = "수정된 상품 반환, 상품은 임시 저장상태", content = @Content(schema = @Schema(implementation = Response.class)))
 	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	@Transactional
 	public ResponseEntity<?> update(
-		@Parameter(description = "상품 수정 정보", required = true, content = @Content(schema = @Schema(implementation = ItemDto.UpdateRequest.class)))
-		@RequestPart ItemDto.UpdateRequest request,
+		@Parameter(description = "상품 수정 정보", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
+		@RequestPart UpdateRequest request,
 		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
@@ -114,7 +124,7 @@ public class ItemController {
 
 
 	@Operation(summary = "나의 상품 list 조회", description = "요청한 states 에 맞는 상품 list 반환")
-	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
+	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	@GetMapping("/my-items")
 	public ResponseEntity<?> myItems(
 		@Parameter(hidden = true)
@@ -125,7 +135,7 @@ public class ItemController {
 	}
 
 	@Operation(summary = "상품 list 조회", description = "전문가 스타일에 맞는 상품 list 반환")
-	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ItemDto.ListResponse.class)))
+	@ApiResponse(responseCode = "200", description = "상품 주요 정보만 반환", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	@GetMapping("/expert-items")
 	public ResponseEntity<?> items(
 		@Parameter(hidden = true)

@@ -260,6 +260,81 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
+	@Schema(name = "상품 response")
+	public static class ResponseForAuction {
+
+		private Long id;
+
+		private String name;
+		private long startPrice;
+
+		private Long width;
+		private Long depth;
+		private Long height;
+		private String material;
+
+		private String conditionGrade;
+		private String conditionDescription;
+		private String text;
+
+
+		private String madeIn;
+		private String designer;
+		private String brand;
+		private int productionYear;
+
+		private String writer;
+		private CategoryDto.ResponseForItem category;
+		private List<ImageDto.Response> imageItemUrls;
+		private List<String> styles;
+
+		private LocalDateTime created;
+		private LocalDateTime updated;
+
+		public static ResponseForAuction toResponseForAuction(Item item) {
+			List<ImageItem> imageItems = item.getImageItems();
+			List<StyleItem> styleItems = item.getStyleItems();
+			Category category = item.getCategory();
+			return ItemDto.ResponseForAuction.builder()
+				.id(item.getId())
+				.name(item.getName())
+				.startPrice(item.getStartPrice())
+				.width(item.getWidth())
+				.depth(item.getDepth())
+				.height(item.getHeight())
+				.material(item.getMaterial())
+				.conditionGrade(item.getConditionGrade())
+				.conditionDescription(item.getConditionDescription())
+				.text(item.getText())
+				.madeIn(item.getMadeIn())
+				.designer(item.getDesigner())
+				.brand(item.getBrand())
+				.productionYear(item.getProductionYear())
+				.created(item.getCreated())
+				.updated(item.getUpdated())
+				.writer(item.getMember().getNickName())
+				.category(category == null ? null :
+					CategoryDto.ResponseForItem.getResponseForItem(category, null))
+				.imageItemUrls(imageItems == null ? new ArrayList<>() :
+					imageItems.stream()
+						.map(x -> ImageDto.Response.builder()
+							.id(x.getId())
+							.url(x.getUrl())
+							.build())
+						.collect(Collectors.toList()))
+				.styles(styleItems == null ? new ArrayList<>() :
+					styleItems.stream().map(StyleItem::getName)
+						.collect(Collectors.toList()))
+				.build();
+		}
+	}
+
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@ToString
+	@Builder
 	@Schema(name = "상품 List 주요 정보 response")
 	public static class ListResponse {
 

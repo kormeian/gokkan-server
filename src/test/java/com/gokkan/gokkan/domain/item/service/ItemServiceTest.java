@@ -23,6 +23,7 @@ import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.Response;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ResponseForAuction;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
@@ -1066,7 +1067,7 @@ class ItemServiceTest {
 		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_FIX_STATE);
 	}
 
-	@DisplayName("05_00_1. readTempDetail success, state TEMPORARY ")
+	@DisplayName("05_00_1. readDetailTemp success, state TEMPORARY ")
 	@Test
 	public void test_05_00_1() {
 		//given
@@ -1077,13 +1078,13 @@ class ItemServiceTest {
 
 		//when
 
-		Response response = itemService.readTempDetail(1L, member);
+		Response response = itemService.readDetailTemp(1L, member);
 
 		//then
 		assertEquals(response.getName(), item.getName());
 	}
 
-	@DisplayName("05_00_2. readTempDetail success, state RETURN ")
+	@DisplayName("05_00_2. readDetailTemp success, state RETURN ")
 	@Test
 	public void test_05_00_2() {
 		//given
@@ -1094,13 +1095,13 @@ class ItemServiceTest {
 
 		//when
 
-		Response response = itemService.readTempDetail(1L, member);
+		Response response = itemService.readDetailTemp(1L, member);
 
 		//then
 		assertEquals(response.getName(), item.getName());
 	}
 
-	@DisplayName("05_01. readTempDetail fail NOT_FOUND_ITEM")
+	@DisplayName("05_01. readDetailTemp fail NOT_FOUND_ITEM")
 	@Test
 	public void test_05_01() {
 		//given
@@ -1109,13 +1110,13 @@ class ItemServiceTest {
 
 		//when
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.readTempDetail(1L, member));
+			() -> itemService.readDetailTemp(1L, member));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
 	}
 
-	@DisplayName("05_02_1. readTempDetail fail, state COMPLETE ")
+	@DisplayName("05_02_1. readDetailTemp fail, state COMPLETE ")
 	@Test
 	public void test_05_02_1() {
 		//given
@@ -1127,13 +1128,13 @@ class ItemServiceTest {
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.readTempDetail(1L, member));
+			() -> itemService.readDetailTemp(1L, member));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 
-	@DisplayName("05_02_2. readTempDetail fail, state ASSESSING ")
+	@DisplayName("05_02_2. readDetailTemp fail, state ASSESSING ")
 	@Test
 	public void test_05_02_2() {
 		//given
@@ -1145,13 +1146,13 @@ class ItemServiceTest {
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.readTempDetail(1L, member));
+			() -> itemService.readDetailTemp(1L, member));
 
 		//then
 		assertEquals(itemException.getErrorCode(), ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 
-	@DisplayName("05_03. readTempDetail fail, MEMBER_NOT_LOGIN")
+	@DisplayName("05_03. readDetailTemp fail, MEMBER_NOT_LOGIN")
 	@Test
 	public void test_05_03() {
 		//given
@@ -1163,13 +1164,13 @@ class ItemServiceTest {
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.readTempDetail(1L, null));
+			() -> itemService.readDetailTemp(1L, null));
 
 		//then
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_NOT_LOGIN);
 	}
 
-	@DisplayName("05_04. readTempDetail fail, MEMBER_NOT_LOGIN")
+	@DisplayName("05_04. readDetailTemp fail, MEMBER_NOT_LOGIN")
 	@Test
 	public void test_05_04() {
 		//given
@@ -1181,10 +1182,69 @@ class ItemServiceTest {
 		//when
 
 		RestApiException itemException = assertThrows(RestApiException.class,
-			() -> itemService.readTempDetail(1L, Member.builder().userId("").build()));
+			() -> itemService.readDetailTemp(1L, Member.builder().userId("").build()));
 
 		//then
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
+	}
+	
+	@DisplayName("06_00. readDetailAuction success")
+	@Test
+	public void test_06_00(){
+	    //given
+		Item item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		item.setState(State.COMPLETE);
+		given(itemRepository.findById(anyLong())).willReturn(Optional.of(item));
+
+		//when
+		ResponseForAuction responseForAuction = itemService.readDetailAuction(1L);
+
+		//then
+		assertEquals(responseForAuction.getName(), item.getName());
+	}
+
+	@DisplayName("06_01. readDetailAuction fail NOT_FOUND_ITEM")
+	@Test
+	public void test_06_01(){
+		//given
+		given(itemRepository.findById(anyLong())).willReturn(Optional.empty());
+
+		//when
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.readDetailAuction(1L));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.NOT_FOUND_ITEM);
+	}
+
+	@DisplayName("06_02. readDetailAuction fail CAN_NOT_READ_STATE")
+	@Test
+	public void test_06_02(){
+		//given
+		Item item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		item.setState(State.TEMPORARY);
+		given(itemRepository.findById(1L)).willReturn(Optional.of(item));
+		item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		item.setId(2L);
+		item.setState(State.RETURN);
+		given(itemRepository.findById(2L)).willReturn(Optional.of(item));
+		item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		item.setId(3L);
+		item.setState(State.ASSESSING);
+		given(itemRepository.findById(3L)).willReturn(Optional.of(item));
+
+		//when
+		RestApiException restApiException1 = assertThrows(RestApiException.class,
+			() -> itemService.readDetailAuction(1L));
+		RestApiException restApiException2 = assertThrows(RestApiException.class,
+			() -> itemService.readDetailAuction(2L));
+		RestApiException restApiException3 = assertThrows(RestApiException.class,
+			() -> itemService.readDetailAuction(3L));
+
+		//then
+		assertEquals(restApiException1.getErrorCode(), ItemErrorCode.CAN_NOT_READ_STATE);
+		assertEquals(restApiException2.getErrorCode(), ItemErrorCode.CAN_NOT_READ_STATE);
+		assertEquals(restApiException3.getErrorCode(), ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 
 	private Item getEmptyItem() {
