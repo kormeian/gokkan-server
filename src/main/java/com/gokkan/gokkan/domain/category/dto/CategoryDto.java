@@ -73,7 +73,7 @@ public class CategoryDto {
 
 		private String parent;
 
-		private List<String> children = new ArrayList<>();
+		private List<Response> children = new ArrayList<>();
 
 		public static Response toResponse(Category category) {
 			return Response.builder()
@@ -82,11 +82,47 @@ public class CategoryDto {
 				.parent(category.getParent() == null ?
 					"root" : category.getParent().getName())
 				.children(category.getChildren() == null ? new ArrayList<>() :
-					category.getChildren().stream().map(Category::getName)
+					category.getChildren().stream().map(Response::toResponse)
 						.collect(Collectors.toList()))
 				.build();
 		}
 	}
 
+	@Getter
+	@Setter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@ToString
+	@Builder
+	public static class ResponseForItem {
 
+		private String name;
+
+		private List<ResponseForItem> children;
+
+		public static ResponseForItem toResponseForItem(Category category,
+			List<ResponseForItem> child) {
+			ResponseForItem response = ResponseForItem.builder()
+				.name(category.getName())
+				.children(new ArrayList<>())
+				.build();
+
+			if (child != null) {
+				response.children.addAll(child);
+			}
+			return response;
+		}
+
+		public static ResponseForItem getResponseForItem(Category category,
+			List<ResponseForItem> child) {
+			Category parent = category.getParent();
+			if (parent == null || parent.getName().equals("root")) {
+				return toResponseForItem(category, child);
+			}
+
+			return getResponseForItem(parent,
+				new ArrayList<>(List.of(toResponseForItem(category, child))));
+		}
+
+	}
 }
