@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.item.dto;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
+import com.gokkan.gokkan.domain.category.dto.CategoryDto;
 import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.dto.ImageDto;
@@ -197,7 +198,7 @@ public class ItemDto {
 		private int productionYear;
 
 		private String writer;
-		private String category;
+		private CategoryDto.ResponseForItem category;
 		private List<ImageDto.Response> imageItemUrls;
 		private List<ImageDto.Response> imageCheckUrls;
 		private List<String> styles;
@@ -209,7 +210,8 @@ public class ItemDto {
 			List<ImageItem> imageItems = item.getImageItems();
 			List<ImageCheck> imageChecks = item.getImageChecks();
 			List<StyleItem> styleItems = item.getStyleItems();
-			return Response.builder()
+			Category category = item.getCategory();
+			return ItemDto.Response.builder()
 				.id(item.getId())
 				.name(item.getName())
 				.thumbnail(item.getThumbnail())
@@ -229,7 +231,8 @@ public class ItemDto {
 				.created(item.getCreated())
 				.updated(item.getUpdated())
 				.writer(item.getMember().getNickName())
-				.category(item.getCategory() == null ? null : item.getCategory().getName())
+				.category(category == null ? null :
+					CategoryDto.ResponseForItem.getResponseForItem(category, null))
 				.imageItemUrls(imageItems == null ? new ArrayList<>() :
 					imageItems.stream()
 						.map(x -> ImageDto.Response.builder()
