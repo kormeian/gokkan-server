@@ -10,6 +10,7 @@ import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,82 +22,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 public class ItemDto {
-
-
-	@Getter
-	@Setter
-	@AllArgsConstructor
-	@NoArgsConstructor
-	@ToString
-	@Builder
-	@Schema(name = "상품 생성 완료 request")
-	public static class CreateRequest {
-
-		@NotNull
-		private Long itemId;
-		@NotNull
-		private String name;
-
-		@NotNull
-		private Long startPrice;
-
-		@NotNull
-		private String category;
-
-		private List<ImageDto.UpdateRequest> imageItemUrls;
-
-		private List<ImageDto.UpdateRequest> imageCheckUrls;
-
-		private List<String> styles;
-
-		@NotNull
-		private Long width;
-		@NotNull
-		private Long depth;
-		@NotNull
-		private Long height;
-		@NotNull
-		private String material;
-
-		@NotNull
-		private String conditionGrade;
-		@NotNull
-		private String conditionDescription;
-		@NotNull
-		private String text;
-
-		private String madeIn;
-		private String designer;
-		private String brand;
-		private Integer productionYear;
-
-		public Item toItem(Item item, Category category) {
-			return Item.builder()
-				.id(item.getId())
-				.member(item.getMember())
-				.name(this.name)
-				.category(category)
-				.startPrice(this.startPrice)
-				.width(this.width)
-				.depth(this.depth)
-				.height(this.height)
-				.material(this.material)
-				.conditionGrade(this.conditionGrade)
-				.conditionDescription(this.conditionDescription)
-				.text(this.text)
-				.madeIn(this.madeIn)
-				.designer(this.designer)
-				.brand(this.brand)
-				.productionYear(this.productionYear)
-				.state(item.getState())
-				.created(item.getCreated())
-				.updated(LocalDateTime.now())
-				.imageItems(item.getImageItems())
-				.imageChecks(item.getImageChecks())
-				.styleItems(item.getStyleItems())
-				.build();
-		}
-	}
 
 	@Getter
 	@Setter
@@ -170,10 +95,11 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 response")
+	@Schema(name = "상품 detail response")
 	public static class Response {
 
 		private Long id;
+		private String itemNumber;
 
 		private String name;
 		private String thumbnail;
@@ -211,8 +137,9 @@ public class ItemDto {
 			List<ImageCheck> imageChecks = item.getImageChecks();
 			List<StyleItem> styleItems = item.getStyleItems();
 			Category category = item.getCategory();
-			return ItemDto.Response.builder()
+			return Response.builder()
 				.id(item.getId())
+				.itemNumber(item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) +item.getId())
 				.name(item.getName())
 				.thumbnail(item.getThumbnail())
 				.startPrice(item.getStartPrice())
@@ -260,10 +187,11 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 response")
+	@Schema(name = "경매 전용 상품 detail response")
 	public static class ResponseForAuction {
 
 		private Long id;
+		private String itemNumber;
 
 		private String name;
 		private long startPrice;
@@ -297,6 +225,7 @@ public class ItemDto {
 			Category category = item.getCategory();
 			return ItemDto.ResponseForAuction.builder()
 				.id(item.getId())
+				.itemNumber(item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) +item.getId())
 				.name(item.getName())
 				.startPrice(item.getStartPrice())
 				.width(item.getWidth())
