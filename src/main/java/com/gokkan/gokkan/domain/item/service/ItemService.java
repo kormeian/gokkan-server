@@ -13,6 +13,7 @@ import com.gokkan.gokkan.domain.image.service.ImageCheckService;
 import com.gokkan.gokkan.domain.image.service.ImageItemService;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ResponseForAuction;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
@@ -105,7 +106,7 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public Response readTempDetail(Long itemId, Member member) {
+	public Response readDetailTemp(Long itemId, Member member) {
 		log.info("readTempDetail item id : " + itemId);
 		Item item = getItem(itemId);
 		memberLoginCheck(member);
@@ -113,6 +114,15 @@ public class ItemService {
 		itemStateCheckForRead(item.getState(),
 			new ArrayList<>(List.of(State.TEMPORARY, State.RETURN)));
 		return Response.toResponse(item);
+	}
+
+	@Transactional(readOnly = true)
+	public ResponseForAuction readDetailAuction(Long itemId) {
+		log.info("readAuctionDetail item id : " + itemId);
+		Item item = getItem(itemId);
+		itemStateCheckForRead(item.getState(),
+			new ArrayList<>(List.of(State.COMPLETE)));
+		return ResponseForAuction.toResponseForAuction(item);
 	}
 
 	@Transactional
