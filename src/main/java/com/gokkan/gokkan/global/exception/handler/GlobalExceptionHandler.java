@@ -26,7 +26,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(RestApiException.class)
 	public ResponseEntity<Object> handleQuizException(final RestApiException e) {
 		final ErrorCode errorCode = e.getErrorCode();
-		log.warn("RestApiException : "+ errorCode.getHttpStatus().value() + " (" + errorCode.getMessage() + ")");
+		log.warn("RestApiException : " + errorCode.getHttpStatus().value() + " ("
+			+ errorCode.getMessage() + ")");
 		return handleExceptionInternal(errorCode);
 	}
 
@@ -34,7 +35,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@SendTo("/queue/error")
 	public ResponseEntity<Object> handleMessageException(final RestApiException e) {
 		final ErrorCode errorCode = e.getErrorCode();
-		log.warn("RestApiException : "+ errorCode.getHttpStatus().value() + " (" + errorCode.getMessage() + ")");
+		log.warn("RestApiException : " + errorCode.getHttpStatus().value() + " ("
+			+ errorCode.getMessage() + ")");
 		return handleExceptionInternal(errorCode);
 	}
 

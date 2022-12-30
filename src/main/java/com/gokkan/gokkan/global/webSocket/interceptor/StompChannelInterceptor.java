@@ -51,11 +51,11 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 		if (token.validate()) {
 			log.info("토큰 유효 멤버 조회");
 			Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
-			if(member == null){
+			if (member == null) {
 				throw new RestApiException(AuthErrorCode.TOKEN_EXPIRED);
 			}
 			setMember(member);
-		} else{
+		} else {
 			throw new RestApiException(AuthErrorCode.ACCESS_TOKEN_INVALID);
 		}
 

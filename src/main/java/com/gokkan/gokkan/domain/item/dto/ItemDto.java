@@ -139,7 +139,8 @@ public class ItemDto {
 			Category category = item.getCategory();
 			return Response.builder()
 				.id(item.getId())
-				.itemNumber(item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) +item.getId())
+				.itemNumber(
+					item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) + item.getId())
 				.name(item.getName())
 				.thumbnail(item.getThumbnail())
 				.startPrice(item.getStartPrice())
@@ -225,7 +226,8 @@ public class ItemDto {
 			Category category = item.getCategory();
 			return ItemDto.ResponseForAuction.builder()
 				.id(item.getId())
-				.itemNumber(item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) +item.getId())
+				.itemNumber(
+					item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) + item.getId())
 				.name(item.getName())
 				.startPrice(item.getStartPrice())
 				.width(item.getWidth())

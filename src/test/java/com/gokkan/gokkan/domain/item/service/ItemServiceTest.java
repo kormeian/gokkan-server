@@ -1187,11 +1187,11 @@ class ItemServiceTest {
 		//then
 		assertEquals(itemException.getErrorCode(), MemberErrorCode.MEMBER_MISMATCH);
 	}
-	
+
 	@DisplayName("06_00. readDetailAuction success")
 	@Test
-	public void test_06_00(){
-	    //given
+	public void test_06_00() {
+		//given
 		Item item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 		item.setState(State.COMPLETE);
 		given(itemRepository.findById(anyLong())).willReturn(Optional.of(item));
@@ -1205,7 +1205,7 @@ class ItemServiceTest {
 
 	@DisplayName("06_01. readDetailAuction fail NOT_FOUND_ITEM")
 	@Test
-	public void test_06_01(){
+	public void test_06_01() {
 		//given
 		given(itemRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -1219,7 +1219,7 @@ class ItemServiceTest {
 
 	@DisplayName("06_02. readDetailAuction fail CAN_NOT_READ_STATE")
 	@Test
-	public void test_06_02(){
+	public void test_06_02() {
 		//given
 		Item item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 		item.setState(State.TEMPORARY);
