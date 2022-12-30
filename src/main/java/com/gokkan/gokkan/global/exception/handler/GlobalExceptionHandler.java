@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +26,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(RestApiException.class)
 	public ResponseEntity<Object> handleQuizException(final RestApiException e) {
 		final ErrorCode errorCode = e.getErrorCode();
+		log.warn("RestApiException : "+ errorCode.getHttpStatus().value() + " (" + errorCode.getMessage() + ")");
+		return handleExceptionInternal(errorCode);
+	}
+
+	@MessageExceptionHandler
+	@SendTo("/queue/error")
+	public ResponseEntity<Object> handleMessageException(final RestApiException e) {
+		final ErrorCode errorCode = e.getErrorCode();
+		log.warn("RestApiException : "+ errorCode.getHttpStatus().value() + " (" + errorCode.getMessage() + ")");
 		return handleExceptionInternal(errorCode);
 	}
 

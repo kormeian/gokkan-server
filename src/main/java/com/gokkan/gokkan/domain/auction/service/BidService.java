@@ -92,7 +92,7 @@ public class BidService {
 			}
 			jsonObject.put("history", jsonArray);
 			jsonObject.put("currentPrice", price);
-			simpMessageSendingOperations.convertAndSend("/topic/auction/" + auctionId,
+			simpMessageSendingOperations.convertAndSend("/topic/" + auctionId,
 				jsonObject.toString());
 		} catch (InterruptedException | JSONException e) {
 			e.printStackTrace();

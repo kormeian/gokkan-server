@@ -1,7 +1,9 @@
 package com.gokkan.gokkan.global.webSocket.interceptor;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.domain.member.exception.AuthErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
+import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import com.gokkan.gokkan.global.security.oauth.token.AuthToken;
 import com.gokkan.gokkan.global.security.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -42,16 +44,19 @@ public class StompChannelInterceptor implements ChannelInterceptor {
 		String authorizationHeader = String.valueOf(
 			headerAccessor.getNativeHeader("Authorization"));
 		if (authorizationHeader == null || authorizationHeader.equals("null")) {
-			log.info("토큰 없음!");
-			return message;
-			//throw new RestApiException(AuthErrorCode.AUTHORIZATION_HEADER_NOT_FOUND);
+			throw new RestApiException(AuthErrorCode.AUTHORIZATION_HEADER_NOT_FOUND);
 		}
 		String tokenStr = authorizationHeader.substring(BEARER_PREFIX.length());
 		AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 		if (token.validate()) {
 			log.info("토큰 유효 멤버 조회");
 			Member member = memberRepository.findByUserId(token.getTokenClaims().getSubject());
+			if(member == null){
+				throw new RestApiException(AuthErrorCode.TOKEN_EXPIRED);
+			}
 			setMember(member);
+		} else{
+			throw new RestApiException(AuthErrorCode.ACCESS_TOKEN_INVALID);
 		}
 
 		return message;
