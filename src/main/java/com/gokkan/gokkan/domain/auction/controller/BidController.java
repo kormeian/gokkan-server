@@ -22,8 +22,10 @@ public class BidController {
 		@DestinationVariable Long auctionId,
 		Long price) {
 		Member member = stompChannelInterceptor.getMember();
-		log.info("멤버 아이디 : " + member.getId() + "가 입찰을 시작합니다. 경매 아이디 : " + auctionId + " 입찰 가격 : "
-			+ price);
+		log.info("멤버 아이디 : " + member.getId() + "가 입찰을 시작합니다.");
+		log.info("경매 아이디 : " + auctionId);
+		log.info("입찰 가격 : " + price);
+
 		bidService.bidding(member, auctionId, price);
 	}
 

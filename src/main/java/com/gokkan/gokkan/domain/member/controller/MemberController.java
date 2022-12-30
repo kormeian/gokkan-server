@@ -3,6 +3,7 @@ package com.gokkan.gokkan.domain.member.controller;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseDto;
+import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseSellerInfo;
 import com.gokkan.gokkan.domain.member.service.MemberService;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import io.swagger.v3.oas.annotations.Operation;
@@ -105,6 +106,14 @@ public class MemberController {
 		@Parameter(hidden = true) @CurrentMember Member member) {
 		memberService.logout(member);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/seller")
+	@Operation(summary = "판매자 정보 조회", description = "판매자 정보 조회")
+	@ApiResponse(description = "판매자 정보", content = @Content(schema = @Schema(implementation = ResponseSellerInfo.class)))
+	public ResponseEntity<ResponseSellerInfo> getSellerInfo(
+		@Parameter(description = "상품 아이디") @RequestParam Long itemId) {
+		return ResponseEntity.ok(memberService.getSellerInfo(itemId));
 	}
 }
 
