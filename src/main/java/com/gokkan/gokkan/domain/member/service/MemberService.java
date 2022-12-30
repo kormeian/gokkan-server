@@ -1,8 +1,12 @@
 package com.gokkan.gokkan.domain.member.service;
 
 import com.gokkan.gokkan.domain.image.service.AwsS3Service;
+import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
+import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.RequestUpdateDto;
+import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseSellerInfo;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
@@ -20,6 +24,7 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
+	private final ItemRepository itemRepository;
 	private final AwsS3Service awsS3Service;
 
 	@Transactional
@@ -82,6 +87,18 @@ public class MemberService {
 		memberRefreshTokenRepository.deleteByUserId(member.getUserId());
 		log.info("리프레시 토큰 삭제 완료");
 		log.info("로그아웃 완료");
+	}
+
+	@Transactional(readOnly = true)
+	public ResponseSellerInfo getSellerInfo(Long itemId) {
+		log.info("판매자 정보 조회");
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> new RestApiException(ItemErrorCode.NOT_FOUND_ITEM));
+		Member seller = item.getMember();
+		return ResponseSellerInfo.builder()
+			.name(seller.getName())
+			.profileImageUrl(seller.getProfileImageUrl())
+			.build();
 	}
 }
 
