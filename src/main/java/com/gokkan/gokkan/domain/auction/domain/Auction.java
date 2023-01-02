@@ -67,4 +67,8 @@ public class Auction {
 	public void setMember(Member member) {
 		this.member = member;
 	}
+
+	public void setEndDateTime(LocalDateTime endDateTime) {
+		this.endDateTime = endDateTime;
+	}
 }
