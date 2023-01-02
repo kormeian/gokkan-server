@@ -47,7 +47,8 @@ public class BidService {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(
 				AuctionErrorCode.AUCTION_NOT_FOUND));
-		if (auction.getAuctionStatus() == AuctionStatus.ENDED || auction.getEndDateTime().isBefore(LocalDateTime.now())) {
+		if (auction.getAuctionStatus() == AuctionStatus.ENDED || auction.getEndDateTime()
+			.isBefore(LocalDateTime.now())) {
 			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
 		}
 
@@ -81,7 +82,7 @@ public class BidService {
 		}
 
 		LocalDateTime currentEndDateTime = auction.getEndDateTime();
-		if(Duration.between(LocalDateTime.now(), currentEndDateTime).getSeconds() < 60){
+		if (Duration.between(LocalDateTime.now(), currentEndDateTime).getSeconds() < 60) {
 			auction.setEndDateTime(currentEndDateTime.plusSeconds(60));
 		}
 
