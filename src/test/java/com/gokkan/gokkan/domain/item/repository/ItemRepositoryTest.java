@@ -6,8 +6,6 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
 import com.gokkan.gokkan.domain.expertInfo.repository.ExpertInfoRepository;
-import com.gokkan.gokkan.domain.image.domain.ImageCheck;
-import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
 import com.gokkan.gokkan.domain.item.domain.Item;
@@ -37,10 +35,6 @@ import org.springframework.context.annotation.Import;
 @Import(QueryDslConfig.class)
 class ItemRepositoryTest {
 
-	String url1 = "url1";
-	String url2 = "url2";
-	String url3 = "url3";
-	String url4 = "url4";
 	String style1 = "style1";
 	String style2 = "style2";
 	String style3 = "style3";
@@ -214,20 +208,6 @@ class ItemRepositoryTest {
 		return categoryRepository.save(Category.builder()
 			.name(name)
 			.children(new ArrayList<>())
-			.build());
-	}
-
-	private ImageItem getImageItem(String url, Item item) {
-		return imageItemRepository.save(ImageItem.builder()
-			.url(url)
-			.item(item)
-			.build());
-	}
-
-	private ImageCheck getImageCheck(String url, Item item) {
-		return imageCheckRepository.save(ImageCheck.builder()
-			.url(url)
-			.item(item)
 			.build());
 	}
 
