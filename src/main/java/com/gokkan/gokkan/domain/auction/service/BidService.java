@@ -10,6 +10,7 @@ import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,8 @@ public class BidService {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(
 				AuctionErrorCode.AUCTION_NOT_FOUND));
-		if (auction.getAuctionStatus() == AuctionStatus.ENDED) {
+		if (auction.getAuctionStatus() == AuctionStatus.ENDED || auction.getEndDateTime()
+			.isBefore(LocalDateTime.now())) {
 			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
 		}
 
@@ -79,6 +81,11 @@ public class BidService {
 				AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
 		}
 
+		LocalDateTime currentEndDateTime = auction.getEndDateTime();
+		if (Duration.between(LocalDateTime.now(), currentEndDateTime).getSeconds() < 60) {
+			auction.setEndDateTime(currentEndDateTime.plusSeconds(60));
+		}
+
 		log.info("현재 진행중인 사람 : {} & 입찰가 : {}원", member.getId(), bidPrice);
 		History currentHistory = History.builder()
 			.memberId(member.getId())
@@ -104,6 +111,7 @@ public class BidService {
 		}
 		jsonObject.put("history", jsonArray);
 		jsonObject.put("currentPrice", bidPrice);
+		jsonObject.put("endDateTime", auction.getEndDateTime().toString());
 
 		auction.setCurrentPrice(bidPrice);
 		auction.setMember(member);
