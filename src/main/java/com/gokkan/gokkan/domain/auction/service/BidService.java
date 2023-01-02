@@ -69,7 +69,7 @@ public class BidService {
 		} else {
 			History lastHistory = history.get(0);
 			if (lastHistory.getMemberId().equals(member.getId())) {
-				throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
+//				throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
 			}
 			currentPrice = lastHistory.getPrice();
 		}
