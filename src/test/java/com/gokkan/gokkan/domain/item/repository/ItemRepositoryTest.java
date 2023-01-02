@@ -11,6 +11,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
 import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
 import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.repository.MemberRepository;
@@ -88,59 +89,28 @@ class ItemRepositoryTest {
 		// 상품1 생성, 상품 이미지, 검수용 이미지, 스타일 등록
 		Item item1 = itemRepository.save(
 			getItem(category, member, State.TEMPORARY));
-		item1.setImageItems(new ArrayList<>(List.of(
-			getImageItem(url1, item1), getImageItem(url2, item1))));
-		item1.setImageChecks(imageCheckRepository.saveAll(new ArrayList<>(List.of(
-			getImageCheck(url1, item1), getImageCheck(url2, item1)))));
-		item1.setStyleItems(styleItemRepository.saveAll(new ArrayList<>(List.of(
-			getStyleItem(styleSaved1, item1), getStyleItem(styleSaved2, item1)))));
 
 		// 상품2 생성, 상품 이미지, 검수용 이미지, 스타일 등록
 		Item item2 = itemRepository.save(
 			getItem(category, member, State.TEMPORARY));
-		item2.setImageItems(new ArrayList<>(List.of(
-			getImageItem(url3, item2), getImageItem(url4, item2))));
-		item2.setImageChecks(imageCheckRepository.saveAll(new ArrayList<>(List.of(
-			getImageCheck(url3, item2), getImageCheck(url4, item2)))));
-		item2.setStyleItems(styleItemRepository.saveAll(new ArrayList<>(List.of(
-			getStyleItem(styleSaved1, item2)))));
 
 		//when
 		// 임시 저장상태 상품 member(작성자) 가 만든 것 list 찾기
-		List<Item> items1 = itemRepository.searchAllMyItem(
+		List<ListResponse> items1 = itemRepository.searchAllMyItem(
 			new ArrayList<>(List.of(State.TEMPORARY)), member);
 
 		// 임시 저장상태 상품 상품 등록 안한 사람 아이디로 상품 list 찾기
-		List<Item> items2 = itemRepository.searchAllMyItem(
+		List<ListResponse> items2 = itemRepository.searchAllMyItem(
 			new ArrayList<>(List.of(State.TEMPORARY)), getMember("another", "test2@test.com"));
 
 		// 검수 대기 상품 member(작성자) 가 만든 것 list 찾기
-		List<Item> items3 = itemRepository.searchAllMyItem(
+		List<ListResponse> items3 = itemRepository.searchAllMyItem(
 			new ArrayList<>(List.of(State.ASSESSING)), member);
 
 		//then
 		assertEquals(items1.size(), 2);
 		assertEquals(items2.size(), 0);
 		assertEquals(items3.size(), 0);
-
-		assertEquals(items1.get(1).getImageItems().size(), 2);
-		assertEquals(items1.get(1).getImageItems().get(0).getUrl(), url1);
-		assertEquals(items1.get(1).getImageItems().get(1).getUrl(), url2);
-		assertEquals(items1.get(1).getImageChecks().size(), 2);
-		assertEquals(items1.get(1).getImageChecks().get(0).getUrl(), url1);
-		assertEquals(items1.get(1).getImageChecks().get(1).getUrl(), url2);
-		assertEquals(items1.get(1).getStyleItems().size(), 2);
-		assertEquals(items1.get(1).getStyleItems().get(0).getName(), style1);
-		assertEquals(items1.get(1).getStyleItems().get(1).getName(), style2);
-
-		assertEquals(items1.get(0).getImageItems().size(), 2);
-		assertEquals(items1.get(0).getImageItems().get(0).getUrl(), url3);
-		assertEquals(items1.get(0).getImageItems().get(1).getUrl(), url4);
-		assertEquals(items1.get(0).getImageChecks().size(), 2);
-		assertEquals(items1.get(0).getImageChecks().get(0).getUrl(), url3);
-		assertEquals(items1.get(0).getImageChecks().get(1).getUrl(), url4);
-		assertEquals(items1.get(0).getStyleItems().size(), 1);
-		assertEquals(items1.get(0).getStyleItems().get(0).getName(), style1);
 	}
 
 	@DisplayName("02_00. searchAllItemForExport success")
@@ -220,26 +190,14 @@ class ItemRepositoryTest {
 			getStyleItem(styleSaved3, item123)))));
 
 		//when
-		List<Item> items1 = itemRepository.searchAllItemForExport(member1);
-		List<Item> items2 = itemRepository.searchAllItemForExport(member2);
-		List<Item> items123 = itemRepository.searchAllItemForExport(member123);
+		List<ListResponse> items1 = itemRepository.searchAllItemForExport(member1);
+		List<ListResponse> items2 = itemRepository.searchAllItemForExport(member2);
+		List<ListResponse> items123 = itemRepository.searchAllItemForExport(member123);
 
 		//then
 		assertEquals(items1.size(), 2);
-		System.out.println("member1 style 1");
-		for (Item item : items1) {
-			System.out.println(item);
-		}
 		assertEquals(items2.size(), 2);
-		System.out.println("member2 style 2");
-		for (Item item : items2) {
-			System.out.println(item);
-		}
 		assertEquals(items123.size(), 4);
-		System.out.println("member123 style 1, 2, 3");
-		for (Item item : items123) {
-			System.out.println(item);
-		}
 	}
 
 	private Member getMember(String userId, String email) {

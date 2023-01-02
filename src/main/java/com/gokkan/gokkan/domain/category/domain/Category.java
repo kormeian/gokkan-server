@@ -45,7 +45,7 @@ public class Category {
 	private Category parent;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parent", cascade = CascadeType.ALL)
-	private List<Category> children = new ArrayList<>();
+	private List<Category> children;
 
 	public static void addRelation(Category parent, Category child) {
 		if (parent.children == null) {

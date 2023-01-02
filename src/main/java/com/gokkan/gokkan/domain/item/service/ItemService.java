@@ -138,8 +138,26 @@ public class ItemService {
 			.getId();
 	}
 
-	private Item updateItem(UpdateRequest request, List<MultipartFile> imageItemFiles,
-		List<MultipartFile> imageCheckFiles, Member member) {
+	@Transactional(readOnly = true)
+	public List<ListResponse> myItems(Member member, List<State> states) {
+		log.info("myItems member id : " + member.getUserId());
+		return itemRepository.searchAllMyItem(states, member);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> itemsForExport(Member member) {
+		if (!member.getRole().equals(Role.ADMIN)) {
+			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
+		}
+		return itemRepository.searchAllItemForExport(member);
+	}
+
+	private Item updateItem(
+		UpdateRequest request,
+		List<MultipartFile> imageItemFiles,
+		List<MultipartFile> imageCheckFiles,
+		Member member
+	) {
 		memberLoginCheck(member);
 		log.info("login member id : " + member.getUserId());
 		Item item = getItem(request.getItemId());
@@ -169,6 +187,7 @@ public class ItemService {
 
 		item.setThumbnail(
 			item.getImageItems().size() == 0 ? "" : item.getImageItems().get(0).getUrl());
+		item.setUpdated(LocalDateTime.now());
 		return item;
 	}
 
@@ -206,20 +225,6 @@ public class ItemService {
 		styleItemRepository.saveAll(styleItems);
 		imageItemRepository.saveAll(imageItems);
 		imageCheckRepository.saveAll(imageChecks);
-	}
-
-	@Transactional(readOnly = true)
-	public List<ListResponse> myItems(Member member, List<State> states) {
-		log.info("myItems member id : " + member.getUserId());
-		return ListResponse.toResponse(itemRepository.searchAllMyItem(states, member));
-	}
-
-	@Transactional(readOnly = true)
-	public List<ListResponse> itemsForExport(Member member) {
-		if (!member.getRole().equals(Role.ADMIN)) {
-			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
-		}
-		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
 	}
 
 	private static void memberMatchCheck(String memberId, String itemMemberId) {
