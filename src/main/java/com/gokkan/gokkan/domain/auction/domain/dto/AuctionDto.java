@@ -1,9 +1,17 @@
 package com.gokkan.gokkan.domain.auction.domain.dto;
 
+import com.gokkan.gokkan.domain.auction.domain.type.SortType;
+import com.gokkan.gokkan.domain.category.domain.Category;
+import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 public class AuctionDto {
 
@@ -32,6 +40,63 @@ public class AuctionDto {
 				.price(price)
 				.bidTime(bidTime)
 				.build();
+		}
+	}
+
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@Schema(name = "경매 List filter api request")
+	public static class FilterListRequest {
+
+		private Category category;
+		private List<String> styles;
+		private SortType sort;
+
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@ToString
+	@Builder
+	@Schema(name = "경매 List filter api 주요 정보 response")
+	public static class ListResponse {
+
+		private Long id;
+		private Long itemId;
+
+		private String name;
+
+		private String thumbnail;
+
+		private Long currentPrice;
+
+		private String writer;
+
+		private LocalDateTime auctionEndDateTime;
+
+		@QueryProjection
+		public ListResponse(
+			Long id,
+			Long itemId,
+			String name,
+			String thumbnail,
+			Long currentPrice,
+			String writer,
+			LocalDateTime auctionEndDateTime
+		) {
+			this.id = id;
+			this.itemId = itemId;
+			this.name = name;
+			this.currentPrice = currentPrice;
+			this.thumbnail = thumbnail;
+			this.writer = writer;
+			this.auctionEndDateTime = auctionEndDateTime;
+
 		}
 	}
 
