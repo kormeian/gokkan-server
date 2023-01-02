@@ -286,7 +286,7 @@ class ItemRepositoryTest {
 			.conditionGrade("test CG")
 			.conditionDescription("test CD")
 			.text("test text")
-			.madeIn("test madeIn")
+//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)

@@ -66,8 +66,8 @@ public class Item {
 	private String text;
 
 
-	@Column(length = 20)
-	private String madeIn;
+//	@Column(length = 20)
+//	private String madeIn;
 	@Column(length = 20)
 	private String designer;
 	@Column(length = 20)
