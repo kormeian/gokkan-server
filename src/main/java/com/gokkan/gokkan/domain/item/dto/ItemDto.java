@@ -55,7 +55,7 @@ public class ItemDto {
 		private String conditionDescription;
 		private String text;
 
-		private String madeIn;
+		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private Integer productionYear;
@@ -75,7 +75,7 @@ public class ItemDto {
 				.conditionGrade(this.conditionGrade)
 				.conditionDescription(this.conditionDescription)
 				.text(this.text)
-				.madeIn(this.madeIn)
+//				.madeIn(this.madeIn)
 				.designer(this.designer)
 				.brand(this.brand)
 				.productionYear(this.productionYear)
@@ -118,7 +118,7 @@ public class ItemDto {
 		private String text;
 
 
-		private String madeIn;
+		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private int productionYear;
@@ -141,25 +141,27 @@ public class ItemDto {
 				.id(item.getId())
 				.itemNumber(
 					item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) + item.getId())
-				.name(item.getName())
-				.thumbnail(item.getThumbnail())
+				.name(item.getName() == null ? "" : item.getName())
+				.thumbnail(item.getThumbnail() == null ? "" : item.getThumbnail())
 				.startPrice(item.getStartPrice())
 				.state(item.getState().getDescription())
 				.width(item.getWidth())
 				.depth(item.getDepth())
 				.height(item.getHeight())
-				.material(item.getMaterial())
-				.conditionGrade(item.getConditionGrade())
-				.conditionDescription(item.getConditionDescription())
-				.text(item.getText())
-				.madeIn(item.getMadeIn())
-				.designer(item.getDesigner())
-				.brand(item.getBrand())
+				.material(item.getMaterial() == null ? "" : item.getMaterial())
+				.conditionGrade(item.getConditionGrade() == null ? "" : item.getConditionGrade())
+				.conditionDescription(
+					item.getConditionDescription() == null ? "" : item.getConditionDescription())
+				.text(item.getText() == null ? "" : item.getText())
+//				.madeIn(item.getMadeIn() == null ? "" : item.getMadeIn())
+				.designer(item.getDesigner() == null ? "" : item.getDesigner())
+				.brand(item.getBrand() == null ? "" : item.getBrand())
 				.productionYear(item.getProductionYear())
 				.created(item.getCreated())
 				.updated(item.getUpdated())
-				.writer(item.getMember().getNickName())
-				.category(category == null ? null :
+				.writer(item.getMember().getNickName() == null ? "" :
+					item.getMember().getNickName())
+				.category(category == null ? CategoryDto.ResponseForItem.builder().build() :
 					CategoryDto.ResponseForItem.getResponseForItem(category, null))
 				.imageItemUrls(imageItems == null ? new ArrayList<>() :
 					imageItems.stream()
@@ -195,8 +197,9 @@ public class ItemDto {
 		private String itemNumber;
 
 		private String name;
-		private long startPrice;
+		private String thumbnail;
 
+		private long startPrice;
 		private Long width;
 		private Long depth;
 		private Long height;
@@ -207,7 +210,7 @@ public class ItemDto {
 		private String text;
 
 
-		private String madeIn;
+		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private int productionYear;
@@ -224,11 +227,12 @@ public class ItemDto {
 			List<ImageItem> imageItems = item.getImageItems();
 			List<StyleItem> styleItems = item.getStyleItems();
 			Category category = item.getCategory();
-			return ItemDto.ResponseForAuction.builder()
+			return ResponseForAuction.builder()
 				.id(item.getId())
 				.itemNumber(
 					item.getCreated().format(DateTimeFormatter.BASIC_ISO_DATE) + item.getId())
 				.name(item.getName())
+				.thumbnail(item.getThumbnail())
 				.startPrice(item.getStartPrice())
 				.width(item.getWidth())
 				.depth(item.getDepth())
@@ -237,7 +241,7 @@ public class ItemDto {
 				.conditionGrade(item.getConditionGrade())
 				.conditionDescription(item.getConditionDescription())
 				.text(item.getText())
-				.madeIn(item.getMadeIn())
+//				.madeIn(item.getMadeIn())
 				.designer(item.getDesigner())
 				.brand(item.getBrand())
 				.productionYear(item.getProductionYear())

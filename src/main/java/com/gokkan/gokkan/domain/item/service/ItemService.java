@@ -50,40 +50,6 @@ public class ItemService {
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
 
-	private static void memberMatchCheck(String memberId, String itemMemberId) {
-		log.info("memberMatchCheck member id : " + memberId);
-		if (!memberId.equals(itemMemberId)) {
-			log.error("memberMatchCheck member id : " + memberId);
-			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
-		}
-	}
-
-	private static void memberLoginCheck(Member member) {
-		if (member == null) {
-			log.error("memberLoginCheck");
-			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
-		} else {
-			log.info("member id : " + member.getId());
-		}
-	}
-
-	private static void itemStateCheckForUpdateAndDelete(State state) {
-		if (state == State.COMPLETE || state == State.ASSESSING) {
-			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
-			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
-		}
-	}
-
-	private static void itemStateCheckForRead(State itemState, List<State> states) {
-		for (State state : states) {
-			if (state == itemState) {
-				return;
-			}
-		}
-		log.error("itemStateCheckForRead state : " + itemState.getDescription());
-		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
-	}
-
 	@Transactional
 	public Response create(
 		UpdateRequest request,
@@ -154,10 +120,20 @@ public class ItemService {
 		log.info("createTemporary member id : " + member.getId());
 		return itemRepository.save(
 				Item.builder()
+					.name("")
 					.member(member)
+					.material("")
+					.conditionGrade("")
+					.conditionDescription("")
+					.text("")
+					.designer("")
+					.brand("")
 					.state(State.TEMPORARY)
 					.created(LocalDateTime.now())
 					.updated(LocalDateTime.now())
+					.imageItems(new ArrayList<>())
+					.imageChecks(new ArrayList<>())
+					.styleItems(new ArrayList<>())
 					.build())
 			.getId();
 	}
@@ -244,5 +220,39 @@ public class ItemService {
 			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
 		}
 		return ListResponse.toResponse(itemRepository.searchAllItemForExport(member));
+	}
+
+	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		log.info("memberMatchCheck member id : " + memberId);
+		if (!memberId.equals(itemMemberId)) {
+			log.error("memberMatchCheck member id : " + memberId);
+			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
+		}
+	}
+
+	private static void memberLoginCheck(Member member) {
+		if (member == null) {
+			log.error("memberLoginCheck");
+			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		} else {
+			log.info("member id : " + member.getId());
+		}
+	}
+
+	private static void itemStateCheckForUpdateAndDelete(State state) {
+		if (state == State.COMPLETE || state == State.ASSESSING) {
+			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
+			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
+		}
+	}
+
+	private static void itemStateCheckForRead(State itemState, List<State> states) {
+		for (State state : states) {
+			if (state == itemState) {
+				return;
+			}
+		}
+		log.error("itemStateCheckForRead state : " + itemState.getDescription());
+		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 }

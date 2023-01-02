@@ -53,7 +53,7 @@ class StyleItemServiceTest {
 			.conditionGrade("test conditionGrade")
 			.conditionDescription("test conditionDescription")
 			.text("test text")
-			.madeIn("test madeIn")
+//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)

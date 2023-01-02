@@ -192,7 +192,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -275,7 +275,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -375,7 +375,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -757,7 +757,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -840,7 +840,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -940,7 +940,7 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
+//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -1071,17 +1071,19 @@ class ItemServiceTest {
 	@Test
 	public void test_05_00_1() {
 		//given
-		Item item = getItem(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-		item.setState(State.TEMPORARY);
 		given(itemRepository.findById(anyLong())).willReturn(
-			Optional.of(item));
+			Optional.of(Item.builder()
+				.member(member)
+				.state(State.TEMPORARY)
+				.created(LocalDateTime.now())
+				.updated(LocalDateTime.now())
+				.build()));
 
 		//when
-
 		Response response = itemService.readDetailTemp(1L, member);
 
 		//then
-		assertEquals(response.getName(), item.getName());
+		assertEquals(response.getName(), "");
 	}
 
 	@DisplayName("05_00_2. readDetailTemp success, state RETURN ")
@@ -1276,7 +1278,7 @@ class ItemServiceTest {
 			.conditionGrade("test conditionGrade")
 			.conditionDescription("test conditionDescription")
 			.text("test text")
-			.madeIn("test madeIn")
+//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
@@ -1324,7 +1326,7 @@ class ItemServiceTest {
 			.conditionGrade("update conditionGrade")
 			.conditionDescription("update conditionDescription")
 			.text("update text")
-			.madeIn("update madeIn")
+//			.madeIn("update madeIn")
 			.designer("update designer")
 			.brand("update brand")
 			.productionYear(1023)
