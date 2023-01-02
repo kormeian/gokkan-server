@@ -5,7 +5,8 @@ import static com.gokkan.gokkan.domain.item.domain.QItem.item;
 import static com.gokkan.gokkan.domain.style.domain.QExpertStyle.expertStyle;
 import static com.gokkan.gokkan.domain.style.domain.QStyleItem.styleItem;
 
-import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
+import com.gokkan.gokkan.domain.item.dto.QItemDto_ListResponse;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.querydsl.core.BooleanBuilder;
@@ -21,7 +22,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Item> searchAllItemForExport(Member member) {
+	public List<ListResponse> searchAllItemForExport(Member member) {
 		// 전문가 스타일 불러오기
 		List<String> expertStyleNames = jpaQueryFactory
 			.select(expertStyle.styleName).from(expertStyle)
@@ -35,7 +36,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 		// 전문가 스탕일로 필터링 된 item list 불러오기
 
 		return jpaQueryFactory
-			.select(item).from(styleItem)
+			.select(
+				new QItemDto_ListResponse(item.id,
+					item.name,
+					item.thumbnail,
+					item.member.nickName,
+					item.created,
+					item.updated))
+			.from(styleItem)
 			.innerJoin(styleItem.item, item)
 			.where(eqStyle(expertStyleNames), item.state.eq(State.ASSESSING))
 			.groupBy(item)
@@ -44,9 +52,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	}
 
 	@Override
-	public List<Item> searchAllMyItem(List<State> states, Member member) {
+	public List<ListResponse> searchAllMyItem(List<State> states, Member member) {
 
-		return jpaQueryFactory.selectFrom(item)
+		return jpaQueryFactory.select(new QItemDto_ListResponse(item.id,
+				item.name,
+				item.thumbnail,
+				item.member.nickName,
+				item.created,
+				item.updated))
+			.from(item)
 			.where(
 				item.member.eq(member),
 				(eqState(states))
