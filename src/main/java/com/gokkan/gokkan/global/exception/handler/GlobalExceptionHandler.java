@@ -7,6 +7,8 @@ import com.gokkan.gokkan.global.exception.response.ErrorResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +35,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@MessageExceptionHandler
 	@SendTo("/queue/error")
-	public ResponseEntity<Object> handleMessageException(final RestApiException e) {
+	public String handleMessageException(final RestApiException e) throws JSONException {
 		final ErrorCode errorCode = e.getErrorCode();
 		log.warn("RestApiException : " + errorCode.getHttpStatus().value() + " ("
 			+ errorCode.getMessage() + ")");
-		return handleExceptionInternal(errorCode);
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("status", errorCode.getHttpStatus().value());
+		jsonObject.put("code", errorCode.name());
+		jsonObject.put("message", errorCode.getMessage());
+		return jsonObject.toString();
+
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
