@@ -1,5 +1,8 @@
 package com.gokkan.gokkan.domain.auction.controller;
 
+import static com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
+import static com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
+
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
@@ -13,6 +16,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,4 +44,14 @@ public class AuctionController {
 		@Parameter(description = "경매 아이디") @RequestParam Long auctionId) {
 		return ResponseEntity.ok(auctionService.getAuctionHistory(auctionId));
 	}
+
+	@GetMapping("/filter-list")
+	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
+	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
+	public ResponseEntity<?> auctionListFilter(
+		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = FilterListRequest.class)))
+		@RequestBody FilterListRequest filterListRequest) {
+		return ResponseEntity.ok(auctionService.readList(filterListRequest));
+	}
+
 }

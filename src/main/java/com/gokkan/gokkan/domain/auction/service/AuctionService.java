@@ -2,10 +2,11 @@ package com.gokkan.gokkan.domain.auction.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.auction.domain.History;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
-import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionService {
 
 	private final AuctionRepository auctionRepository;
-	private final AuctionHistoryRepository auctionHistoryRepository;
 	private final RedisTemplate<String, String> redisTemplate;
 
 	@Transactional(readOnly = true)
@@ -61,7 +61,13 @@ public class AuctionService {
 		return responseAuctionHistories;
 	}
 
+	@Transactional(readOnly = true)
+	public List<ListResponse> readList(FilterListRequest filterListRequest) {
+		return auctionRepository.searchAllFilter(filterListRequest);
+	}
+
 	private List<History> getHistory(Long auctionId) {
+
 		List<String> StringHistory = redisTemplate.opsForList()
 			.range(String.valueOf(auctionId), 0, -1);
 		if (StringHistory == null || StringHistory.isEmpty()) {
