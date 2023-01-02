@@ -7,6 +7,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
+import com.querydsl.core.annotations.QueryProjection;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -266,7 +267,6 @@ public class ItemDto {
 
 	@Getter
 	@Setter
-	@AllArgsConstructor
 	@NoArgsConstructor
 	@ToString
 	@Builder
@@ -279,34 +279,25 @@ public class ItemDto {
 
 		private String thumbnail;
 
-		private String state;
-
 		private String writer;
-		private String category;
-		private List<String> styles;
 
 		private LocalDateTime created;
 		private LocalDateTime updated;
 
-		public static ListResponse toResponse(Item item) {
-			List<StyleItem> styleItems = item.getStyleItems();
-			return ListResponse.builder()
-				.id(item.getId())
-				.name(item.getName())
-				.thumbnail(item.getThumbnail())
-				.state(item.getState().getDescription())
-				.created(item.getCreated())
-				.updated(item.getUpdated())
-				.writer(item.getMember().getNickName())
-				.category(item.getCategory() == null ? null : item.getCategory().getName())
-				.styles(styleItems == null ? new ArrayList<>() :
-					styleItems.stream().map(StyleItem::getName)
-						.collect(Collectors.toList()))
-				.build();
-		}
-
-		public static List<ListResponse> toResponse(List<Item> items) {
-			return items.stream().map(ListResponse::toResponse).collect(Collectors.toList());
+		@QueryProjection
+		public ListResponse(
+			Long id,
+			String name,
+			String thumbnail,
+			String writer,
+			LocalDateTime created,
+			LocalDateTime updated) {
+			this.id = id;
+			this.name = name;
+			this.thumbnail = thumbnail;
+			this.writer = writer;
+			this.created = created;
+			this.updated = updated;
 		}
 	}
 }
