@@ -73,7 +73,7 @@ public class CategoryDto {
 
 		private String parent;
 
-		private List<Response> children = new ArrayList<>();
+		private List<Response> children;
 
 		public static Response toResponse(Category category) {
 			return Response.builder()
