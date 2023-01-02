@@ -1,6 +1,6 @@
 package com.gokkan.gokkan.global.webSocket.config;
 
-import com.gokkan.gokkan.global.webSocket.handler.StompErrorHandler;
+import com.gokkan.gokkan.global.webSocket.handler.StompSubErrorHandler;
 import com.gokkan.gokkan.global.webSocket.interceptor.StompChannelInterceptor;
 import com.gokkan.gokkan.global.webSocket.interceptor.StompHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
 	private final StompChannelInterceptor stompChannelInterceptor;
-	private final StompErrorHandler stompErrorHandler;
+	private final StompSubErrorHandler stompSubErrorHandler;
+	private final StompHandshakeInterceptor stompHandshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -36,11 +37,11 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/gokkan")
 			//WebSocket 또는 SockJS Client가 웹소켓 핸드셰이크 커넥션을 생성할 경로
-			.addInterceptors(new StompHandshakeInterceptor())
+			.addInterceptors(stompHandshakeInterceptor)
 			.setAllowedOriginPatterns("*")
 //			.setAllowedOrigins("*")
 			.withSockJS();
-		registry.setErrorHandler(stompErrorHandler);
+		registry.setErrorHandler(stompSubErrorHandler);
 	}
 
 	@Override

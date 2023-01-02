@@ -51,8 +51,8 @@ public class ExpertCareerController {
 	}
 
 	@GetMapping("/my-career")
-	@ApiResponse(description = "현재 회원 정보", content = @Content(schema = @Schema(implementation = ResponseGetExpertCareer.class)))
-	@Operation(summary = "내 전문가 커리어 조회", description = "내 전문가 커리어 조회")
+	@ApiResponse(description = "현재 회원 정보(리스트임!!)", content = @Content(schema = @Schema(implementation = ResponseGetExpertCareer.class)))
+	@Operation(summary = "내 전문가 커리어 조회(리스트임!!)", description = "내 전문가 커리어 조회(리스트임!!)")
 	public ResponseEntity<List<ResponseGetExpertCareer>> getExpertCareer(
 		@Parameter(hidden = true) @CurrentMember Member member) {
 		return ResponseEntity.ok(expertCareerService.getMyExpertCareer(member));

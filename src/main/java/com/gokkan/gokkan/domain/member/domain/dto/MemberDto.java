@@ -58,4 +58,13 @@ public class MemberDto {
 		}
 	}
 
+	@Getter
+	@Schema(name = "판매자 정보")
+	@Builder
+	public static class ResponseSellerInfo {
+
+		private final String name;
+		private final String profileImageUrl;
+	}
+
 }
