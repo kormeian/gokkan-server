@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.global.exception.handler;
 
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
+import com.gokkan.gokkan.global.exception.dto.ErrorDto.MessageError;
 import com.gokkan.gokkan.global.exception.errorcode.CommonErrorCode;
 import com.gokkan.gokkan.global.exception.errorcode.ErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -12,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,12 +35,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@MessageExceptionHandler
-	@SendTo("/queue/error")
-	public ResponseEntity<Object> handleMessageException(final RestApiException e) {
+	@SendToUser(value = "/queue/error")
+	public MessageError handleMessageException(final RestApiException e) {
 		final ErrorCode errorCode = e.getErrorCode();
 		log.warn("RestApiException : " + errorCode.getHttpStatus().value() + " ("
 			+ errorCode.getMessage() + ")");
-		return handleExceptionInternal(errorCode);
+		return MessageError.builder()
+			.status(errorCode.getHttpStatus().value())
+			.code(errorCode.name())
+			.message(errorCode.getMessage())
+			.build();
 	}
 
 	@ExceptionHandler(IllegalArgumentException.class)

@@ -6,8 +6,10 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
+import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,6 +61,25 @@ public class AuctionService {
 				ResponseAuctionHistory.of(secretId, h.getPrice(), h.getBidTime()));
 		}
 		return responseAuctionHistories;
+	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> getWaitPaymentAuctionList(Member member) {
+		List<Auction> waitPaymentAuctions = auctionRepository.findAllByAuctionStatusEqualsAndMemberEquals(
+			AuctionStatus.WAIT_PAYMENT, member);
+		if (waitPaymentAuctions.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return waitPaymentAuctions.stream()
+			.map(auction -> ListResponse.builder()
+				.id(auction.getId())
+				.itemId(auction.getExpertComment().getItem().getId())
+				.name(auction.getExpertComment().getItem().getName())
+				.thumbnail(auction.getExpertComment().getItem().getThumbnail())
+				.currentPrice(auction.getCurrentPrice())
+				.writer(auction.getExpertComment().getItem().getMember().getName())
+				.build())
+			.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)

@@ -71,4 +71,8 @@ public class Auction {
 	public void setEndDateTime(LocalDateTime endDateTime) {
 		this.endDateTime = endDateTime;
 	}
+
+	public void setAuctionStatus(AuctionStatus auctionStatus) {
+		this.auctionStatus = auctionStatus;
+	}
 }
