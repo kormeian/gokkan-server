@@ -96,7 +96,23 @@ public class AuctionDto {
 			this.thumbnail = thumbnail;
 			this.writer = writer;
 			this.auctionEndDateTime = auctionEndDateTime;
+		}
 
+		@Builder
+		public ListResponse(
+			Long id,
+			Long itemId,
+			String name,
+			String thumbnail,
+			Long currentPrice,
+			String writer
+		) {
+			this.id = id;
+			this.itemId = itemId;
+			this.name = name;
+			this.currentPrice = currentPrice;
+			this.thumbnail = thumbnail;
+			this.writer = writer;
 		}
 	}
 
