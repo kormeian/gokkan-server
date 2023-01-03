@@ -6,6 +6,7 @@ import static com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListRespons
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
+import com.gokkan.gokkan.domain.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,10 +49,20 @@ public class AuctionController {
 	@GetMapping("/filter-list")
 	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
-	public ResponseEntity<?> auctionListFilter(
+	public ResponseEntity<List<ListResponse>> auctionListFilter(
 		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = FilterListRequest.class)))
 		@RequestBody FilterListRequest filterListRequest) {
 		return ResponseEntity.ok(auctionService.readList(filterListRequest));
 	}
+
+	@GetMapping("wait-payment")
+	@Operation(summary = "결제 대기중인 경매 조회", description = "결제 대기중인 경매 조회")
+	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
+	public ResponseEntity<List<ListResponse>> waitPaymentAuctionList(
+		@Parameter(hidden = true) Member member
+	) {
+		return ResponseEntity.ok(auctionService.getWaitPaymentAuctionList(member));
+	}
+
 
 }
