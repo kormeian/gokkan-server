@@ -4,10 +4,6 @@ spring:
       - classpath:security.yml
       - classpath:awsS3.yml
       - classpath:database.yml
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 200MB
 
 springdoc:
   swagger-ui:
