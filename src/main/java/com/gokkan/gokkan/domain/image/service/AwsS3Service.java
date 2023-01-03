@@ -84,6 +84,7 @@ public class AwsS3Service {
 	public void check(List<MultipartFile> multipartFiles) {
 		log.info("check List<multipartFile> size : " + multipartFiles.size());
 		if (multipartFiles.get(0).isEmpty()) {
+			log.info("check List<multipartFile> empty");
 			return;
 		}
 		for (MultipartFile multipartFile : multipartFiles) {
@@ -93,7 +94,7 @@ public class AwsS3Service {
 
 	public void checkImageCount(List<MultipartFile> multipartFiles, int savedCount) {
 		log.info("checkImageCount List<multipartFile> size : " + multipartFiles.size()
-			+ " savedImageCount : " + savedCount);
+			+ ", savedImageCount : " + savedCount);
 		int multipartFiesSize = multipartFiles.size() == 1 ?
 			(multipartFiles.get(0).isEmpty() ? -1 : 1)
 			: multipartFiles.size();
