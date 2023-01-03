@@ -8,10 +8,11 @@ import static com.gokkan.gokkan.domain.style.domain.QStyleItem.styleItem;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.QAuctionDto_ListResponse;
+import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.domain.type.SortType;
-import com.gokkan.gokkan.domain.category.domain.Category;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -38,8 +39,12 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			.innerJoin(auction.expertComment, expertComment)
 			.innerJoin(expertComment.item, item)
 			.innerJoin(item.styleItems, styleItem)
-			.where(eqCategory(filterListRequest.getCategory()),
-				eqStyle(filterListRequest.getStyles()))
+			.where(
+				auction.auctionStatus.eq(AuctionStatus.STARTED),
+				eqCategory(filterListRequest.getCategory()),
+				eqStyle(filterListRequest.getStyles()),
+				auction.endDateTime.after(LocalDateTime.now())
+			)
 			.groupBy(auction)
 			.orderBy(
 				filterListRequest.getSort().equals(SortType.DESC) ?
@@ -48,12 +53,11 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 	}
 
 
-	private BooleanBuilder eqCategory(Category category) {
+	private BooleanBuilder eqCategory(String category) {
 		if (category == null) {
 			return null;
 		}
-
-		return new BooleanBuilder().or(item.category.eq(category));
+		return new BooleanBuilder().or(item.category.name.eq(category));
 	}
 
 
