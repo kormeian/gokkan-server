@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.global.exception.handler;
 
+import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
 import com.gokkan.gokkan.global.exception.errorcode.CommonErrorCode;
 import com.gokkan.gokkan.global.exception.errorcode.ErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
@@ -64,9 +66,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        return handleExceptionInternal(e, errorCode);
 //    }
 
-	@ExceptionHandler({Exception.class})
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<Object> handleMaxUploadSizeExceededException(
+		final MaxUploadSizeExceededException e) {
+		log.warn("RestApiException : " + HttpStatus.BAD_REQUEST.value() + " ("
+			+ e.getMessage() + ")");
+		final ErrorCode errorCode = ImageErrorCode.IMAGE_SIZE_TOO_BIG;
+		return handleExceptionInternal(errorCode);
+	}
+
+	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleAllException(final Exception ex) {
-		log.warn("handleAllException", ex);
+		log.error("handleAllException", ex);
 		final ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
 		return handleExceptionInternal(errorCode);
 	}
