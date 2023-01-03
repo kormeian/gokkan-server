@@ -18,7 +18,8 @@ public enum ImageErrorCode implements ErrorCode {
 	INVALID_FORMAT_URL(HttpStatus.BAD_REQUEST, "잘못된 이미지 url입니다."),
 	NOT_FOUND_IMAGE_ITEM(HttpStatus.BAD_REQUEST, "해당 아이디의 상품 이미지를 찾을 수 없습니다."),
 	NOT_FOUND_IMAGE_CHECK(HttpStatus.BAD_REQUEST, "해당 아이디의 검수 이미지를 찾을 수 없습니다."),
-	TOO_MANY_IMAGE(HttpStatus.BAD_REQUEST, "이미지가 너무 많습니다. 항목당 5개 이하로 보내주세요");
+	TOO_MANY_IMAGE(HttpStatus.BAD_REQUEST, "이미지가 너무 많습니다. 항목당 5개 이하로 보내주세요"),
+	IMAGE_SIZE_TOO_BIG(HttpStatus.BAD_REQUEST, "이미지 용량이 너무 큽니다. 이미지 하나당 5MB 이하만 가능합니다.");
 
 
 	private final HttpStatus httpStatus;

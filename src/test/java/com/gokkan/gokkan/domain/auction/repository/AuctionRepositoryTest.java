@@ -86,10 +86,14 @@ class AuctionRepositoryTest {
 		ExpertComment expertComment3 = getExpertComment(item3);
 		ExpertComment expertComment4 = getExpertComment(item4);
 
-		Auction auction1 = getAuction(expertComment1, member);
-		Auction auction2 = getAuction(expertComment2, member);
-		Auction auction3 = getAuction(expertComment3, member);
-		Auction auction4 = getAuction(expertComment4, member);
+		getAuction(expertComment1, member, AuctionStatus.STARTED);
+		getAuction(expertComment2, member, AuctionStatus.STARTED);
+		getAuction(expertComment3, member, AuctionStatus.STARTED);
+		getAuction(expertComment4, member, AuctionStatus.STARTED);
+		getAuction(expertComment4, member, AuctionStatus.ENDED);
+		getAuction(expertComment4, member, AuctionStatus.ENDED);
+		getAuction(expertComment4, member, AuctionStatus.ENDED);
+		getAuction(expertComment4, member, AuctionStatus.ENDED);
 
 		//when
 
@@ -101,31 +105,35 @@ class AuctionRepositoryTest {
 			getFilterListRequest(category1, null));
 		List<ListResponse> listResponses4 = auctionRepository.searchAllFilter(
 			getFilterListRequest(category2, null));
+		List<ListResponse> listResponses5 = auctionRepository.searchAllFilter(
+			FilterListRequest.builder().sort(SortType.DESC).build());
 
 		//then
 		assertEquals(listResponses1.size(), 2);
 		assertEquals(listResponses2.size(), 2);
 		assertEquals(listResponses3.size(), 2);
 		assertEquals(listResponses4.size(), 2);
+		assertEquals(listResponses5.size(), 4);
 	}
 
 	private FilterListRequest getFilterListRequest(Category category1, List<String> styleNames) {
 		return FilterListRequest.builder()
 			.sort(SortType.DESC)
 			.styles(styleNames)
-			.category(category1)
+			.category(category1.getName())
 			.build();
 	}
 
 
-	private Auction getAuction(ExpertComment expertComment, Member member) {
+	private Auction getAuction(ExpertComment expertComment, Member member,
+		AuctionStatus auctionStatus) {
 		return auctionRepository.save(
 			Auction.builder()
 				.startDateTime(LocalDateTime.now())
 				.endDateTime(LocalDateTime.now().plus(1, ChronoUnit.DAYS))
 				.startPrice(100L)
 				.currentPrice(200L)
-				.auctionStatus(AuctionStatus.STARTED)
+				.auctionStatus(auctionStatus)
 				.expertComment(expertComment)
 				.member(member)
 				.build());

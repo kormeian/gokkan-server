@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.auction.domain.dto;
 
 import com.gokkan.gokkan.domain.auction.domain.type.SortType;
-import com.gokkan.gokkan.domain.category.domain.Category;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -52,7 +51,7 @@ public class AuctionDto {
 	@Schema(name = "경매 List filter api request")
 	public static class FilterListRequest {
 
-		private Category category;
+		private String category;
 		private List<String> styles;
 		private SortType sort;
 
