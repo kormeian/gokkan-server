@@ -67,7 +67,7 @@ public class AuctionService {
 	public List<ListResponse> getWaitPaymentAuctionList(Member member) {
 		List<Auction> waitPaymentAuctions = auctionRepository.findAllByAuctionStatusEqualsAndMemberEquals(
 			AuctionStatus.WAIT_PAYMENT, member);
-		if(waitPaymentAuctions.isEmpty()) {
+		if (waitPaymentAuctions.isEmpty()) {
 			return new ArrayList<>();
 		}
 		return waitPaymentAuctions.stream()

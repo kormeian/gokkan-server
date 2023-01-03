@@ -17,11 +17,11 @@ public class AuctionScheduleService {
 
 	private final AuctionRepository auctionRepository;
 
-@Scheduled(cron = "0 0/10 * * * ?", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 0/10 * * * ?", zone = "Asia/Seoul")
 	public void auctionSchedule() {
-	log.info("경매 스케쥴러 실행");
-	List<Auction> auctionList = auctionRepository.findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(
-		LocalDateTime.now(), AuctionStatus.STARTED);
+		log.info("경매 스케쥴러 실행");
+		List<Auction> auctionList = auctionRepository.findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(
+			LocalDateTime.now(), AuctionStatus.STARTED);
 		for (Auction auction : auctionList) {
 			auction.setAuctionStatus(AuctionStatus.WAIT_PAYMENT);
 			auctionRepository.save(auction);

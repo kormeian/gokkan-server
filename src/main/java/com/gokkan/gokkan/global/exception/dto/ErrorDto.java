@@ -9,7 +9,8 @@ public class ErrorDto {
 	@Getter
 	@Builder
 	@Setter
-	public static class MessageError{
+	public static class MessageError {
+
 		private int status;
 		private String code;
 		private String message;

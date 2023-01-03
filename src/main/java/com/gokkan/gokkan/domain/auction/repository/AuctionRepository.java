@@ -10,7 +10,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long>, AuctionRepositoryCustom {
-	List<Auction> findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(LocalDateTime currentDateTime, AuctionStatus auctionStatus);
 
-	List<Auction> findAllByAuctionStatusEqualsAndMemberEquals(AuctionStatus auctionStatus, Member member);
+	List<Auction> findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(
+		LocalDateTime currentDateTime, AuctionStatus auctionStatus);
+
+	List<Auction> findAllByAuctionStatusEqualsAndMemberEquals(AuctionStatus auctionStatus,
+		Member member);
 }
