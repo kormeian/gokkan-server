@@ -111,6 +111,10 @@ public class CategoryService {
 	}
 
 	private Category getCategoryByName(String name, boolean parent) {
+		if (name == null || name.equals("")) {
+			return categoryRepository.findByName("")
+				.orElse(categoryRepository.save(Category.builder().name("").level(0).build()));
+		}
 		return parent ?
 			categoryRepository.findByName(name)
 				.orElseThrow(
