@@ -1,7 +1,7 @@
 package com.gokkan.gokkan.global.exception.handler;
 
-import com.gokkan.gokkan.global.exception.dto.ErrorDto.MessageError;
 import com.gokkan.gokkan.domain.image.exception.ImageErrorCode;
+import com.gokkan.gokkan.global.exception.dto.ErrorDto.MessageError;
 import com.gokkan.gokkan.global.exception.errorcode.CommonErrorCode;
 import com.gokkan.gokkan.global.exception.errorcode.ErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
