@@ -48,7 +48,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			)
 			.groupBy(auction)
 			.orderBy(
-				filterListRequest.getSort().equals(SortType.DESC) ?
+				SortType.getSortType(filterListRequest.getSort()).equals(SortType.DESC) ?
 					auction.endDateTime.desc() : auction.endDateTime.asc())
 			.fetch();
 	}

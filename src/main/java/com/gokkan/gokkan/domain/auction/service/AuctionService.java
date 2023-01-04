@@ -85,11 +85,13 @@ public class AuctionService {
 
 	@Transactional(readOnly = true)
 	public List<ListResponse> readList(FilterListRequest filterListRequest) {
+		log.info("readList : " + filterListRequest);
 		return auctionRepository.searchAllFilter(filterListRequest);
 	}
 
 	@Transactional(readOnly = true)
 	public List<ListResponse> similarList(SimilarListRequest similarListRequest) {
+		log.info("similarList : " + similarListRequest);
 		return auctionRepository.searchAllSimilar(similarListRequest);
 	}
 
