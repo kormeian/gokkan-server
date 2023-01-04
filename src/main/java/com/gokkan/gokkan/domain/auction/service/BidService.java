@@ -127,8 +127,10 @@ public class BidService {
 		saveHistory(auction.getId(), currentHistory);
 		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId,
 			jsonObject.toString());
-		simpMessageSendingOperations.convertAndSend("/topic/endDateTime" + auctionId,
-			jsonObject2.toString());
+		if (currentEndDateTime != auction.getEndDateTime()) {
+			simpMessageSendingOperations.convertAndSend("/topic/endDateTime/" + auctionId,
+				jsonObject2.toString());
+		}
 
 		if (lock.isLocked()) {
 			lock.unlock();
