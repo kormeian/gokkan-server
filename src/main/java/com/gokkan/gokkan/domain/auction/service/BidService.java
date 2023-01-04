@@ -94,6 +94,7 @@ public class BidService {
 			.build();
 		history.add(0, currentHistory);
 		JSONObject jsonObject = new JSONObject();
+		JSONObject jsonObject2 = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
 		LocalDateTime bidDateTime = auction.getStartDateTime();
 		for (History h : history) {
@@ -111,7 +112,7 @@ public class BidService {
 		}
 		jsonObject.put("history", jsonArray);
 		jsonObject.put("currentPrice", bidPrice);
-		jsonObject.put("endDateTime", auction.getEndDateTime().toString());
+		jsonObject2.put("endDateTime", auction.getEndDateTime().toString());
 
 		auction.setCurrentPrice(bidPrice);
 		auction.setMember(member);
@@ -126,6 +127,8 @@ public class BidService {
 		saveHistory(auction.getId(), currentHistory);
 		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId,
 			jsonObject.toString());
+		simpMessageSendingOperations.convertAndSend("/topic/endDateTime" + auctionId,
+			jsonObject2.toString());
 
 		if (lock.isLocked()) {
 			lock.unlock();
