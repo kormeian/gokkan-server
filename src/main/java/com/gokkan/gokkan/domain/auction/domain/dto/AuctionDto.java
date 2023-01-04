@@ -60,6 +60,17 @@ public class AuctionDto {
 	@Getter
 	@Setter
 	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@Schema(name = "카테고리 유사 경매 5개 List api request")
+	public static class SimilarListRequest {
+		private String category;
+		private Long auctionId;
+	}
+
+	@Getter
+	@Setter
+	@NoArgsConstructor
 	@ToString
 	@Builder
 	@Schema(name = "경매 List filter api 주요 정보 response")
