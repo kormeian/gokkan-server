@@ -27,13 +27,13 @@ public class StyleItemService {
 			styleExistCheck(name);
 		}
 
-		boolean[] deleted = new boolean[saved.size()];        // true -> 삭제 해야할 것 			false -> 삭제 안하고 저장 해 놓을것
+		boolean[] deleted = new boolean[saved.size()];        // true -> 기존 save 에서 삭제 안된것 			false ->  기존 save 에서 삭제한것
 		boolean[] duplicate = new boolean[names.size()];    // true -> 저장 된 것과 중복된 것 	false -> 중복 안되어서 StyleItem 생성 할 것
 
 		for (int i = 0; i < names.size(); i++) {
 			String name = names.get(i);
 			for (int j = 0; j < saved.size(); j++) {
-				if (name.equals(saved.get(j).getStyle().getName())) {
+				if (name.equals(saved.get(j).getName())) {
 					duplicate[i] = true;
 					deleted[j] = true;
 					break;
@@ -45,6 +45,8 @@ public class StyleItemService {
 		for (int i = 0; i < deleted.length; i++) {
 			if (deleted[i]) {
 				styleItems.add(saved.get(i));
+			} else {
+				styleItemRepository.delete(saved.get(i));
 			}
 		}
 
