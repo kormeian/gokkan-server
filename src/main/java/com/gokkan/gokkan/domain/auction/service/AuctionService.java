@@ -6,6 +6,7 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
@@ -85,6 +86,11 @@ public class AuctionService {
 	@Transactional(readOnly = true)
 	public List<ListResponse> readList(FilterListRequest filterListRequest) {
 		return auctionRepository.searchAllFilter(filterListRequest);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ListResponse> similarList(SimilarListRequest similarListRequest) {
+		return auctionRepository.searchAllSimilar(similarListRequest);
 	}
 
 	private List<History> getHistory(Long auctionId) {
