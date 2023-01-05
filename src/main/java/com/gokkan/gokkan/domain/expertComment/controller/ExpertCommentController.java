@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +32,7 @@ public class ExpertCommentController {
 	public void createExpertComment(
 		@Parameter(hidden = true) @CurrentMember Member member,
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestCreateExpertComment.class)))
-		@RequestBody RequestCreateExpertComment requestCreateExpertComment) {
+		@Validated @RequestBody RequestCreateExpertComment requestCreateExpertComment) {
 		expertCommentService.createExpertComment(member, requestCreateExpertComment);
 	}
 

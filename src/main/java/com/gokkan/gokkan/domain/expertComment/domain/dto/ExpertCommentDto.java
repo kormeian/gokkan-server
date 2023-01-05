@@ -7,6 +7,7 @@ import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.style.domain.ExpertStyle;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,10 +18,15 @@ public class ExpertCommentDto {
 	@Schema(name = "전문가 의견 생성 요청", description = "전문가 의견 생성 요청")
 	public static class RequestCreateExpertComment {
 
+		@NotNull(message = "itemId 은 null 일 수 없습니다.")
 		private final Long itemId;
+		@NotNull(message = "comment 은 null 일 수 없습니다.")
 		private final String comment;
+		@NotNull(message = "minPrice 은 null 일 수 없습니다.")
 		private final Long minPrice;
+		@NotNull(message = "maxPrice 은 null 일 수 없습니다.")
 		private final Long maxPrice;
+		@NotNull(message = "status 은 null 일 수 없습니다.")
 		private final State status;
 
 		@Builder
@@ -66,7 +72,7 @@ public class ExpertCommentDto {
 		}
 
 		public void setStyles(List<ExpertStyle> expertStyles) {
-			StringBuffer stringBuffer = new StringBuffer();
+			StringBuilder stringBuffer = new StringBuilder();
 			for (int i = 0; i < expertStyles.size(); i++) {
 				stringBuffer.append(expertStyles.get(i).getStyleName());
 				if (i != expertStyles.size() - 1) {
