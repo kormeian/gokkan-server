@@ -1,6 +1,8 @@
 package com.gokkan.gokkan.domain.category.controller;
 
-import static com.gokkan.gokkan.domain.category.dto.CategoryDto.*;
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
 
 import com.gokkan.gokkan.domain.category.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +37,7 @@ public class CategoryController {
 	@PostMapping("")
 	public ResponseEntity<?> create(
 		@Parameter(description = "카테고리 생성 request", required = true, content = @Content(schema = @Schema(implementation = CreateRequest.class)))
-		@RequestBody CreateRequest request) {
+		@Validated @RequestBody CreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
 	}
 

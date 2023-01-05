@@ -1,16 +1,15 @@
 package com.gokkan.gokkan.domain.category.dto;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -25,7 +24,7 @@ public class CategoryDto {
 	@Schema(name = "카테고리 생성시 필요한 request")
 	public static class CreateRequest {
 
-		@NonNull
+		@NotNull(message = "카테고리 name 은 null 일 수 없습니다.")
 		private String name;
 
 		private String parent;
@@ -47,13 +46,13 @@ public class CategoryDto {
 	@Schema(name = "카테고리 수정시 필요한 request")
 	public static class UpdateRequest {
 
-		@NotNull
+		@NotNull(message = "카테고리 id 은 null 일 수 없습니다.")
 		private Long id;
 
-		@NonNull
+		@NotNull(message = "카테고리 name 은 null 일 수 없습니다.")
 		private String name;
 
-		@NonNull
+		@NotNull(message = "카테고리 parent 은 null 일 수 없습니다.")
 		private String parent;
 
 	}

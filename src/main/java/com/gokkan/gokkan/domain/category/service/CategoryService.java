@@ -74,8 +74,10 @@ public class CategoryService {
 	public Response update(UpdateRequest request) {
 		log.info("update name : " + request.getName() + " parent : " + request.getParent());
 		checkParentNameAndChildName(request.getName(), request.getParent());
-		duplicateCheck(request.getName());
 		Category category = getCategoryById(request.getId());
+		if (!category.getName().equals(request.getName())) {
+			duplicateCheck(request.getName());
+		}
 
 		if (!category.getParent().getName().equals(request.getParent())) {
 			Category updateParent = getCategoryByName(request.getParent(), true);
