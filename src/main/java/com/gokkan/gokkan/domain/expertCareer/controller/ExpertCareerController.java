@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,7 +38,7 @@ public class ExpertCareerController {
 	public void createExpertCareer(
 		@Parameter(hidden = true) @CurrentMember Member member,
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestCreateExpertCareer.class)))
-		@RequestBody List<RequestCreateExpertCareer> requestCreateExpertCareer) {
+		@Validated @RequestBody List<RequestCreateExpertCareer> requestCreateExpertCareer) {
 		expertCareerService.createExpertCareer(member, requestCreateExpertCareer);
 	}
 
@@ -46,7 +47,7 @@ public class ExpertCareerController {
 	public void updateExpertCareer(
 		@Parameter(hidden = true) @CurrentMember Member member,
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestUpdateExpertCareer.class)))
-		@RequestBody List<RequestUpdateExpertCareer> requestUpdateExpertCareer) {
+		@Validated @RequestBody List<RequestUpdateExpertCareer> requestUpdateExpertCareer) {
 		expertCareerService.updateExpertCareer(member, requestUpdateExpertCareer);
 	}
 

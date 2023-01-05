@@ -3,6 +3,7 @@ package com.gokkan.gokkan.domain.expertCareer.domain.dto;
 import com.gokkan.gokkan.domain.expertCareer.domain.ExpertCareer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,9 +14,13 @@ public class ExpertCareerDto {
 	@Schema(name = "전문가 커리어 생성 요청", description = "전문가 커리어 생성 요청")
 	public static class RequestCreateExpertCareer {
 
+		@NotNull(message = "startDate 은 null 일 수 없습니다.")
 		private final LocalDate startDate;
+		@NotNull(message = "endDate 은 null 일 수 없습니다.")
 		private final LocalDate endDate;
+		@NotNull(message = "companyName 은 null 일 수 없습니다.")
 		private final String companyName;
+		@NotNull(message = "position 은 null 일 수 없습니다.")
 		private final String position;
 
 		@Builder
@@ -32,10 +37,15 @@ public class ExpertCareerDto {
 	@Schema(name = "전문가 커리어 수정 요청", description = "전문가 커리어 수정 요청")
 	public static class RequestUpdateExpertCareer {
 
+		@NotNull(message = "expertCareerId 은 null 일 수 없습니다.")
 		private final Long expertCareerId;
+		@NotNull(message = "startDate 은 null 일 수 없습니다.")
 		private final LocalDate startDate;
+		@NotNull(message = "endDate 은 null 일 수 없습니다.")
 		private final LocalDate endDate;
+		@NotNull(message = "companyName 은 null 일 수 없습니다.")
 		private final String companyName;
+		@NotNull(message = "position 은 null 일 수 없습니다.")
 		private final String position;
 
 		@Builder
