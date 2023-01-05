@@ -1,8 +1,8 @@
 package com.gokkan.gokkan.domain.style.dto;
 
 import com.gokkan.gokkan.domain.style.domain.Style;
-import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class StyleDto {
 	@Schema(name = "스타일 생성 request")
 	public static class CreateRequest {
 
-		@NotNull
+		@NotNull(message = "name 은 null 일 수 없습니다.")
 		private String name;
 	}
 
@@ -36,10 +36,10 @@ public class StyleDto {
 	@Schema(name = "스타일 수정 request")
 	public static class UpdateRequest {
 
-		@NotNull
+		@NotNull(message = "id 은 null 일 수 없습니다.")
 		private Long id;
 
-		@NotNull
+		@NotNull(message = "name 은 null 일 수 없습니다.")
 		private String name;
 	}
 
