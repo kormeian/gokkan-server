@@ -13,8 +13,9 @@ public class ExpertInfoDto {
 	@Schema(name = "전문가 정보 생성 요청(멤버 아이디) DTO")
 	public static class RequestCreateExpertInfoByMemberId {
 
-		@NotNull
+		@NotNull(message = "memberId 는 null 일 수 없습니다.")
 		private Long memberId;
+		@NotNull(message = "info 는 null 일 수 없습니다.")
 		private String info;
 
 		@Builder
@@ -28,8 +29,9 @@ public class ExpertInfoDto {
 	@Schema(name = "전문가 정보 생성 요청(멤버 닉네임) DTO")
 	public static class RequestCreateExpertInfoByNickName {
 
-		@NotNull
+		@NotNull(message = "nickName 는 null 일 수 없습니다.")
 		private String nickName;
+		@NotNull(message = "info 는 null 일 수 없습니다.")
 		private String info;
 
 		@Builder
