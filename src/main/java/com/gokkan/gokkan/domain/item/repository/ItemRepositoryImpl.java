@@ -41,6 +41,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 					item.name,
 					item.thumbnail,
 					item.member.nickName,
+					item.state,
 					item.created,
 					item.updated))
 			.from(styleItem)
@@ -58,6 +59,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 				item.name,
 				item.thumbnail,
 				item.member.nickName,
+				item.state,
 				item.created,
 				item.updated))
 			.from(item)
