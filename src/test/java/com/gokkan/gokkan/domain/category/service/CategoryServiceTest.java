@@ -281,6 +281,7 @@ class CategoryServiceTest {
 	@Test
 	public void test_04_02() {
 		//given
+		given(categoryRepository.findById(any())).willReturn(Optional.of(getCategory(categoryName1, root)));
 		given(categoryRepository.existsByName(categoryName2)).willReturn(true);
 
 		//when
@@ -296,7 +297,6 @@ class CategoryServiceTest {
 	@Test
 	public void test_04_03() {
 		//given
-		given(categoryRepository.existsByName(categoryName2)).willReturn(false);
 		given(categoryRepository.findById(any())).willReturn(Optional.empty());
 
 		//when

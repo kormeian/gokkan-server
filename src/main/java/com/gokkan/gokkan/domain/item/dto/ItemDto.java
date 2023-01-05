@@ -9,13 +9,13 @@ import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.querydsl.core.annotations.QueryProjection;
-import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,30 +34,41 @@ public class ItemDto {
 	@Schema(name = "상품 수정 request")
 	public static class UpdateRequest {
 
-		@NotNull
+		@NotNull(message = "itemId 는 null 일 수 없습니다.")
 		private Long itemId;
 		private String name;
 
 		private long startPrice;
 
+		@NotNull(message = "category 는 null 일 수 없습니다.")
 		private String category;
 
 		private List<ImageDto.UpdateRequest> imageItemUrls;
 
 		private List<ImageDto.UpdateRequest> imageCheckUrls;
 
+		@NotNull(message = "styles 는 null 일 수 없습니다.")
 		private List<String> styles;
 
+		@NotNull(message = "width 는 null 일 수 없습니다.")
 		private Long width;
+		@NotNull(message = "depth 는 null 일 수 없습니다.")
 		private Long depth;
+		@NotNull(message = "height 는 null 일 수 없습니다.")
 		private Long height;
+		@NotNull(message = "material 는 null 일 수 없습니다.")
 		private String material;
 
+		@NotNull(message = "conditionGrade 는 null 일 수 없습니다.")
 		private String conditionGrade;
+		@NotNull(message = "conditionDescription 는 null 일 수 없습니다.")
 		private String conditionDescription;
+		@NotNull(message = "text 는 null 일 수 없습니다.")
 		private String text;
 
+		@NotNull(message = "designer 는 null 일 수 없습니다.")
 		private String designer;
+		@NotNull(message = "brand 는 null 일 수 없습니다.")
 		private String brand;
 		private Integer productionYear;
 
@@ -75,7 +86,6 @@ public class ItemDto {
 				.conditionGrade(this.conditionGrade)
 				.conditionDescription(this.conditionDescription)
 				.text(this.text)
-//				.madeIn(this.madeIn)
 				.designer(this.designer)
 				.brand(this.brand)
 				.productionYear(this.productionYear)
@@ -117,8 +127,6 @@ public class ItemDto {
 		private String conditionDescription;
 		private String text;
 
-
-		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private int productionYear;
@@ -153,7 +161,6 @@ public class ItemDto {
 				.conditionDescription(
 					item.getConditionDescription() == null ? "" : item.getConditionDescription())
 				.text(item.getText() == null ? "" : item.getText())
-//				.madeIn(item.getMadeIn() == null ? "" : item.getMadeIn())
 				.designer(item.getDesigner() == null ? "" : item.getDesigner())
 				.brand(item.getBrand() == null ? "" : item.getBrand())
 				.productionYear(item.getProductionYear())
@@ -209,8 +216,6 @@ public class ItemDto {
 		private String conditionDescription;
 		private String text;
 
-
-		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private int productionYear;
@@ -241,7 +246,6 @@ public class ItemDto {
 				.conditionGrade(item.getConditionGrade())
 				.conditionDescription(item.getConditionDescription())
 				.text(item.getText())
-//				.madeIn(item.getMadeIn())
 				.designer(item.getDesigner())
 				.brand(item.getBrand())
 				.productionYear(item.getProductionYear())

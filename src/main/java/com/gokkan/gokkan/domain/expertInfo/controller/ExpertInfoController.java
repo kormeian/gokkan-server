@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,7 @@ public class ExpertInfoController {
 	@Operation(summary = "전문가 정보 생성 (멤버 아이디)", description = "전문가 정보 생성 (멤버 아이디)")
 	public void createExpertInfoByMemberId(
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestCreateExpertInfoByMemberId.class)))
-		@RequestBody RequestCreateExpertInfoByMemberId requestCreateExpertInfoByMemberId) {
+		@Validated @RequestBody RequestCreateExpertInfoByMemberId requestCreateExpertInfoByMemberId) {
 		expertInfoService.createExpertInfoByMemberId(requestCreateExpertInfoByMemberId);
 	}
 
@@ -42,7 +43,7 @@ public class ExpertInfoController {
 	@Operation(summary = "전문가 정보 생성 (멤버 닉네임)", description = "전문가 정보 생성 (멤버 닉네임)")
 	public void createExpertInfoByName(
 		@Parameter(content = @Content(schema = @Schema(implementation = RequestCreateExpertInfoByNickName.class)))
-		@RequestBody RequestCreateExpertInfoByNickName requestCreateExpertInfoByNickName) {
+		@Validated @RequestBody RequestCreateExpertInfoByNickName requestCreateExpertInfoByNickName) {
 		expertInfoService.createExpertInfoByNickName(requestCreateExpertInfoByNickName);
 	}
 

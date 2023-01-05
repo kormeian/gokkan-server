@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +46,7 @@ public class ItemController {
 	@Transactional
 	public ResponseEntity<?> create(
 		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
-		@RequestPart UpdateRequest request,
+		@Validated @RequestPart UpdateRequest request,
 		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
 		@RequestPart List<MultipartFile> imageItemFiles,
 		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
