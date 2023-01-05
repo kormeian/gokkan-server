@@ -9,7 +9,6 @@ import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,6 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,39 +40,37 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(length = 100)
+	@Size(max = 100)
 	private String name;
 
-	@Column(length = 10)
+	@Size(max = 10)
 	private long startPrice;
 
-	@Column(length = 10)
+	@Size(max = 10)
 	@Enumerated(EnumType.STRING)
 	private State state;
 
-	@Column(length = 5)
+	@Size(max = 10)
 	private long width;
-	@Column(length = 5)
+	@Size(max = 10)
 	private long depth;
-	@Column(length = 5)
+	@Size(max = 10)
 	private long height;
+	@Size(max = 30)
 	private String material;
 
-	@Column(length = 10)
+	@Size(max = 30)
 	private String conditionGrade;
-	@Column(length = 2000)
+	@Size(max = 2000)
 	private String conditionDescription;
-	@Column(length = 2000)
+	@Size(max = 2000)
 	private String text;
 
-
-	//	@Column(length = 20)
-//	private String madeIn;
-	@Column(length = 20)
+	@Size(max = 30)
 	private String designer;
-	@Column(length = 20)
+	@Size(max = 30)
 	private String brand;
-	@Column(length = 4)
+	@Size(max = 10)
 	private int productionYear;
 	private String thumbnail;
 

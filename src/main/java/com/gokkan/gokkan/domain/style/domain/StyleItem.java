@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class StyleItem {
 	@Column(name = "style_item_id")
 	private Long id;
 
-	@Column(length = 20)
+	@Size(max = 50)
 	private String name;
 
 	@ManyToOne(fetch = FetchType.LAZY)
