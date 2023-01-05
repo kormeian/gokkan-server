@@ -50,40 +50,6 @@ public class ItemService {
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
 
-	private static void memberMatchCheck(String memberId, String itemMemberId) {
-		log.info("memberMatchCheck member id : " + memberId);
-		if (!memberId.equals(itemMemberId)) {
-			log.error("memberMatchCheck member id : " + memberId);
-			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
-		}
-	}
-
-	private static void memberLoginCheck(Member member) {
-		if (member == null) {
-			log.error("memberLoginCheck");
-			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
-		} else {
-			log.info("member id : " + member.getId());
-		}
-	}
-
-	private static void itemStateCheckForUpdateAndDelete(State state) {
-		if (state == State.COMPLETE || state == State.ASSESSING) {
-			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
-			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
-		}
-	}
-
-	private static void itemStateCheckForRead(State itemState, List<State> states) {
-		for (State state : states) {
-			if (state == itemState) {
-				return;
-			}
-		}
-		log.error("itemStateCheckForRead state : " + itemState.getDescription());
-		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
-	}
-
 	@Transactional
 	public Response create(
 		UpdateRequest request,
@@ -91,7 +57,7 @@ public class ItemService {
 		List<MultipartFile> imageCheckFiles,
 		Member member) {
 		log.info("create item id : " + request.getItemId());
-		Item item = updateItem(request, imageItemFiles, imageCheckFiles, member);
+		Item item = updateItem(request, imageItemFiles, imageCheckFiles, member, true);
 		item.setState(State.ASSESSING);
 		return Response.toResponse(itemRepository.save(item));
 	}
@@ -146,7 +112,7 @@ public class ItemService {
 		Member member) {
 		log.info("update item id : " + request.getItemId());
 		return Response.toResponse(
-			itemRepository.save(updateItem(request, imageItemFiles, imageCheckFiles, member)));
+			itemRepository.save(updateItem(request, imageItemFiles, imageCheckFiles, member, false)));
 	}
 
 	public Long createTemporary(Member member) {
@@ -190,20 +156,26 @@ public class ItemService {
 		UpdateRequest request,
 		List<MultipartFile> imageItemFiles,
 		List<MultipartFile> imageCheckFiles,
-		Member member
+		Member member,
+		boolean create
 	) {
 		memberLoginCheck(member);
 		log.info("login member id : " + member.getId());
 		Item item = getItem(request.getItemId());
 		memberMatchCheck(member.getUserId(), item.getMember().getUserId());
 		itemStateCheckForUpdateAndDelete(item.getState());
-
+		if (create) {
+			itemSaveCompleteCategoryCheck(request.getCategory());
+		}
 		checkImageFiles(imageItemFiles, imageCheckFiles,
 			request.getImageItemUrls().size(), request.getImageCheckUrls().size());
 
 		Category category = categoryService.getCategory(request.getCategory());
 		List<StyleItem> styleItems = styleItemService.createNotDuplicate(request.getStyles(),
 			item.getStyleItems());
+		if (create) {
+			itemSaveCompleteStyleCheck(styleItems.size());
+		}
 		List<ImageItem> imageItems = imageItemService.create(awsS3Service.save(imageItemFiles));
 		List<ImageCheck> imageChecks = imageCheckService.create(awsS3Service.save(imageCheckFiles));
 
@@ -244,6 +216,52 @@ public class ItemService {
 				log.error("getItem item id : " + itemId);
 				return new RestApiException(ItemErrorCode.NOT_FOUND_ITEM);
 			}));
+	}
+	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		log.info("memberMatchCheck member id : " + memberId);
+		if (!memberId.equals(itemMemberId)) {
+			log.error("memberMatchCheck member id : " + memberId);
+			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
+		}
+	}
+
+	private static void memberLoginCheck(Member member) {
+		if (member == null) {
+			log.error("memberLoginCheck");
+			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		} else {
+			log.info("member id : " + member.getId());
+		}
+	}
+
+	private static void itemSaveCompleteCategoryCheck(String category) {
+		log.info("saveItemRelations category name : " + category);
+		if (category.equals("")) {
+			throw new RestApiException(ItemErrorCode.CATEGORY_NOT_NUL);
+		}
+	}
+
+	private static void itemSaveCompleteStyleCheck(int styleItems) {
+		if (styleItems == 0) {
+			throw new RestApiException(ItemErrorCode.STYLE_NOT_NULL);
+		}
+	}
+
+	private static void itemStateCheckForUpdateAndDelete(State state) {
+		if (state == State.COMPLETE || state == State.ASSESSING) {
+			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
+			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
+		}
+	}
+
+	private static void itemStateCheckForRead(State itemState, List<State> states) {
+		for (State state : states) {
+			if (state == itemState) {
+				return;
+			}
+		}
+		log.error("itemStateCheckForRead state : " + itemState.getDescription());
+		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 
 	private void saveItemRelations(

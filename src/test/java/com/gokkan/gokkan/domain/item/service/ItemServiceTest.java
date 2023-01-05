@@ -142,7 +142,7 @@ class ItemServiceTest {
 			.willReturn(getCategory(updateRequest.getCategory(), root));
 
 		given(styleItemService.createNotDuplicate(anyList(), anyList()))
-			.willReturn(new ArrayList<>());
+			.willReturn(new ArrayList<>(List.of(StyleItem.builder().build())));
 		given(awsS3Service.save(anyList()))
 			.willReturn(new ArrayList<>(Arrays.asList(url1, url2)));
 		given(imageItemService.create(anyList()))
@@ -183,7 +183,7 @@ class ItemServiceTest {
 		assertEquals(item.getState(), State.ASSESSING);
 
 		assertEquals(item.getCategory().getName(), updateRequest.getCategory());
-		assertEquals(item.getStyleItems().size(), 0);
+		assertEquals(item.getStyleItems().size(), 1);
 
 		assertEquals(item.getWidth(), updateRequest.getWidth());
 		assertEquals(item.getDepth(), updateRequest.getDepth());
@@ -192,7 +192,6 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -275,7 +274,6 @@ class ItemServiceTest {
 		assertEquals(item.getConditionGrade(), updateRequest.getConditionGrade());
 		assertEquals(item.getConditionDescription(), updateRequest.getConditionDescription());
 		assertEquals(item.getText(), updateRequest.getText());
-//		assertEquals(item.getMadeIn(), updateRequest.getMadeIn());
 		assertEquals(item.getDesigner(), updateRequest.getDesigner());
 		assertEquals(item.getBrand(), updateRequest.getBrand());
 		assertEquals(item.getProductionYear(), updateRequest.getProductionYear());
@@ -500,6 +498,61 @@ class ItemServiceTest {
 
 		//then
 		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CAN_NOT_FIX_STATE);
+	}
+
+	@DisplayName("01_06. create fail CATEGORY_NOT_NUL")
+	@Test
+	public void test_01_06() throws IOException {
+
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>());
+		updateRequest.setCategory("");
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getEmptyItem()));
+//		given(categoryService.getCategory(anyString()))
+//			.willReturn(Category.builder().name("").build());
+//
+//		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+//			.willReturn(new ArrayList<>());
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.CATEGORY_NOT_NUL);
+	}
+
+	@DisplayName("01_07. create fail STYLE_NOT_NUL")
+	@Test
+	public void test_01_07() throws IOException {
+
+		//given
+		UpdateRequest updateRequest = getUpdateRequest(
+			new ArrayList<>(),
+			new ArrayList<>(),
+			new ArrayList<>());
+		given(itemRepository.findById(anyLong()))
+			.willReturn(Optional.of(getEmptyItem()));
+		given(categoryService.getCategory(anyString()))
+			.willReturn(root);
+
+		given(styleItemService.createNotDuplicate(anyList(), anyList()))
+			.willReturn(new ArrayList<>());
+
+		//when
+
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> itemService.create(updateRequest, getMultipartFiles(png), getMultipartFiles(png),
+				member));
+
+		//then
+		assertEquals(restApiException.getErrorCode(), ItemErrorCode.STYLE_NOT_NULL);
 	}
 
 	@DisplayName("02_00_1. readDetail success, state ASSESSING ")
