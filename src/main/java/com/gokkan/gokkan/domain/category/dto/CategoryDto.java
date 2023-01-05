@@ -86,6 +86,17 @@ public class CategoryDto {
 						.collect(Collectors.toList()))
 				.build();
 		}
+
+		public static Response all(Category category) {
+			return Response.builder()
+				.id(category.getId())
+				.name(category.getName())
+				.parent(category.getParent() == null ?
+					"root" : category.getParent().getName())
+				.children(category.getChildren()
+					.stream().map(Response::all).collect(Collectors.toList()))
+				.build();
+		}
 	}
 
 	@Getter

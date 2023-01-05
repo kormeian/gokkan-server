@@ -49,21 +49,6 @@ class CategoryServiceTest {
 	@InjectMocks
 	private CategoryService categoryService;
 
-	private static CreateRequest getCreateRequest(String name, String parent) {
-		return CreateRequest.builder()
-			.parent(parent)
-			.name(name)
-			.build();
-	}
-
-	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
-		return UpdateRequest.builder()
-			.id(id)
-			.parent(parent)
-			.name(name)
-			.build();
-	}
-
 	@DisplayName("01_01. create root category success already exist root")
 	@Test
 	public void test_01_01() {
@@ -356,12 +341,73 @@ class CategoryServiceTest {
 		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.CAN_NOT_SAME_PARENT_NAME);
 	}
 
+	@DisplayName("05_00. readAll success")
+	@Test
+	public void test_05_00(){
+	    //given
+		Category root1 = Category.builder()
+			.name("root")
+			.level(0)
+			.parent(null)
+			.build();
+		Category category1 = getCategory(categoryName1, root1);
+		Category category11 = getCategory(categoryName11, category1);
+		Category category12 = getCategory(categoryName12, category1);
+		category1.setChildren(new ArrayList<>(List.of(category11, category12)));
+
+		Category category2 = getCategory(categoryName2, root1);
+		Category category21 = getCategory(categoryName21, category2);
+		category2.setChildren(new ArrayList<>(List.of(category21)));
+		root1.setChildren(new ArrayList<>(List.of(category1, category2)));
+
+		given(categoryRepository.findByName("root")).willReturn(
+			Optional.of(root1));
+
+	    //when
+		Response response = categoryService.readAll();
+
+		//then
+		assertEquals(response.getChildren().size(), 2);
+		assertEquals(response.getChildren().get(0).getChildren().size(), 2);
+		assertEquals(response.getChildren().get(1).getChildren().size(), 1);
+	}
+
+	@DisplayName("05_01. readAll fail ")
+	@Test
+	public void test_05_01(){
+		//given
+		given(categoryRepository.findByName("root")).willReturn(
+			Optional.empty());
+
+		//when
+		RestApiException restApiException = assertThrows(RestApiException.class,
+			() -> categoryService.readAll());
+
+		//then
+		assertEquals(restApiException.getErrorCode(), CategoryErrorCode.NOT_FOUND_CATEGORY);
+	}
+
 	private Category getCategory(String name, Category parent) {
 		return Category.builder()
 			.name(name)
 			.parent(parent)
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
+			.build();
+	}
+
+	private static CreateRequest getCreateRequest(String name, String parent) {
+		return CreateRequest.builder()
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+		return UpdateRequest.builder()
+			.id(id)
+			.parent(parent)
+			.name(name)
 			.build();
 	}
 }
