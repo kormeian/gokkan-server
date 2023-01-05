@@ -15,13 +15,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 public class CertificationService {
-
+	private final String IMP_KEY = "7685734080745845";
+	private final String IMP_SECRET = "hBzf6iv8aPrgtzMK5XDcwGaeMgVXplSG5LlShz3qmY8wIVEtLWi44QWDYM69Ago1C2meKqbdq1k0FpVB";
 	public String getAccessToken() {
 
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("imp_key", "7685734080745845");
-		formData.add("imp_secret",
-			"hBzf6iv8aPrgtzMK5XDcwGaeMgVXplSG5LlShz3qmY8wIVEtLWi44QWDYM69Ago1C2meKqbdq1k0FpVB");
+		formData.add("imp_key", IMP_KEY);
+		formData.add("imp_secret", IMP_SECRET);
 		WebClient webClient = WebClient.create("https://api.iamport.kr/users/getToken");
 		String block = webClient.post()
 			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -46,11 +46,11 @@ public class CertificationService {
 	}
 
 	public String getPhoneNumber(String imp_uid, String accessToken) {
-		WebClient webClient2 = WebClient.create("https://api.iamport.kr/certifications/" + imp_uid);
+		WebClient webClient = WebClient.create("https://api.iamport.kr/certifications/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
 		String block = "";
 		try {
-			block = webClient2.get()
+			block = webClient.get()
 				.header("Authorization", accessToken)
 				.retrieve()
 				.bodyToMono(String.class)
@@ -68,5 +68,27 @@ public class CertificationService {
 		}
 
 		return phone;
+	}
+
+	public void getPaymentInfo(String imp_uid, String accessToken){
+		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/" + imp_uid);
+		JSONParser jsonParser = new JSONParser();
+		String block = "";
+		try {
+			block = webClient.get()
+				.header("Authorization", accessToken)
+				.retrieve()
+				.bodyToMono(String.class)
+				.block();
+		} catch (Exception e) {
+			throw new RestApiException(CertificationErrorCode.CERTIFICATION_NOT_FOUND);
+		}
+		try {
+			JSONObject object = (JSONObject) jsonParser.parse(block);
+			System.out.println(object);
+		} catch (ParseException e) {
+			throw new RestApiException(CertificationErrorCode.CERTIFICATION_FAILED);
+		}
+
 	}
 }
