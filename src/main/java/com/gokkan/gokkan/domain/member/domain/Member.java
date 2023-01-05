@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.member.domain;
 
 import com.gokkan.gokkan.global.security.oauth.entity.ProviderType;
 import com.gokkan.gokkan.global.security.oauth.entity.Role;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -54,6 +55,8 @@ public class Member {
 	@NotNull
 	private Role role;
 
+	private LocalDateTime createdAt;
+
 	@Builder
 	public Member(
 		@NotNull String userId,
@@ -61,7 +64,8 @@ public class Member {
 		@NotNull String email,
 		@NotNull String profileImageUrl,
 		@NotNull ProviderType providerType,
-		@NotNull Role role) {
+		@NotNull Role role,
+		@NotNull LocalDateTime createdAt) {
 
 		this.userId = userId;
 		this.name = name;
@@ -69,6 +73,7 @@ public class Member {
 		this.profileImageUrl = profileImageUrl != null ? profileImageUrl : "";
 		this.providerType = providerType;
 		this.role = role;
+		this.createdAt = createdAt;
 	}
 
 }

@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.member.domain.dto;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -65,6 +66,7 @@ public class MemberDto {
 
 		private final String name;
 		private final String profileImageUrl;
+		private final LocalDateTime createdAt;
 	}
 
 }
