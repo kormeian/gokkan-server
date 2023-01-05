@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.category.controller;
 
-import com.gokkan.gokkan.domain.category.dto.CategoryDto;
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.*;
+
 import com.gokkan.gokkan.domain.category.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,16 +30,16 @@ public class CategoryController {
 	private final CategoryService categoryService;
 
 	@Operation(summary = "카테고리 생성", description = "카테고리 생성")
-	@ApiResponse(responseCode = "201", description = "생성된 카테고리 반환", content = @Content(schema = @Schema(implementation = CategoryDto.Response.class)))
+	@ApiResponse(responseCode = "201", description = "생성된 카테고리와 바로 아래 자식 노드까지만 반환", content = @Content(schema = @Schema(implementation = Response.class)))
 	@PostMapping("")
 	public ResponseEntity<?> create(
-		@Parameter(description = "카테고리 생성 request", required = true, content = @Content(schema = @Schema(implementation = CategoryDto.CreateRequest.class)))
-		@RequestBody CategoryDto.CreateRequest request) {
+		@Parameter(description = "카테고리 생성 request", required = true, content = @Content(schema = @Schema(implementation = CreateRequest.class)))
+		@RequestBody CreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(request));
 	}
 
 	@Operation(summary = "카테고리 읽기", description = "이름에 해당하는 카테고리 반환")
-	@ApiResponse(responseCode = "200", description = "이름에 해당하는 카테고리 반환", content = @Content(schema = @Schema(implementation = CategoryDto.Response.class)))
+	@ApiResponse(responseCode = "200", description = "이름에 해당하는 카테고리 반환", content = @Content(schema = @Schema(implementation = Response.class)))
 	@GetMapping("")
 	public ResponseEntity<?> read(
 		@Parameter(description = "카테고리 조회 parameter", required = true)
@@ -57,11 +58,18 @@ public class CategoryController {
 	}
 
 	@Operation(summary = "카테고리 수정", description = "카테고리 수정")
-	@ApiResponse(responseCode = "200", description = "수정된 카테고리 반환", content = @Content(schema = @Schema(implementation = CategoryDto.Response.class)))
+	@ApiResponse(responseCode = "200", description = "수정된 카테고리 반환", content = @Content(schema = @Schema(implementation = Response.class)))
 	@PutMapping("")
 	public ResponseEntity<?> update(
-		@Parameter(description = "카테고리 수정 request", required = true, content = @Content(schema = @Schema(implementation = CategoryDto.UpdateRequest.class)))
-		@RequestBody CategoryDto.UpdateRequest request) {
+		@Parameter(description = "카테고리 수정 request", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
+		@RequestBody UpdateRequest request) {
 		return ResponseEntity.status(HttpStatus.OK).body(categoryService.update(request));
+	}
+
+	@Operation(summary = "전체 카테고리 읽기", description = "최상위 카테고리부터 최하단까지 전체 카테고리 조회")
+	@ApiResponse(responseCode = "200", description = "최상위 카테고리부터 최하단까지 전체 카테고리 조회", content = @Content(schema = @Schema(implementation = Response.class)))
+	@GetMapping("/all")
+	public ResponseEntity<?> readAll() {
+		return ResponseEntity.ok(categoryService.readAll());
 	}
 }
