@@ -2,13 +2,14 @@ package com.gokkan.gokkan.domain.auction.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
+import com.gokkan.gokkan.domain.auction.domain.AutoBidding;
 import com.gokkan.gokkan.domain.auction.domain.History;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
+import com.gokkan.gokkan.domain.auction.repository.AutoBiddingRepository;
 import com.gokkan.gokkan.domain.member.domain.Member;
-import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -37,31 +38,20 @@ public class BidService {
 	private final RedissonClient redissonClient;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final AuctionHistoryRepository auctionHistoryRepository;
+	private final AutoBiddingRepository autoBiddingRepository;
 
 
 	@Transactional
 	public void bidding(Member member, Long auctionId, Long bidPrice) {
-		if (member == null) {
-			throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
-		}
-		Auction auction = auctionRepository.findById(auctionId)
-			.orElseThrow(() -> new RestApiException(
-				AuctionErrorCode.AUCTION_NOT_FOUND));
-		if (auction.getAuctionStatus() == AuctionStatus.ENDED || auction.getEndDateTime()
-			.isBefore(LocalDateTime.now())) {
-			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
-		}
+		log.info("멤버 아이디 : " + member.getId() + "가 입찰을 시작합니다.");
+		log.info("경매 아이디 : " + auctionId);
+		log.info("입찰 가격 : " + bidPrice);
+
+		Auction auction = auctionFindById(auctionId);
 
 		final String lockName = auctionId + ":lock";
 		final RLock lock = redissonClient.getLock(lockName);
-		try {
-			if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
-				throw new RestApiException(AuctionErrorCode.AUCTION_ANOTHER_USER_IS_BIDDING);
-			}
-		} catch (InterruptedException e) {
-			throw new RestApiException(AuctionErrorCode.AUCTION_FAILED_TO_GET_LOCK);
-		}
-		log.info("lock acquired");
+		tryLock(lock);
 
 		List<History> history = getHistory(auctionId);
 		Long currentPrice;
@@ -124,7 +114,7 @@ public class BidService {
 				.price(bidPrice)
 				.bidDateTime(LocalDateTime.now())
 				.build());
-		saveHistory(auction.getId(), currentHistory);
+		saveRedisHistory(auction.getId(), currentHistory);
 		simpMessageSendingOperations.convertAndSend("/topic/" + auctionId,
 			jsonObject.toString());
 		if (currentEndDateTime != auction.getEndDateTime()) {
@@ -132,19 +122,54 @@ public class BidService {
 				jsonObject2.toString());
 		}
 
-		if (lock.isLocked()) {
-			lock.unlock();
-			log.info("lock released");
-		}
+		unLock(lock);
+
 		log.info("입찰 성공");
+
+		AutoBidding autoBidding = autoBiddingRepository.findFirstByAuctionAndMemberNotAndPriceGreaterThanEqualOrderByCreatedDateAsc(auction, member, auction.getCurrentPrice()+10000);
+		if (autoBidding != null) {
+			log.info("자동 입찰 진행");
+			bidding(autoBidding.getMember(), auctionId, auction.getCurrentPrice()+10000);
+		}
 	}
 
-	private void saveHistory(Long auctionId, History currentHistory) {
+	@Transactional
+	public void registrationAutoBid(Member member, Long auctionId, Long price) {
+		log.info("멤버 아이디 : " + member.getId());
+		log.info("경매 아이디 : " + auctionId);
+		log.info("최대 입찰가 : " + price);
+		log.info("자동 입찰 등록");
+		Auction auction = auctionFindById(auctionId);
+		Long currentPrice = auction.getCurrentPrice();
+		if(!auction.getMember().getId().equals(member.getId())){
+			if(currentPrice >= price){
+				throw new RestApiException(AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
+			} else if (currentPrice + 10000L > price) {
+				throw new RestApiException(AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
+			}
+		}
+		AutoBidding autoBidding = autoBiddingRepository.findByAuctionAndMember(auction, member);
+		if(autoBidding == null){
+			autoBiddingRepository.save(AutoBidding.builder()
+				.auction(auction)
+				.member(member)
+				.price(price)
+				.build());
+			log.info("자동 입찰 등록 성공");
+		} else {
+			autoBidding.setPrice(price);
+			autoBiddingRepository.save(autoBidding);
+			log.info("자동 입찰 수정 성공");
+		}
+		bidding(member, auctionId, currentPrice+10000L);
+	}
+
+	private void saveRedisHistory(Long auctionId, History currentHistory) {
 		redisTemplate.opsForList().leftPush(auctionId.toString(), currentHistory.toString());
 	}
 
 
-	private List<History> getHistory(Long auctionId) {
+	public List<History> getHistory(Long auctionId) {
 		List<String> StringHistory = redisTemplate.opsForList()
 			.range(String.valueOf(auctionId), 0, -1);
 		if (StringHistory == null || StringHistory.isEmpty()) {
@@ -155,4 +180,32 @@ public class BidService {
 			.collect(Collectors.toList());
 	}
 
+	private Auction auctionFindById(Long auctionId){
+		Auction auction = auctionRepository.findById(auctionId)
+			.orElseThrow(() -> new RestApiException(
+				AuctionErrorCode.AUCTION_NOT_FOUND));
+		if (auction.getAuctionStatus() == AuctionStatus.ENDED || auction.getEndDateTime()
+			.isBefore(LocalDateTime.now())) {
+			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
+		}
+		return auction;
+	}
+
+	private void tryLock(RLock lock){
+		try {
+			if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
+				throw new RestApiException(AuctionErrorCode.AUCTION_ANOTHER_USER_IS_BIDDING);
+			}
+		} catch (InterruptedException e) {
+			throw new RestApiException(AuctionErrorCode.AUCTION_FAILED_TO_GET_LOCK);
+		}
+		log.info("lock acquired");
+	}
+
+	private void unLock(RLock lock){
+		if (lock.isLocked()) {
+			lock.unlock();
+			log.info("lock released");
+		}
+	}
 }
