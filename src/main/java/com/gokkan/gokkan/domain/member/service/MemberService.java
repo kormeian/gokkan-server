@@ -98,6 +98,7 @@ public class MemberService {
 		return ResponseSellerInfo.builder()
 			.name(seller.getName())
 			.profileImageUrl(seller.getProfileImageUrl())
+			.createdAt(seller.getCreatedAt())
 			.build();
 	}
 }
