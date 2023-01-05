@@ -1,7 +1,9 @@
 package com.gokkan.gokkan.domain.category.service;
 
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.*;
+
 import com.gokkan.gokkan.domain.category.domain.Category;
-import com.gokkan.gokkan.domain.category.dto.CategoryDto;
+import com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.UpdateRequest;
 import com.gokkan.gokkan.domain.category.exception.CategoryErrorCode;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
@@ -28,7 +30,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	public CategoryDto.Response create(CategoryDto.CreateRequest request) {
+	public Response create(CreateRequest request) {
 		log.info("create name : " + request.getName() + " parent : " + request.getParent());
 		checkParentNameAndChildName(request.getName(), request.getParent());
 		duplicateCheck(request.getName());
@@ -52,13 +54,13 @@ public class CategoryService {
 		category.setLevel(parent.getLevel() + 1);
 		Category.addRelation(parent, category);
 
-		return CategoryDto.Response.toResponse(categoryRepository.save(category));
+		return Response.toResponse(categoryRepository.save(category));
 	}
 
 	@Transactional(readOnly = true)
-	public CategoryDto.Response read(String name) {
+	public Response read(String name) {
 		log.info("read name : " + name);
-		return CategoryDto.Response.toResponse(getCategoryByName(name, false));
+		return Response.toResponse(getCategoryByName(name, false));
 	}
 
 	@Transactional
@@ -69,7 +71,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	public CategoryDto.Response update(UpdateRequest request) {
+	public Response update(UpdateRequest request) {
 		log.info("update name : " + request.getName() + " parent : " + request.getParent());
 		checkParentNameAndChildName(request.getName(), request.getParent());
 		duplicateCheck(request.getName());
@@ -85,7 +87,13 @@ public class CategoryService {
 
 		category.setName(request.getName());
 
-		return CategoryDto.Response.toResponse(categoryRepository.save(category));
+		return Response.toResponse(categoryRepository.save(category));
+	}
+
+	@Transactional(readOnly = true)
+	public Response readAll() {
+		log.info("readAll");
+		return Response.all(getCategory("root"));
 	}
 
 	public Category getCategory(String categoryName) {
