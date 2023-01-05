@@ -232,7 +232,7 @@ class AuctionRepositoryTest {
 
 	private FilterListRequest getFilterListRequest(Category category1, List<String> styleNames) {
 		return FilterListRequest.builder()
-			.sort("DESC")
+			.sort("마감 시간 역순")
 			.styles(styleNames)
 			.category(category1.getName())
 			.build();

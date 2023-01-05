@@ -37,7 +37,6 @@ public class Category {
 	@Size(max = 40)
 	private String name;
 
-	@Size(max = 3)
 	private int level;
 
 	@ManyToOne(fetch = FetchType.LAZY)

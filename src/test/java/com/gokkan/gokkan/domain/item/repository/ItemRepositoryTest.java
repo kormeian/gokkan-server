@@ -39,13 +39,9 @@ class ItemRepositoryTest {
 	String style2 = "style2";
 	String style3 = "style3";
 	String style4 = "style4";
-	String categoryName1 = "test category1";
+	String categoryName1 = "category1";
 	@Autowired
 	private ItemRepository itemRepository;
-	@Autowired
-	private ImageItemRepository imageItemRepository;
-	@Autowired
-	private ImageCheckRepository imageCheckRepository;
 	@Autowired
 	private StyleItemRepository styleItemRepository;
 	@Autowired
@@ -58,13 +54,6 @@ class ItemRepositoryTest {
 	private ExpertInfoRepository expertInfoRepository;
 	@Autowired
 	private ExpertStyleRepository expertStyleRepository;
-
-	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
-		return ExpertStyle.builder()
-			.expertInfo(expertInfo)
-			.style(styleSaved1)
-			.build();
-	}
 
 	@DisplayName("01_00. searchAllMyItem success size 2")
 	@Test
@@ -207,6 +196,7 @@ class ItemRepositoryTest {
 	private Category getCategory(String name) {
 		return categoryRepository.save(Category.builder()
 			.name(name)
+			.level(0)
 			.children(new ArrayList<>())
 			.build());
 	}
@@ -224,7 +214,6 @@ class ItemRepositoryTest {
 			.conditionGrade("test CG")
 			.conditionDescription("test CD")
 			.text("test text")
-//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
@@ -251,5 +240,12 @@ class ItemRepositoryTest {
 			.name("test name")
 			.info("test info")
 			.build());
+	}
+
+	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
+		return ExpertStyle.builder()
+			.expertInfo(expertInfo)
+			.style(styleSaved1)
+			.build();
 	}
 }

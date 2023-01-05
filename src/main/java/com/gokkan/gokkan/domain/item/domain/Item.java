@@ -43,18 +43,13 @@ public class Item {
 	@Size(max = 100)
 	private String name;
 
-	@Size(max = 10)
 	private long startPrice;
 
-	@Size(max = 10)
 	@Enumerated(EnumType.STRING)
 	private State state;
 
-	@Size(max = 10)
 	private long width;
-	@Size(max = 10)
 	private long depth;
-	@Size(max = 10)
 	private long height;
 	@Size(max = 30)
 	private String material;
@@ -70,7 +65,6 @@ public class Item {
 	private String designer;
 	@Size(max = 30)
 	private String brand;
-	@Size(max = 10)
 	private int productionYear;
 	private String thumbnail;
 
