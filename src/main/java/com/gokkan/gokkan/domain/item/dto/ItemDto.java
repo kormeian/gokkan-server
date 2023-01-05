@@ -6,6 +6,7 @@ import com.gokkan.gokkan.domain.image.domain.ImageCheck;
 import com.gokkan.gokkan.domain.image.domain.ImageItem;
 import com.gokkan.gokkan.domain.image.dto.ImageDto;
 import com.gokkan.gokkan.domain.item.domain.Item;
+import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.querydsl.core.annotations.QueryProjection;
 import com.sun.istack.NotNull;
@@ -56,11 +57,9 @@ public class ItemDto {
 		private String conditionDescription;
 		private String text;
 
-		//		private String madeIn;
 		private String designer;
 		private String brand;
 		private Integer productionYear;
-
 
 		public Item toItem(Item item, Category category) {
 			return Item.builder()
@@ -267,6 +266,7 @@ public class ItemDto {
 
 	@Getter
 	@Setter
+	@AllArgsConstructor
 	@NoArgsConstructor
 	@ToString
 	@Builder
@@ -280,6 +280,7 @@ public class ItemDto {
 		private String thumbnail;
 
 		private String writer;
+		private String state;
 
 		private LocalDateTime created;
 		private LocalDateTime updated;
@@ -290,12 +291,14 @@ public class ItemDto {
 			String name,
 			String thumbnail,
 			String writer,
+			State state,
 			LocalDateTime created,
 			LocalDateTime updated) {
 			this.id = id;
 			this.name = name;
 			this.thumbnail = thumbnail;
 			this.writer = writer;
+			this.state = state.getDescription();
 			this.created = created;
 			this.updated = updated;
 		}
