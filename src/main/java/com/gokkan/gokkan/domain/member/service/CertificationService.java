@@ -15,8 +15,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 public class CertificationService {
+
 	private final String IMP_KEY = "7685734080745845";
 	private final String IMP_SECRET = "hBzf6iv8aPrgtzMK5XDcwGaeMgVXplSG5LlShz3qmY8wIVEtLWi44QWDYM69Ago1C2meKqbdq1k0FpVB";
+
 	public String getAccessToken() {
 
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -70,7 +72,7 @@ public class CertificationService {
 		return phone;
 	}
 
-	public void getPaymentInfo(String imp_uid, String accessToken){
+	public void getPaymentInfo(String imp_uid, String accessToken) {
 		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
 		String block = "";

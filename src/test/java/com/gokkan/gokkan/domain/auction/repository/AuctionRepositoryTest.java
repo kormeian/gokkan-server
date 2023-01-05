@@ -8,7 +8,6 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
-import com.gokkan.gokkan.domain.auction.domain.type.SortType;
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;

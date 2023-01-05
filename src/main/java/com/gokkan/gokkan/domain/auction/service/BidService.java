@@ -126,10 +126,11 @@ public class BidService {
 
 		log.info("입찰 성공");
 
-		AutoBidding autoBidding = autoBiddingRepository.findFirstByAuctionAndMemberNotAndPriceGreaterThanEqualOrderByCreatedDateAsc(auction, member, auction.getCurrentPrice()+10000);
+		AutoBidding autoBidding = autoBiddingRepository.findFirstByAuctionAndMemberNotAndPriceGreaterThanEqualOrderByCreatedDateAsc(
+			auction, member, auction.getCurrentPrice() + 10000);
 		if (autoBidding != null) {
 			log.info("자동 입찰 진행");
-			bidding(autoBidding.getMember(), auctionId, auction.getCurrentPrice()+10000);
+			bidding(autoBidding.getMember(), auctionId, auction.getCurrentPrice() + 10000);
 		}
 	}
 
@@ -141,15 +142,17 @@ public class BidService {
 		log.info("자동 입찰 등록");
 		Auction auction = auctionFindById(auctionId);
 		Long currentPrice = auction.getCurrentPrice();
-		if(!auction.getMember().getId().equals(member.getId())){
-			if(currentPrice >= price){
-				throw new RestApiException(AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
+		if (!auction.getMember().getId().equals(member.getId())) {
+			if (currentPrice >= price) {
+				throw new RestApiException(
+					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
 			} else if (currentPrice + 10000L > price) {
-				throw new RestApiException(AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
+				throw new RestApiException(
+					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
 			}
 		}
 		AutoBidding autoBidding = autoBiddingRepository.findByAuctionAndMember(auction, member);
-		if(autoBidding == null){
+		if (autoBidding == null) {
 			autoBiddingRepository.save(AutoBidding.builder()
 				.auction(auction)
 				.member(member)
@@ -161,7 +164,7 @@ public class BidService {
 			autoBiddingRepository.save(autoBidding);
 			log.info("자동 입찰 수정 성공");
 		}
-		bidding(member, auctionId, currentPrice+10000L);
+		bidding(member, auctionId, currentPrice + 10000L);
 	}
 
 	private void saveRedisHistory(Long auctionId, History currentHistory) {
@@ -180,7 +183,7 @@ public class BidService {
 			.collect(Collectors.toList());
 	}
 
-	private Auction auctionFindById(Long auctionId){
+	private Auction auctionFindById(Long auctionId) {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(
 				AuctionErrorCode.AUCTION_NOT_FOUND));
@@ -191,7 +194,7 @@ public class BidService {
 		return auction;
 	}
 
-	private void tryLock(RLock lock){
+	private void tryLock(RLock lock) {
 		try {
 			if (!lock.tryLock(1, 3, TimeUnit.SECONDS)) {
 				throw new RestApiException(AuctionErrorCode.AUCTION_ANOTHER_USER_IS_BIDDING);
@@ -202,7 +205,7 @@ public class BidService {
 		log.info("lock acquired");
 	}
 
-	private void unLock(RLock lock){
+	private void unLock(RLock lock) {
 		if (lock.isLocked()) {
 			lock.unlock();
 			log.info("lock released");

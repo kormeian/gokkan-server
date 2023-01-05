@@ -1,16 +1,10 @@
 package com.gokkan.gokkan.domain.auction.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
-import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
-import com.gokkan.gokkan.domain.auction.domain.History;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
-import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
-import com.gokkan.gokkan.domain.member.domain.Member;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +26,7 @@ public class AuctionScheduleService {
 		log.info("경매 스케쥴러 실행");
 		List<Auction> auctionList = auctionRepository.findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(
 			LocalDateTime.now(), AuctionStatus.STARTED);
-		if(auctionList.isEmpty()) {
+		if (auctionList.isEmpty()) {
 			log.info("마감된 경매가 없습니다.");
 			return;
 		}
