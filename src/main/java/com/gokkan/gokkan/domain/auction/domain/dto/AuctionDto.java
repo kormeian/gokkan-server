@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.domain.auction.domain.dto;
 
-import com.gokkan.gokkan.domain.auction.domain.type.SortType;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -67,6 +66,7 @@ public class AuctionDto {
 	@ToString
 	@Schema(name = "카테고리 유사 경매 5개 List api request")
 	public static class SimilarListRequest {
+
 		private String category;
 		private Long auctionId;
 	}

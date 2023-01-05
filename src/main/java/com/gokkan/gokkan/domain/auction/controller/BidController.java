@@ -21,12 +21,16 @@ public class BidController {
 	public void message(
 		@DestinationVariable Long auctionId,
 		Long price) {
-		Member member = stompChannelInterceptor.getMember();
-		log.info("멤버 아이디 : " + member.getId() + "가 입찰을 시작합니다.");
-		log.info("경매 아이디 : " + auctionId);
-		log.info("입찰 가격 : " + price);
 
+		Member member = stompChannelInterceptor.getMember();
 		bidService.bidding(member, auctionId, price);
 	}
 
+	@MessageMapping("/auto/{auctionId}")
+	public void autoBidding(
+		@DestinationVariable Long auctionId,
+		Long price) {
+		Member member = stompChannelInterceptor.getMember();
+		bidService.registrationAutoBid(member, auctionId, price);
+	}
 }

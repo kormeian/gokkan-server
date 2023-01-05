@@ -49,6 +49,21 @@ class CategoryServiceTest {
 	@InjectMocks
 	private CategoryService categoryService;
 
+	private static CreateRequest getCreateRequest(String name, String parent) {
+		return CreateRequest.builder()
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+		return UpdateRequest.builder()
+			.id(id)
+			.parent(parent)
+			.name(name)
+			.build();
+	}
+
 	@DisplayName("01_01. create root category success already exist root")
 	@Test
 	public void test_01_01() {
@@ -281,7 +296,8 @@ class CategoryServiceTest {
 	@Test
 	public void test_04_02() {
 		//given
-		given(categoryRepository.findById(any())).willReturn(Optional.of(getCategory(categoryName1, root)));
+		given(categoryRepository.findById(any())).willReturn(
+			Optional.of(getCategory(categoryName1, root)));
 		given(categoryRepository.existsByName(categoryName2)).willReturn(true);
 
 		//when
@@ -343,8 +359,8 @@ class CategoryServiceTest {
 
 	@DisplayName("05_00. readAll success")
 	@Test
-	public void test_05_00(){
-	    //given
+	public void test_05_00() {
+		//given
 		Category root1 = Category.builder()
 			.name("root")
 			.level(0)
@@ -363,7 +379,7 @@ class CategoryServiceTest {
 		given(categoryRepository.findByName("root")).willReturn(
 			Optional.of(root1));
 
-	    //when
+		//when
 		Response response = categoryService.readAll();
 
 		//then
@@ -374,7 +390,7 @@ class CategoryServiceTest {
 
 	@DisplayName("05_01. readAll fail ")
 	@Test
-	public void test_05_01(){
+	public void test_05_01() {
 		//given
 		given(categoryRepository.findByName("root")).willReturn(
 			Optional.empty());
@@ -393,21 +409,6 @@ class CategoryServiceTest {
 			.parent(parent)
 			.children(new ArrayList<>())
 			.level(parent.getLevel() + 1)
-			.build();
-	}
-
-	private static CreateRequest getCreateRequest(String name, String parent) {
-		return CreateRequest.builder()
-			.parent(parent)
-			.name(name)
-			.build();
-	}
-
-	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
-		return UpdateRequest.builder()
-			.id(id)
-			.parent(parent)
-			.name(name)
 			.build();
 	}
 }

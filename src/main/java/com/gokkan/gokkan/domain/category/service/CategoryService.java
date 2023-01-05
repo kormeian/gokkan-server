@@ -1,6 +1,6 @@
 package com.gokkan.gokkan.domain.category.service;
 
-import static com.gokkan.gokkan.domain.category.dto.CategoryDto.*;
+import static com.gokkan.gokkan.domain.category.dto.CategoryDto.CreateRequest;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.dto.CategoryDto.Response;

@@ -6,8 +6,6 @@ import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
 import com.gokkan.gokkan.domain.expertInfo.domain.ExpertInfo;
 import com.gokkan.gokkan.domain.expertInfo.repository.ExpertInfoRepository;
-import com.gokkan.gokkan.domain.image.repository.ImageCheckRepository;
-import com.gokkan.gokkan.domain.image.repository.ImageItemRepository;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
 import com.gokkan.gokkan.domain.item.type.State;
@@ -54,6 +52,13 @@ class ItemRepositoryTest {
 	private ExpertInfoRepository expertInfoRepository;
 	@Autowired
 	private ExpertStyleRepository expertStyleRepository;
+
+	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
+		return ExpertStyle.builder()
+			.expertInfo(expertInfo)
+			.style(styleSaved1)
+			.build();
+	}
 
 	@DisplayName("01_00. searchAllMyItem success size 2")
 	@Test
@@ -240,12 +245,5 @@ class ItemRepositoryTest {
 			.name("test name")
 			.info("test info")
 			.build());
-	}
-
-	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
-		return ExpertStyle.builder()
-			.expertInfo(expertInfo)
-			.style(styleSaved1)
-			.build();
 	}
 }
