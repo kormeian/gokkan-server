@@ -21,7 +21,7 @@ public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 
-	private static void checkParentNameAndChildName(String name, String parent) {
+	private void checkParentNameAndChildName(String name, String parent) {
 		log.info("checkParentNameAndChildName name : " + name + " parent : " + parent);
 		if (name.equals(parent)) {
 			log.error("checkParentNameAndChildName name : " + name);

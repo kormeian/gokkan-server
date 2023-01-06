@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,10 +51,12 @@ public class AuctionController {
 	@GetMapping("/filter-list")
 	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
-	public ResponseEntity<List<ListResponse>> auctionListFilter(
+	public ResponseEntity<?> auctionListFilter(
 		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = FilterListRequest.class)))
-		@RequestBody FilterListRequest filterListRequest) {
-		return ResponseEntity.ok(auctionService.readList(filterListRequest));
+		@RequestBody FilterListRequest filterListRequest,
+		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
+		Pageable pageable) {
+		return ResponseEntity.ok(auctionService.readList(filterListRequest, pageable));
 	}
 
 	@GetMapping("/list/similar")
@@ -72,6 +75,4 @@ public class AuctionController {
 		@Parameter(hidden = true) Member member) {
 		return ResponseEntity.ok(auctionService.getWaitPaymentAuctionList(member));
 	}
-
-
 }

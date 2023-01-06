@@ -34,6 +34,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
@@ -96,34 +98,33 @@ class AuctionRepositoryTest {
 		getAuction(expertComment4, member, AuctionStatus.ENDED);
 		getAuction(expertComment4, member, AuctionStatus.ENDED);
 		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
 
 		//when
-		List<ListResponse> listResponses1 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category1, List.of(styleName1)));
-		List<ListResponse> listResponses2 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category2, List.of(styleName2)));
-		List<ListResponse> listResponses3 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category1, null));
-		List<ListResponse> listResponses4 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category2, null));
+		Page<ListResponse> listResponses1 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category1, List.of(styleName1)), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses2 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category2, List.of(styleName2)), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses3 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category1, null), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses4 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category2, null), PageRequest.of(0, 1));
 
 		//then
-		assertEquals(listResponses1.size(), 2);
-		assertEquals(listResponses2.size(), 2);
-		assertEquals(listResponses3.size(), 2);
-		assertEquals(listResponses4.size(), 2);
+		assertEquals(listResponses1.getContent().size(), 1);
+		assertEquals(listResponses1.getTotalElements(), 2);
+		assertEquals(listResponses1.getTotalPages(), 2);
+
+		assertEquals(listResponses2.getContent().size(), 1);
+		assertEquals(listResponses2.getTotalElements(), 2);
+		assertEquals(listResponses2.getTotalPages(), 2);
+
+		assertEquals(listResponses3.getContent().size(), 1);
+		assertEquals(listResponses3.getTotalElements(), 2);
+		assertEquals(listResponses3.getTotalPages(), 2);
+
+		assertEquals(listResponses4.getContent().size(), 1);
+		assertEquals(listResponses4.getTotalElements(), 2);
+		assertEquals(listResponses4.getTotalPages(), 2);
 	}
 
 	@DisplayName("02_00. searchAllSimilar")

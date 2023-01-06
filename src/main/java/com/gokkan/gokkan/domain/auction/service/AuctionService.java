@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,9 +86,9 @@ public class AuctionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ListResponse> readList(FilterListRequest filterListRequest) {
+	public Page<ListResponse> readList(FilterListRequest filterListRequest, Pageable pageable) {
 		log.info("readList : " + filterListRequest);
-		return auctionRepository.searchAllFilter(filterListRequest);
+		return auctionRepository.searchAllFilter(filterListRequest, pageable);
 	}
 
 	@Transactional(readOnly = true)

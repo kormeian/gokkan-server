@@ -98,6 +98,7 @@ class ItemServiceTest {
 	private AwsS3Service awsS3Service;
 	@InjectMocks
 	private ItemService itemService;
+
 	@DisplayName("01_00. create success from empty image saved")
 	@Test
 	public void test_01_00() throws IOException {

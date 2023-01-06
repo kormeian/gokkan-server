@@ -136,6 +136,7 @@ public class ItemController {
 		@CurrentMember Member member,
 		@Parameter(description = "상품 상태 list")
 		@RequestParam List<State> states,
+		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
 		Pageable pageable) {
 		return ResponseEntity.ok(itemService.myItems(member, states, pageable));
 	}
@@ -146,6 +147,7 @@ public class ItemController {
 	public ResponseEntity<?> items(
 		@Parameter(hidden = true)
 		@CurrentMember Member member,
+		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
 		Pageable pageable) {
 		return ResponseEntity.ok(itemService.itemsForExport(member, pageable));
 	}
