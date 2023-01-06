@@ -4,12 +4,14 @@ import com.gokkan.gokkan.domain.item.dto.ItemDto.ListResponse;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ItemRepositoryCustom {
 
-	List<ListResponse> searchAllItemForExport(Member member);
+	Page<ListResponse> searchAllItemForExport(Member member, Pageable pageable);
 
-	List<ListResponse> searchAllMyItem(List<State> state, Member member);
+	Page<ListResponse> searchAllMyItem(List<State> state, Member member, Pageable pageable);
 }
