@@ -42,29 +42,6 @@ class StyleItemServiceTest {
 	@InjectMocks
 	private StyleItemService styleItemService;
 
-	private static Item getItem() {
-		return Item.builder()
-			.name("test name")
-			.startPrice(100L)
-			.width(100L)
-			.depth(100L)
-			.height(100L)
-			.material("나무")
-			.conditionGrade("test conditionGrade")
-			.conditionDescription("test conditionDescription")
-			.text("test text")
-//			.madeIn("test madeIn")
-			.designer("test designer")
-			.brand("test brand")
-			.productionYear(2023)
-			.state(State.ASSESSING)
-			.created(LocalDateTime.now())
-			.updated(LocalDateTime.now())
-			.imageItems(new ArrayList<>())
-			.imageChecks(new ArrayList<>())
-			.build();
-	}
-
 	@DisplayName("01_00. createNotDuplicate success not delete all duplicate")
 	@Test
 	public void test_01_00() {
@@ -245,6 +222,28 @@ class StyleItemServiceTest {
 			.style(style)
 			.name(style.getName())
 			.item(getItem())
+			.build();
+	}
+
+	private static Item getItem() {
+		return Item.builder()
+			.name("test name")
+			.startPrice(100L)
+			.width(100L)
+			.depth(100L)
+			.height(100L)
+			.material("나무")
+			.conditionGrade("test conditionGrade")
+			.conditionDescription("test conditionDescription")
+			.text("test text")
+			.designer("test designer")
+			.brand("test brand")
+			.productionYear(2023)
+			.state(State.ASSESSING)
+			.created(LocalDateTime.now())
+			.updated(LocalDateTime.now())
+			.imageItems(new ArrayList<>())
+			.imageChecks(new ArrayList<>())
 			.build();
 	}
 }

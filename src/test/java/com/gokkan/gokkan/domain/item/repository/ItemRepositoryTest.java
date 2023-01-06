@@ -55,13 +55,6 @@ class ItemRepositoryTest {
 	@Autowired
 	private ExpertStyleRepository expertStyleRepository;
 
-	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
-		return ExpertStyle.builder()
-			.expertInfo(expertInfo)
-			.style(styleSaved1)
-			.build();
-	}
-
 	@DisplayName("01_00. searchAllMyItem success size 2")
 	@Test
 	public void test_01_00() {
@@ -283,5 +276,12 @@ class ItemRepositoryTest {
 			.name("test name")
 			.info("test info")
 			.build());
+	}
+
+	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
+		return ExpertStyle.builder()
+			.expertInfo(expertInfo)
+			.style(styleSaved1)
+			.build();
 	}
 }
