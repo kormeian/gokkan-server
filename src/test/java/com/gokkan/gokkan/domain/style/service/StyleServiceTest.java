@@ -36,26 +36,6 @@ class StyleServiceTest {
 	@InjectMocks
 	private StyleService styleService;
 
-	private static UpdateRequest getUpdateRequest(String name, Long id) {
-		return StyleDto.UpdateRequest.builder()
-			.id(id)
-			.name(name)
-			.build();
-	}
-
-	private static CreateRequest getCreateRequest(String name) {
-		return StyleDto.CreateRequest.builder()
-			.name(name)
-			.build();
-	}
-
-	private static Style getStyle(String name, Long id) {
-		return Style.builder()
-			.id(id)
-			.name(name)
-			.build();
-	}
-
 	@DisplayName("01_00. create success")
 	@Test
 	public void test_01_00() {
@@ -176,6 +156,26 @@ class StyleServiceTest {
 
 		//then
 		assertEquals(styleException.getErrorCode(), StyleErrorCode.NOT_FOUND_STYLE);
+	}
+
+	private static UpdateRequest getUpdateRequest(String name, Long id) {
+		return StyleDto.UpdateRequest.builder()
+			.id(id)
+			.name(name)
+			.build();
+	}
+
+	private static CreateRequest getCreateRequest(String name) {
+		return StyleDto.CreateRequest.builder()
+			.name(name)
+			.build();
+	}
+
+	private static Style getStyle(String name, Long id) {
+		return Style.builder()
+			.id(id)
+			.name(name)
+			.build();
 	}
 
 }

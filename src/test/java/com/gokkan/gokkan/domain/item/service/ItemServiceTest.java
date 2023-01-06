@@ -98,36 +98,6 @@ class ItemServiceTest {
 	private AwsS3Service awsS3Service;
 	@InjectMocks
 	private ItemService itemService;
-
-	private static Category getCategory(String name, Category parent) {
-		return Category.builder()
-			.name(name)
-			.parent(parent)
-			.children(new ArrayList<>())
-			.level(parent.getLevel() + 1)
-			.build();
-	}
-
-	private static ImageItem getImageItem(Long id, String url) {
-		return ImageItem.builder()
-			.id(id)
-			.url(url)
-			.build();
-	}
-
-	private static ImageCheck getImageCheck(Long id, String url) {
-		return ImageCheck.builder()
-			.id(id)
-			.url(url)
-			.build();
-	}
-
-	private static ImageDto.UpdateRequest getImageUpdateRequest(Long id) {
-		return ImageDto.UpdateRequest.builder()
-			.imageId(id)
-			.build();
-	}
-
 	@DisplayName("01_00. create success from empty image saved")
 	@Test
 	public void test_01_00() throws IOException {
@@ -1331,7 +1301,6 @@ class ItemServiceTest {
 			.conditionGrade("test conditionGrade")
 			.conditionDescription("test conditionDescription")
 			.text("test text")
-//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
@@ -1379,13 +1348,41 @@ class ItemServiceTest {
 			.conditionGrade("update conditionGrade")
 			.conditionDescription("update conditionDescription")
 			.text("update text")
-//			.madeIn("update madeIn")
 			.designer("update designer")
 			.brand("update brand")
 			.productionYear(1023)
 			.imageItemUrls(imageItems)
 			.imageCheckUrls(imageChecks)
 			.styles(styleItems)
+			.build();
+	}
+
+	private static Category getCategory(String name, Category parent) {
+		return Category.builder()
+			.name(name)
+			.parent(parent)
+			.children(new ArrayList<>())
+			.level(parent.getLevel() + 1)
+			.build();
+	}
+
+	private static ImageItem getImageItem(Long id, String url) {
+		return ImageItem.builder()
+			.id(id)
+			.url(url)
+			.build();
+	}
+
+	private static ImageCheck getImageCheck(Long id, String url) {
+		return ImageCheck.builder()
+			.id(id)
+			.url(url)
+			.build();
+	}
+
+	private static ImageDto.UpdateRequest getImageUpdateRequest(Long id) {
+		return ImageDto.UpdateRequest.builder()
+			.imageId(id)
 			.build();
 	}
 }

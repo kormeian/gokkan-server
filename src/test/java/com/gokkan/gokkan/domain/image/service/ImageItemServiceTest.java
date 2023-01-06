@@ -45,12 +45,6 @@ class ImageItemServiceTest {
 	@InjectMocks
 	private ImageItemService imageItemService;
 
-	private static ImageItem getImageItem(String url) {
-		return ImageItem.builder()
-			.url(url)
-			.build();
-	}
-
 	@DisplayName("01_00. save success")
 	@Test
 	public void test_01_00() {
@@ -147,5 +141,11 @@ class ImageItemServiceTest {
 
 		//then
 		assertEquals(imageItems.size(), 0);
+	}
+
+	private static ImageItem getImageItem(String url) {
+		return ImageItem.builder()
+			.url(url)
+			.build();
 	}
 }

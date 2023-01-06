@@ -10,9 +10,13 @@ import com.gokkan.gokkan.domain.item.dto.QItemDto_ListResponse;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,7 +26,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<ListResponse> searchAllItemForExport(Member member) {
+	public Page<ListResponse> searchAllItemForExport(Member member, Pageable pageable) {
 		// 전문가 스타일 불러오기
 		List<String> expertStyleNames = jpaQueryFactory
 			.select(expertStyle.styleName).from(expertStyle)
@@ -35,7 +39,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 		// 3. 가져온 id 묶음으로 상품 list 불러오기
 		// 전문가 스탕일로 필터링 된 item list 불러오기
 
-		return jpaQueryFactory
+		List<ListResponse> content = jpaQueryFactory
 			.select(
 				new QItemDto_ListResponse(item.id,
 					item.name,
@@ -44,18 +48,27 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 					item.state,
 					item.created,
 					item.updated))
-			.from(styleItem)
-			.innerJoin(styleItem.item, item)
+			.from(item)
+			.innerJoin(item.styleItems, styleItem)
 			.where(eqStyle(expertStyleNames), item.state.eq(State.ASSESSING))
 			.groupBy(item)
 			.orderBy(item.created.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
 			.fetch();
+
+		JPAQuery<Long> countQuery = jpaQueryFactory.select(item.countDistinct())
+			.from(item)
+			.innerJoin(item.styleItems, styleItem)
+			.where(eqStyle(expertStyleNames), item.state.eq(State.ASSESSING));
+
+		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
 	@Override
-	public List<ListResponse> searchAllMyItem(List<State> states, Member member) {
-
-		return jpaQueryFactory.select(new QItemDto_ListResponse(item.id,
+	public Page<ListResponse> searchAllMyItem(List<State> states, Member member,
+		Pageable pageable) {
+		List<ListResponse> content = jpaQueryFactory.select(new QItemDto_ListResponse(item.id,
 				item.name,
 				item.thumbnail,
 				item.member.nickName,
@@ -68,7 +81,18 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 				(eqState(states))
 			)
 			.orderBy(item.created.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
 			.fetch();
+
+		JPAQuery<Long> countQuery = jpaQueryFactory.select(item.countDistinct())
+			.from(item)
+			.where(
+				item.member.eq(member),
+				(eqState(states))
+			);
+
+		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
 
 	private BooleanBuilder eqState(List<State> states) {

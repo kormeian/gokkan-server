@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
@@ -53,13 +55,6 @@ class ItemRepositoryTest {
 	@Autowired
 	private ExpertStyleRepository expertStyleRepository;
 
-	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
-		return ExpertStyle.builder()
-			.expertInfo(expertInfo)
-			.style(styleSaved1)
-			.build();
-	}
-
 	@DisplayName("01_00. searchAllMyItem success size 2")
 	@Test
 	public void test_01_00() {
@@ -84,21 +79,29 @@ class ItemRepositoryTest {
 
 		//when
 		// 임시 저장상태 상품 member(작성자) 가 만든 것 list 찾기
-		List<ListResponse> items1 = itemRepository.searchAllMyItem(
-			new ArrayList<>(List.of(State.TEMPORARY)), member);
+		Page<ListResponse> items11 = itemRepository.searchAllMyItem(
+			new ArrayList<>(List.of(State.TEMPORARY)), member, PageRequest.of(0, 1));
+		Page<ListResponse> items12 = itemRepository.searchAllMyItem(
+			new ArrayList<>(List.of(State.TEMPORARY)), member, PageRequest.of(1, 1));
 
 		// 임시 저장상태 상품 상품 등록 안한 사람 아이디로 상품 list 찾기
-		List<ListResponse> items2 = itemRepository.searchAllMyItem(
-			new ArrayList<>(List.of(State.TEMPORARY)), getMember("another", "test2@test.com"));
+		Page<ListResponse> items2 = itemRepository.searchAllMyItem(
+			new ArrayList<>(List.of(State.TEMPORARY)), getMember("another", "test2@test.com"),
+			PageRequest.of(0, 2));
 
 		// 검수 대기 상품 member(작성자) 가 만든 것 list 찾기
-		List<ListResponse> items3 = itemRepository.searchAllMyItem(
-			new ArrayList<>(List.of(State.ASSESSING)), member);
+		Page<ListResponse> items3 = itemRepository.searchAllMyItem(
+			new ArrayList<>(List.of(State.ASSESSING)), member, PageRequest.of(0, 2));
 
 		//then
-		assertEquals(items1.size(), 2);
-		assertEquals(items2.size(), 0);
-		assertEquals(items3.size(), 0);
+		assertEquals(items11.getContent().size(), 1);
+		assertEquals(items11.getSize(), 1);
+		assertEquals(items11.getTotalElements(), 2);
+		assertEquals(items12.getContent().size(), 1);
+		assertEquals(items12.getSize(), 1);
+		assertEquals(items12.getTotalElements(), 2);
+		assertEquals(items2.getContent().size(), 0);
+		assertEquals(items3.getContent().size(), 0);
 	}
 
 	@DisplayName("02_00. searchAllItemForExport success")
@@ -114,7 +117,7 @@ class ItemRepositoryTest {
 		ExpertInfo expertInfo2 = getExpertInfo(member2);
 		ExpertInfo expertInfo123 = getExpertInfo(member123);
 
-		// 스타일 두개 생성
+		// 스타일 1, 2, 3, 4 생성
 		Style styleSaved1 = styleRepository.save(Style.builder().name(style1).build());
 		Style styleSaved2 = styleRepository.save(Style.builder().name(style2).build());
 		Style styleSaved3 = styleRepository.save(Style.builder().name(style3).build());
@@ -178,14 +181,42 @@ class ItemRepositoryTest {
 			getStyleItem(styleSaved3, item123)))));
 
 		//when
-		List<ListResponse> items1 = itemRepository.searchAllItemForExport(member1);
-		List<ListResponse> items2 = itemRepository.searchAllItemForExport(member2);
-		List<ListResponse> items123 = itemRepository.searchAllItemForExport(member123);
+		Page<ListResponse> items1 = itemRepository.searchAllItemForExport(member1,
+			PageRequest.of(0, 3));
+		Page<ListResponse> items2 = itemRepository.searchAllItemForExport(member2,
+			PageRequest.of(0, 3));
+		Page<ListResponse> items123 = itemRepository.searchAllItemForExport(member123,
+			PageRequest.of(0, 3));
+		Page<ListResponse> items1232 = itemRepository.searchAllItemForExport(member123,
+			PageRequest.of(1, 3));
 
 		//then
-		assertEquals(items1.size(), 2);
-		assertEquals(items2.size(), 2);
-		assertEquals(items123.size(), 4);
+		assertEquals(items1.getContent().size(), 2);
+		assertEquals(items1.getTotalPages(), 1);
+		assertEquals(items1.getTotalElements(), 2);
+
+		assertEquals(items2.getContent().size(), 2);
+		assertEquals(items2.getTotalPages(), 1);
+		assertEquals(items2.getTotalElements(), 2);
+
+		for (ListResponse listResponse : items123.getContent()) {
+			System.out.println(listResponse);
+		}
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
+		for (ListResponse listResponse : items1232.getContent()) {
+			System.out.println(listResponse);
+		}
+
+		assertEquals(items123.getContent().size(), 3);
+		assertEquals(items123.getTotalPages(), 2);
+		assertEquals(items123.getTotalElements(), 4);
+
+		assertEquals(items1232.getContent().size(), 1);
+		assertEquals(items1232.getTotalPages(), 2);
+		assertEquals(items1232.getTotalElements(), 4);
 	}
 
 	private Member getMember(String userId, String email) {
@@ -245,5 +276,12 @@ class ItemRepositoryTest {
 			.name("test name")
 			.info("test info")
 			.build());
+	}
+
+	private static ExpertStyle getExpertStyle(Style styleSaved1, ExpertInfo expertInfo) {
+		return ExpertStyle.builder()
+			.expertInfo(expertInfo)
+			.style(styleSaved1)
+			.build();
 	}
 }

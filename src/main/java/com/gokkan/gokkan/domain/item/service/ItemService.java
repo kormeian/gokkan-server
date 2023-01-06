@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,53 +51,6 @@ public class ItemService {
 	private final ImageItemService imageItemService;
 	private final ImageCheckService imageCheckService;
 	private final AwsS3Service awsS3Service;
-
-	private static void memberMatchCheck(String memberId, String itemMemberId) {
-		log.info("memberMatchCheck member id : " + memberId);
-		if (!memberId.equals(itemMemberId)) {
-			log.error("memberMatchCheck member id : " + memberId);
-			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
-		}
-	}
-
-	private static void memberLoginCheck(Member member) {
-		if (member == null) {
-			log.error("memberLoginCheck");
-			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
-		} else {
-			log.info("member id : " + member.getId());
-		}
-	}
-
-	private static void itemSaveCompleteCategoryCheck(String category) {
-		log.info("saveItemRelations category name : " + category);
-		if (category.equals("")) {
-			throw new RestApiException(ItemErrorCode.CATEGORY_NOT_NUL);
-		}
-	}
-
-	private static void itemSaveCompleteStyleCheck(int styleItems) {
-		if (styleItems == 0) {
-			throw new RestApiException(ItemErrorCode.STYLE_NOT_NULL);
-		}
-	}
-
-	private static void itemStateCheckForUpdateAndDelete(State state) {
-		if (state == State.COMPLETE || state == State.ASSESSING) {
-			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
-			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
-		}
-	}
-
-	private static void itemStateCheckForRead(State itemState, List<State> states) {
-		for (State state : states) {
-			if (state == itemState) {
-				return;
-			}
-		}
-		log.error("itemStateCheckForRead state : " + itemState.getDescription());
-		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
-	}
 
 	@Transactional
 	public Response create(
@@ -187,17 +142,65 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ListResponse> myItems(Member member, List<State> states) {
+	public Page<ListResponse> myItems(Member member, List<State> states, Pageable pageable) {
 		log.info("myItems member id : " + member.getUserId());
-		return itemRepository.searchAllMyItem(states, member);
+		return itemRepository.searchAllMyItem(states, member, pageable);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ListResponse> itemsForExport(Member member) {
+	public Page<ListResponse> itemsForExport(Member member, Pageable pageable) {
+		log.info("itemsForExport member id : " + member.getUserId());
 		if (!member.getRole().equals(Role.ADMIN)) {
 			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
 		}
-		return itemRepository.searchAllItemForExport(member);
+		return itemRepository.searchAllItemForExport(member, pageable);
+	}
+
+	private static void memberMatchCheck(String memberId, String itemMemberId) {
+		log.info("memberMatchCheck member id : " + memberId);
+		if (!memberId.equals(itemMemberId)) {
+			log.error("memberMatchCheck member id : " + memberId);
+			throw new RestApiException(MemberErrorCode.MEMBER_MISMATCH);
+		}
+	}
+
+	private static void memberLoginCheck(Member member) {
+		if (member == null) {
+			log.error("memberLoginCheck");
+			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
+		} else {
+			log.info("member id : " + member.getId());
+		}
+	}
+
+	private static void itemSaveCompleteCategoryCheck(String category) {
+		log.info("saveItemRelations category name : " + category);
+		if (category.equals("")) {
+			throw new RestApiException(ItemErrorCode.CATEGORY_NOT_NUL);
+		}
+	}
+
+	private static void itemSaveCompleteStyleCheck(int styleItems) {
+		if (styleItems == 0) {
+			throw new RestApiException(ItemErrorCode.STYLE_NOT_NULL);
+		}
+	}
+
+	private static void itemStateCheckForUpdateAndDelete(State state) {
+		if (state == State.COMPLETE || state == State.ASSESSING) {
+			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
+			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
+		}
+	}
+
+	private static void itemStateCheckForRead(State itemState, List<State> states) {
+		for (State state : states) {
+			if (state == itemState) {
+				return;
+			}
+		}
+		log.error("itemStateCheckForRead state : " + itemState.getDescription());
+		throw new RestApiException(ItemErrorCode.CAN_NOT_READ_STATE);
 	}
 
 	private Item updateItem(
