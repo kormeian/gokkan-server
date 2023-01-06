@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -187,17 +189,18 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ListResponse> myItems(Member member, List<State> states) {
+	public Page<ListResponse> myItems(Member member, List<State> states, Pageable pageable) {
 		log.info("myItems member id : " + member.getUserId());
-		return itemRepository.searchAllMyItem(states, member);
+		return itemRepository.searchAllMyItem(states, member, pageable);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ListResponse> itemsForExport(Member member) {
+	public Page<ListResponse> itemsForExport(Member member, Pageable pageable) {
+		log.info("itemsForExport member id : " + member.getUserId());
 		if (!member.getRole().equals(Role.ADMIN)) {
 			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
 		}
-		return itemRepository.searchAllItemForExport(member);
+		return itemRepository.searchAllItemForExport(member, pageable);
 	}
 
 	private Item updateItem(
