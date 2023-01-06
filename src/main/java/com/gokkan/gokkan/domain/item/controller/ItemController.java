@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -134,8 +135,9 @@ public class ItemController {
 		@Parameter(hidden = true)
 		@CurrentMember Member member,
 		@Parameter(description = "상품 상태 list")
-		@RequestParam List<State> states) {
-		return ResponseEntity.ok(itemService.myItems(member, states));
+		@RequestParam List<State> states,
+		Pageable pageable) {
+		return ResponseEntity.ok(itemService.myItems(member, states, pageable));
 	}
 
 	@Operation(summary = "상품 list 조회", description = "전문가 스타일에 맞는 상품 list 반환")
@@ -143,7 +145,8 @@ public class ItemController {
 	@GetMapping("/expert-items")
 	public ResponseEntity<?> items(
 		@Parameter(hidden = true)
-		@CurrentMember Member member) {
-		return ResponseEntity.ok(itemService.itemsForExport(member));
+		@CurrentMember Member member,
+		Pageable pageable) {
+		return ResponseEntity.ok(itemService.itemsForExport(member, pageable));
 	}
 }
