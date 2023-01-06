@@ -156,7 +156,7 @@ public class ItemService {
 		return itemRepository.searchAllItemForExport(member, pageable);
 	}
 
-	private static void memberMatchCheck(String memberId, String itemMemberId) {
+	private void memberMatchCheck(String memberId, String itemMemberId) {
 		log.info("memberMatchCheck member id : " + memberId);
 		if (!memberId.equals(itemMemberId)) {
 			log.error("memberMatchCheck member id : " + memberId);
@@ -164,7 +164,7 @@ public class ItemService {
 		}
 	}
 
-	private static void memberLoginCheck(Member member) {
+	private void memberLoginCheck(Member member) {
 		if (member == null) {
 			log.error("memberLoginCheck");
 			throw new RestApiException(MemberErrorCode.MEMBER_NOT_LOGIN);
@@ -173,27 +173,27 @@ public class ItemService {
 		}
 	}
 
-	private static void itemSaveCompleteCategoryCheck(String category) {
+	private void itemSaveCompleteCategoryCheck(String category) {
 		log.info("saveItemRelations category name : " + category);
 		if (category.equals("")) {
 			throw new RestApiException(ItemErrorCode.CATEGORY_NOT_NUL);
 		}
 	}
 
-	private static void itemSaveCompleteStyleCheck(int styleItems) {
+	private void itemSaveCompleteStyleCheck(int styleItems) {
 		if (styleItems == 0) {
 			throw new RestApiException(ItemErrorCode.STYLE_NOT_NULL);
 		}
 	}
 
-	private static void itemStateCheckForUpdateAndDelete(State state) {
+	private void itemStateCheckForUpdateAndDelete(State state) {
 		if (state == State.COMPLETE || state == State.ASSESSING) {
 			log.error("itemStateCheckForUpdateAndDelete state : " + state.getDescription());
 			throw new RestApiException(ItemErrorCode.CAN_NOT_FIX_STATE);
 		}
 	}
 
-	private static void itemStateCheckForRead(State itemState, List<State> states) {
+	private void itemStateCheckForRead(State itemState, List<State> states) {
 		for (State state : states) {
 			if (state == itemState) {
 				return;

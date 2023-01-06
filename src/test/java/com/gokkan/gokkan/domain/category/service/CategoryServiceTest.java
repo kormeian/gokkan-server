@@ -397,14 +397,14 @@ class CategoryServiceTest {
 			.build();
 	}
 
-	private static CreateRequest getCreateRequest(String name, String parent) {
+	private CreateRequest getCreateRequest(String name, String parent) {
 		return CreateRequest.builder()
 			.parent(parent)
 			.name(name)
 			.build();
 	}
 
-	private static UpdateRequest getUpdateRequest(String name, String parent, Long id) {
+	private UpdateRequest getUpdateRequest(String name, String parent, Long id) {
 		return UpdateRequest.builder()
 			.id(id)
 			.parent(parent)
