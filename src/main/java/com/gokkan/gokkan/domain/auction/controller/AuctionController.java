@@ -3,9 +3,13 @@ package com.gokkan.gokkan.domain.auction.controller;
 import static com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
 import static com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetailAddress;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetailItem;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetailPaymentAmount;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
+import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,10 +73,35 @@ public class AuctionController {
 	}
 
 	@GetMapping("wait-payment")
-	@Operation(summary = "결제 대기중인 경매 조회", description = "결제 대기중인 경매 조회")
-	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
-	public ResponseEntity<List<ListResponse>> waitPaymentAuctionList(
+	@Operation(summary = "낙찰 된 경매 조회", description = "낙찰 된 경매 조회")
+	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = SuccessfulBidListResponse.class)))
+	public ResponseEntity<List<SuccessfulBidListResponse>> waitPaymentAuctionList(
 		@Parameter(hidden = true) Member member) {
 		return ResponseEntity.ok(auctionService.getWaitPaymentAuctionList(member));
+	}
+
+	@GetMapping("/order/address")
+	@Operation(summary = "경매 주문 상세 조회 (배송지)")
+	@ApiResponse(description = "주문 상세 (배송지)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailAddress.class)))
+	public ResponseEntity<AuctionOrderDetailAddress> getAddressInfo(
+		@Parameter(hidden = true) Member member){
+		return ResponseEntity.ok(auctionService.getAddressInfo(member));
+	}
+
+	@GetMapping("/order/item")
+	@Operation(summary = "경매 주문 상세 조회 (주문상품)")
+	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailItem.class)))
+	public ResponseEntity<AuctionOrderDetailItem> getItemInfo(
+		@Parameter(description = "경매 아이디") Long auctionId,
+		@Parameter(description = "상품 아이디") Long itemId){
+		return ResponseEntity.ok(auctionService.getItemInfo(auctionId, itemId));
+	}
+
+	@GetMapping("/order/pay")
+	@Operation(summary = "경매 주문 상세 조회 (주문상품)")
+	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailPaymentAmount.class)))
+	public ResponseEntity<AuctionOrderDetailPaymentAmount> getPaymentAmount(
+		@Parameter(description = "경매 아이디") Long auctionId){
+		return ResponseEntity.ok(auctionService.getPaymentAmount(auctionId));
 	}
 }
