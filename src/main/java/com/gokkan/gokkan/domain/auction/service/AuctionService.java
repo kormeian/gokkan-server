@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.auction.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
+import com.gokkan.gokkan.domain.auction.domain.AuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.History;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetailAddress;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetailItem;
@@ -13,6 +14,7 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
+import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.exception.ItemErrorCode;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionService {
 
 	private final AuctionRepository auctionRepository;
+	private final AuctionHistoryRepository auctionHistoryRepository;
 	private final ItemRepository itemRepository;
 	private final RedisTemplate<String, String> redisTemplate;
 
@@ -55,6 +58,17 @@ public class AuctionService {
 	public List<ResponseAuctionHistory> getAuctionHistory(Long auctionId) {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(AuctionErrorCode.AUCTION_NOT_FOUND));
+		if (!auction.getAuctionStatus().equals(AuctionStatus.STARTED)) {
+			List<AuctionHistory> auctionHistories = auctionHistoryRepository.findAllByAuctionIdOrderByBidDateTimeDesc(
+				auctionId);
+			return auctionHistories.stream()
+				.map(auctionHistory -> ResponseAuctionHistory.builder()
+					.bidTime(auctionHistory.getBidDateTime())
+					.memberId(makeSecretId(auction, auction.getMember().getId()))
+					.price(auctionHistory.getPrice())
+					.build())
+				.collect(Collectors.toList());
+		}
 		List<History> auctionHistories = getHistory(auction.getId());
 		if (auctionHistories.isEmpty()) {
 			return new ArrayList<>();
@@ -62,14 +76,9 @@ public class AuctionService {
 		LocalDateTime bidDateTime = auction.getStartDateTime();
 		List<ResponseAuctionHistory> responseAuctionHistories = new ArrayList<>();
 		for (History h : auctionHistories) {
-			int secretValue = (int) (
-				(h.getMemberId() + auction.getId()) +
-					(bidDateTime.getYear() * bidDateTime.getMonth().getValue()) +
-					(bidDateTime.getSecond() + bidDateTime.getMinute() + bidDateTime.getHour()));
-			String secretId = String.format("%05d",
-				secretValue).substring(0, 5);
 			responseAuctionHistories.add(
-				ResponseAuctionHistory.of(secretId, h.getPrice(), h.getBidTime()));
+				ResponseAuctionHistory.of(makeSecretId(auction, h.getMemberId()), h.getPrice(),
+					h.getBidTime()));
 		}
 		return responseAuctionHistories;
 	}
@@ -163,5 +172,15 @@ public class AuctionService {
 		if (!auction.getAuctionStatus().equals(AuctionStatus.WAIT_PAYMENT)) {
 			throw new RestApiException(AuctionErrorCode.AUCTION_STATUS_IS_NOT_WAIT_PAYMENT);
 		}
+	}
+
+	private String makeSecretId(Auction auction, Long memberId) {
+		LocalDateTime bidDateTime = auction.getStartDateTime();
+		int secretValue = (int) (
+			(memberId + auction.getId()) +
+				(bidDateTime.getYear() * bidDateTime.getMonth().getValue()) +
+				(bidDateTime.getSecond() + bidDateTime.getMinute() + bidDateTime.getHour()));
+		return String.format("%05d",
+			secretValue).substring(0, 5);
 	}
 }
