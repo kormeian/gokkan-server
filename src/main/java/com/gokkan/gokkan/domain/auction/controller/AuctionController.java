@@ -59,7 +59,7 @@ public class AuctionController {
 		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = FilterListRequest.class)))
 		@RequestBody FilterListRequest filterListRequest,
 		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
-		Pageable pageable) {
+			Pageable pageable) {
 		return ResponseEntity.ok(auctionService.readList(filterListRequest, pageable));
 	}
 
@@ -84,7 +84,7 @@ public class AuctionController {
 	@Operation(summary = "경매 주문 상세 조회 (배송지)")
 	@ApiResponse(description = "주문 상세 (배송지)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailAddress.class)))
 	public ResponseEntity<AuctionOrderDetailAddress> getAddressInfo(
-		@Parameter(hidden = true) Member member){
+		@Parameter(hidden = true) Member member) {
 		return ResponseEntity.ok(auctionService.getAddressInfo(member));
 	}
 
@@ -93,7 +93,7 @@ public class AuctionController {
 	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailItem.class)))
 	public ResponseEntity<AuctionOrderDetailItem> getItemInfo(
 		@Parameter(description = "경매 아이디") Long auctionId,
-		@Parameter(description = "상품 아이디") Long itemId){
+		@Parameter(description = "상품 아이디") Long itemId) {
 		return ResponseEntity.ok(auctionService.getItemInfo(auctionId, itemId));
 	}
 
@@ -101,7 +101,7 @@ public class AuctionController {
 	@Operation(summary = "경매 주문 상세 조회 (주문상품)")
 	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailPaymentAmount.class)))
 	public ResponseEntity<AuctionOrderDetailPaymentAmount> getPaymentAmount(
-		@Parameter(description = "경매 아이디") Long auctionId){
+		@Parameter(description = "경매 아이디") Long auctionId) {
 		return ResponseEntity.ok(auctionService.getPaymentAmount(auctionId));
 	}
 }

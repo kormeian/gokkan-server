@@ -149,7 +149,8 @@ public class AuctionDto {
 	@Getter
 	@Builder
 	@Schema(name = "주문 상세 (배송지)")
-	public static class AuctionOrderDetailAddress{
+	public static class AuctionOrderDetailAddress {
+
 		private String name;
 		private String phoneNumber;
 		private String address;
@@ -159,7 +160,8 @@ public class AuctionDto {
 	@Getter
 	@Builder
 	@Schema(name = "주문 상세 (주문 상품)")
-	public static class AuctionOrderDetailItem{
+	public static class AuctionOrderDetailItem {
+
 		private Long id;
 		private Long itemId;
 		private String itemName;
@@ -170,7 +172,8 @@ public class AuctionDto {
 	@Getter
 	@Builder
 	@Schema(name = "주문 상세 (결제 금액)")
-	public static class AuctionOrderDetailPaymentAmount{
+	public static class AuctionOrderDetailPaymentAmount {
+
 		private Long hammerPrice;
 		private Long fee;
 		private Long paymentAmount;
