@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.auction.domain.dto;
 
+import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -129,4 +130,52 @@ public class AuctionDto {
 		}
 	}
 
+	@Getter
+	@Builder
+	@Schema(name = "낙찰된 경매 상세 정보 response")
+	public static class SuccessfulBidListResponse {
+
+		private Long id;
+		private Long itemId;
+		private String name;
+		private String thumbnail;
+		private Long currentPrice;
+		private String writer;
+		private LocalDateTime auctionEndDateTime;
+		private AuctionStatus auctionStatus;
+
+	}
+
+	@Getter
+	@Builder
+	@Schema(name = "주문 상세 (배송지)")
+	public static class AuctionOrderDetailAddress {
+
+		private String name;
+		private String phoneNumber;
+		private String address;
+		private String addressDetail;
+	}
+
+	@Getter
+	@Builder
+	@Schema(name = "주문 상세 (주문 상품)")
+	public static class AuctionOrderDetailItem {
+
+		private Long id;
+		private Long itemId;
+		private String itemName;
+		private String thumbnail;
+		private Long price;
+	}
+
+	@Getter
+	@Builder
+	@Schema(name = "주문 상세 (결제 금액)")
+	public static class AuctionOrderDetailPaymentAmount {
+
+		private Long hammerPrice;
+		private Long fee;
+		private Long paymentAmount;
+	}
 }

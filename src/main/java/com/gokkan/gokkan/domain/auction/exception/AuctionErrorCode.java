@@ -16,7 +16,8 @@ public enum AuctionErrorCode implements ErrorCode {
 	AUCTION_FAILED_TO_GET_LOCK(HttpStatus.BAD_REQUEST, "경매에 입찰하는데 실패했습니다."),
 	AUCTION_ALREADY_BID(HttpStatus.BAD_REQUEST, "이미 입찰한 경매입니다."),
 	AUCTION_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 내역을 찾을 수 없습니다."),
-	AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT(HttpStatus.BAD_REQUEST, "호가 단위 이하의 금액입니다.");
+	AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT(HttpStatus.BAD_REQUEST, "호가 단위 이하의 금액입니다."),
+	AUCTION_STATUS_IS_NOT_WAIT_PAYMENT(HttpStatus.BAD_REQUEST, "결제 대기 중인 경매가 아닙니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
