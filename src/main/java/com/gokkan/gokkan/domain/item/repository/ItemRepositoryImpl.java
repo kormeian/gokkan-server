@@ -46,6 +46,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 					item.thumbnail,
 					item.member.nickName,
 					item.state,
+					item.startPrice,
 					item.created,
 					item.updated))
 			.from(item)
@@ -73,6 +74,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 				item.thumbnail,
 				item.member.nickName,
 				item.state,
+				item.startPrice,
 				item.created,
 				item.updated))
 			.from(item)
