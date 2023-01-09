@@ -12,6 +12,7 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
 import com.gokkan.gokkan.domain.member.domain.Member;
+import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -76,7 +77,7 @@ public class AuctionController {
 	@Operation(summary = "낙찰 된 경매 조회", description = "낙찰 된 경매 조회")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = SuccessfulBidListResponse.class)))
 	public ResponseEntity<List<SuccessfulBidListResponse>> waitPaymentAuctionList(
-		@Parameter(hidden = true) Member member) {
+		@Parameter(hidden = true) @CurrentMember Member member) {
 		return ResponseEntity.ok(auctionService.getWaitPaymentAuctionList(member));
 	}
 
@@ -84,24 +85,24 @@ public class AuctionController {
 	@Operation(summary = "경매 주문 상세 조회 (배송지)")
 	@ApiResponse(description = "주문 상세 (배송지)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailAddress.class)))
 	public ResponseEntity<AuctionOrderDetailAddress> getAddressInfo(
-		@Parameter(hidden = true) Member member) {
+		@Parameter(hidden = true) @CurrentMember Member member) {
 		return ResponseEntity.ok(auctionService.getAddressInfo(member));
 	}
 
 	@GetMapping("/order/item")
-	@Operation(summary = "경매 주문 상세 조회 (주문상품)")
-	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailItem.class)))
+	@Operation(summary = "경매 주문 상세 조회 (주문 상품)")
+	@ApiResponse(description = "주문 상세 (주문 상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailItem.class)))
 	public ResponseEntity<AuctionOrderDetailItem> getItemInfo(
-		@Parameter(description = "경매 아이디") Long auctionId,
-		@Parameter(description = "상품 아이디") Long itemId) {
+		@Parameter(description = "경매 아이디") @RequestParam Long auctionId,
+		@Parameter(description = "상품 아이디") @RequestParam Long itemId) {
 		return ResponseEntity.ok(auctionService.getItemInfo(auctionId, itemId));
 	}
 
 	@GetMapping("/order/pay")
-	@Operation(summary = "경매 주문 상세 조회 (주문상품)")
-	@ApiResponse(description = "주문 상세 (주문상품)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailPaymentAmount.class)))
+	@Operation(summary = "경매 주문 상세 조회 (결제 금액)")
+	@ApiResponse(description = "주문 상세 (결제 금액)", content = @Content(schema = @Schema(implementation = AuctionOrderDetailPaymentAmount.class)))
 	public ResponseEntity<AuctionOrderDetailPaymentAmount> getPaymentAmount(
-		@Parameter(description = "경매 아이디") Long auctionId) {
+		@Parameter(description = "경매 아이디") @RequestParam Long auctionId) {
 		return ResponseEntity.ok(auctionService.getPaymentAmount(auctionId));
 	}
 }
