@@ -44,8 +44,6 @@ public class MemberService {
 			String saveImage = awsS3Service.save(profileImage);
 			member.setProfileImageUrl(saveImage);
 			log.info("프로필 이미지 수정 완료");
-		} else {
-			member.setProfileImageUrl(member.getProfileImageUrl());
 		}
 
 		memberRepository.save(member);
