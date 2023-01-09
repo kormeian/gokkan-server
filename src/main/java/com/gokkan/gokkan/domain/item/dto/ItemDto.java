@@ -286,6 +286,8 @@ public class ItemDto {
 		private String writer;
 		private String state;
 
+		private Long startPrice;
+
 		private LocalDateTime created;
 		private LocalDateTime updated;
 
@@ -296,6 +298,7 @@ public class ItemDto {
 			String thumbnail,
 			String writer,
 			State state,
+			Long startPrice,
 			LocalDateTime created,
 			LocalDateTime updated) {
 			this.id = id;
@@ -303,6 +306,7 @@ public class ItemDto {
 			this.thumbnail = thumbnail;
 			this.writer = writer;
 			this.state = state.getDescription();
+			this.startPrice = startPrice;
 			this.created = created;
 			this.updated = updated;
 		}
