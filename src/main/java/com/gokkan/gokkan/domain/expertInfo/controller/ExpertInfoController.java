@@ -63,4 +63,11 @@ public class ExpertInfoController {
 		return ResponseEntity.ok(expertInfoService.getExpertInfo(member));
 	}
 
+	@GetMapping("/is-expert")
+	@Operation(summary = "전문가 여부 조회", description = "전문가 여부 조회")
+	public ResponseEntity<Boolean> isExpert(
+		@Parameter(hidden = true) @CurrentMember Member member) {
+		return ResponseEntity.ok(expertInfoService.isExpert(member));
+	}
+
 }

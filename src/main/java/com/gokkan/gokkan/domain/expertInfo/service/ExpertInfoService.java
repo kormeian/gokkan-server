@@ -84,4 +84,7 @@ public class ExpertInfoService {
 			.orElseThrow(() -> new RestApiException(ExpertInfoErrorCode.EXPERT_INFO_NOT_FOUND));
 	}
 
+	public boolean isExpert(Member member) {
+		return expertInfoRepository.existsByMemberId(member.getId());
+	}
 }
