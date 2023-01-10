@@ -65,12 +65,15 @@ public class AuctionController {
 		Long minPrice,
 		@Parameter(description = "필터링 최대 가격", required = true, example = "/filter-list?maxPrice=10000")
 		Long maxPrice,
+		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
+		String sort,
 		@ParameterObject Pageable pageable) {
 		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
 				.category(category)
 				.styles(styles)
 				.minPrice(minPrice)
 				.maxPrice(maxPrice)
+				.sort(sort)
 				.build(),
 			pageable));
 	}
