@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SortType {
 
-	DESC("마감 시간 역순"),
-	ASC("마감 시간 역순");
+	ASC("마감임박순"),
+	DESC("신규등록순");
 
 	private final String description;
 
