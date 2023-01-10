@@ -31,7 +31,6 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 수정 request")
 	public static class UpdateRequest {
 
 		@NotNull(message = "itemId 는 null 일 수 없습니다.")
@@ -105,7 +104,6 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 detail response")
 	public static class Response {
 
 		private Long id;
@@ -197,7 +195,6 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "경매 전용 상품 detail response")
 	public static class ResponseForAuction {
 
 		private Long id;
@@ -274,7 +271,6 @@ public class ItemDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "상품 List 주요 정보 response")
 	public static class ListResponse {
 
 		private Long id;

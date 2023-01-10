@@ -21,7 +21,6 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "카테고리 생성시 필요한 request")
 	public static class CreateRequest {
 
 		@NotNull(message = "카테고리 name 은 null 일 수 없습니다.")
@@ -43,7 +42,6 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "카테고리 수정시 필요한 request")
 	public static class UpdateRequest {
 
 		@NotNull(message = "카테고리 id 은 null 일 수 없습니다.")
@@ -63,7 +61,6 @@ public class CategoryDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "카테고리 response")
 	public static class Response {
 
 		private Long id;

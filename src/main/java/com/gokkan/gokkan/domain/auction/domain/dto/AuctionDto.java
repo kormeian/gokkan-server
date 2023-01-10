@@ -49,12 +49,10 @@ public class AuctionDto {
 	@AllArgsConstructor
 	@Builder
 	@ToString
-	@Schema(name = "경매 List filter api request")
 	public static class FilterListRequest {
 
 		private String category;
 		private List<String> styles;
-		@Schema(name = "정렬방식", description = "(마감 시간 역순), (마감 시간 정순) 둘 중 하나로 보내주시면 됩니다. 다른 메세지는 오류납니다.")
 		private String sort;
 
 	}
@@ -65,7 +63,6 @@ public class AuctionDto {
 	@AllArgsConstructor
 	@Builder
 	@ToString
-	@Schema(name = "카테고리 유사 경매 5개 List api request")
 	public static class SimilarListRequest {
 
 		private String category;

@@ -11,6 +11,7 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInf
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
+import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,12 +21,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -56,20 +60,30 @@ public class AuctionController {
 	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<?> auctionListFilter(
-		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = FilterListRequest.class)))
-		@RequestBody FilterListRequest filterListRequest,
-		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
-			Pageable pageable) {
-		return ResponseEntity.ok(auctionService.readList(filterListRequest, pageable));
+		@Parameter(description = "카테고리 name", required = true, example = "/filter-list?category=의자")
+		String category,
+		@Parameter(description = "style name", required = true, example = "/filter-list?styles=Art Deco, Memphis")
+		List<String> styles,
+		@ParameterObject Pageable pageable) {
+		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
+				.category(category)
+				.styles(styles)
+				.build(),
+			pageable));
 	}
 
 	@GetMapping("/list/similar")
 	@Operation(summary = "카테고리 유사 경매 list", description = "카테고리 유사 경매 list 5개 주요 정보")
 	@ApiResponse(description = "카테고리 유사 경매 list 5개 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<List<ListResponse>> categorySimilarAuctionList(
-		@Parameter(description = "경매 list filter request", required = true, content = @Content(schema = @Schema(implementation = SimilarListRequest.class)))
-		@RequestBody SimilarListRequest similarListRequest) {
-		return ResponseEntity.ok(auctionService.similarList(similarListRequest));
+		@Parameter(description = "카테고리 name", required = true)
+		String category,
+		@Parameter(description = "현재 경매 id -> 이 경매를 제외한 유사 경매 넘겨줌", required = true)
+		Long auctionId) {
+		return ResponseEntity.ok(auctionService.similarList(SimilarListRequest.builder()
+			.category(category)
+			.auctionId(auctionId)
+			.build()));
 	}
 
 	@GetMapping("wait-payment")

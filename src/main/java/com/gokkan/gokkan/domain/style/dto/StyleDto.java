@@ -20,7 +20,6 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "스타일 생성 request")
 	public static class CreateRequest {
 
 		@NotNull(message = "name 은 null 일 수 없습니다.")
@@ -33,7 +32,6 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "스타일 수정 request")
 	public static class UpdateRequest {
 
 		@NotNull(message = "id 은 null 일 수 없습니다.")
@@ -49,7 +47,6 @@ public class StyleDto {
 	@NoArgsConstructor
 	@ToString
 	@Builder
-	@Schema(name = "스타일 response")
 	public static class Response {
 
 		private Long id;
