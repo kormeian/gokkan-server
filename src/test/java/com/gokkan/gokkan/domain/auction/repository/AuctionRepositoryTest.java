@@ -144,7 +144,7 @@ class AuctionRepositoryTest {
 
 		FilterListRequest findNickName2 = getFilterListRequest(Category.builder().build(), null,
 			null, null);
-		;
+
 		findNickName2.setMemberNickName("nickName2");
 		Page<ListResponse> listResponsesNickName2 = auctionRepository.searchAllFilter(findNickName2,
 			PageRequest.of(0, 3));
@@ -276,6 +276,74 @@ class AuctionRepositoryTest {
 		assertEquals(listResponses4.size(), 5);
 		assertFalse(listResponses4.stream().map(ListResponse::getId).collect(Collectors.toSet())
 			.contains(10L));
+	}
+
+	@DisplayName("03_00. searchMyBidAuction")
+	@Test
+	public void test_03_00() {
+		//given
+		Category category1 = getCategory(categoryName1);
+		Category category2 = getCategory(categoryName2);
+		Style style1 = getStyle(this.styleName1);
+		Style style2 = getStyle(this.styleName2);
+		Member member = getMember("member", "member@test.com");
+		member.setNickName("nickName");
+		Member member1 = getMember("member1", "member1@test.com");
+		member1.setNickName("nickName1");
+		Member member2 = getMember("member2", "member2@test.com");
+		member2.setNickName("nickName2");
+		Member member3 = getMember("member3", "member3@test.com");
+		member3.setNickName("nickName3");
+
+		Item item1 = getItem(category1, member, State.COMPLETE);
+		item1.setStyleItems(
+			new ArrayList<>(List.of(getStyleItem(style1, item1))));
+		Item item2 = getItem(category2, member, State.COMPLETE);
+		item2.setStyleItems(
+			new ArrayList<>(List.of(getStyleItem(style2, item2))));
+		Item item3 = getItem(category1, member, State.COMPLETE);
+		item3.setStyleItems(
+			new ArrayList<>(List.of(getStyleItem(style1, item3), getStyleItem(style2, item3))));
+		Item item4 = getItem(category2, member, State.COMPLETE);
+		item4.setStyleItems(
+			new ArrayList<>(List.of(getStyleItem(style1, item4), getStyleItem(style2, item4))));
+
+		ExpertComment expertComment1 = getExpertComment(item1);
+		ExpertComment expertComment2 = getExpertComment(item2);
+		ExpertComment expertComment3 = getExpertComment(item3);
+		ExpertComment expertComment4 = getExpertComment(item4);
+
+		getAuction(expertComment1, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(expertComment2, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(expertComment3, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(expertComment4, member2, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(expertComment1, member2, AuctionStatus.WAIT_PAYMENT, 200L);
+		getAuction(expertComment2, member3, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment3, member3, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment4, member3, AuctionStatus.STARTED, 200L);
+
+		//when
+		Page<ListResponse> myBidAuctionList1 = auctionRepository
+			.searchMyBidAuction(member1.getNickName(), "결제대기", PageRequest.of(0, 3));
+
+		Page<ListResponse> myBidAuctionList2 = auctionRepository
+			.searchMyBidAuction(member2.getNickName(), "결제대기", PageRequest.of(0, 3));
+
+		Page<ListResponse> myBidAuctionList3 = auctionRepository
+			.searchMyBidAuction(member3.getNickName(), "결제대기", PageRequest.of(0, 3));
+
+		//then
+		assertEquals(myBidAuctionList1.getContent().size(), 3);
+		assertEquals(myBidAuctionList1.getTotalElements(), 3);
+		assertEquals(myBidAuctionList1.getTotalPages(), 1);
+
+		assertEquals(myBidAuctionList2.getContent().size(), 2);
+		assertEquals(myBidAuctionList2.getTotalElements(), 2);
+		assertEquals(myBidAuctionList2.getTotalPages(), 1);
+
+		assertEquals(myBidAuctionList3.getContent().size(), 0);
+		assertEquals(myBidAuctionList3.getTotalElements(), 0);
+		assertEquals(myBidAuctionList3.getTotalPages(), 0);
 	}
 
 	private SimilarListRequest getSimilarList(String category, Long id) {
