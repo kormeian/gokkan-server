@@ -11,7 +11,6 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInf
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
-import com.gokkan.gokkan.domain.item.dto.ItemDto.UpdateRequest;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,11 +25,8 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -65,10 +61,16 @@ public class AuctionController {
 		String category,
 		@Parameter(description = "style name", required = true, example = "/filter-list?styles=Art Deco, Memphis")
 		List<String> styles,
+		@Parameter(description = "필터링 최저 가격", required = true, example = "/filter-list?minPrice=10")
+		Long minPrice,
+		@Parameter(description = "필터링 최대 가격", required = true, example = "/filter-list?maxPrice=10000")
+		Long maxPrice,
 		@ParameterObject Pageable pageable) {
 		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
 				.category(category)
 				.styles(styles)
+				.minPrice(minPrice)
+				.maxPrice(maxPrice)
 				.build(),
 			pageable));
 	}
