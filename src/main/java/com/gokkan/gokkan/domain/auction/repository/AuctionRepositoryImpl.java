@@ -49,6 +49,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
+				minPrice(filterListRequest.getMinPrice()),
+				maxPrice(filterListRequest.getMaxPrice()),
 				auction.endDateTime.after(LocalDateTime.now())
 			)
 			.groupBy(auction)
@@ -68,6 +70,8 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
+				minPrice(filterListRequest.getMinPrice()),
+				maxPrice(filterListRequest.getMaxPrice()),
 				auction.endDateTime.after(LocalDateTime.now())
 			);
 
@@ -123,5 +127,19 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 		}
 
 		return booleanBuilder;
+	}
+
+	private BooleanBuilder minPrice(Long minPrice) {
+		if (minPrice == null) {
+			return null;
+		}
+		return new BooleanBuilder().or(auction.currentPrice.between(minPrice, Long.MAX_VALUE));
+	}
+
+	private BooleanBuilder maxPrice(Long maxPrice) {
+		if (maxPrice == null) {
+			return null;
+		}
+		return new BooleanBuilder().or(auction.currentPrice.between(-1, maxPrice));
 	}
 }
