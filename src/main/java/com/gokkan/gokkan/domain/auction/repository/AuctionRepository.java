@@ -2,7 +2,6 @@ package com.gokkan.gokkan.domain.auction.repository;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
-import com.gokkan.gokkan.domain.member.domain.Member;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +12,4 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, Auction
 
 	List<Auction> findAllByEndDateTimeLessThanEqualAndAuctionStatusEquals(
 		LocalDateTime currentDateTime, AuctionStatus auctionStatus);
-
-	List<Auction> findAllByAuctionStatusEqualsAndMemberEquals(AuctionStatus auctionStatus,
-		Member member);
 }
