@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.auction.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.FilterListRequest;
@@ -122,7 +123,28 @@ class AuctionRepositoryTest {
 		Page<ListResponse> listResponses44 = auctionRepository.searchAllFilter(
 			getFilterListRequest(category2, null, 150L, null), PageRequest.of(0, 1));
 
+		FilterListRequest asc = getFilterListRequest(Category.builder().build(), null,
+			null, null);
+		asc.setSort("신규등록순");
+		Page<ListResponse> listResponsesAllASC = auctionRepository.searchAllFilter(asc,
+			PageRequest.of(0, 10));
+
+		FilterListRequest desc = getFilterListRequest(Category.builder().build(), null,
+			null, null);
+		desc.setSort("마감임박순");
+		Page<ListResponse> listResponsesAllDESC = auctionRepository.searchAllFilter(desc,
+			PageRequest.of(0, 10));
+
 		//then
+		for (int i = 0; i < listResponsesAllASC.getContent().size() - 1; i++) {
+			assertTrue(listResponsesAllASC.getContent().get(i).getAuctionEndDateTime()
+				.isAfter(listResponsesAllASC.getContent().get(i + 1).getAuctionEndDateTime()));
+		}
+
+		for (int i = 0; i < listResponsesAllDESC.getContent().size() - 1; i++) {
+			assertTrue(listResponsesAllDESC.getContent().get(i).getAuctionEndDateTime()
+				.isBefore(listResponsesAllDESC.getContent().get(i + 1).getAuctionEndDateTime()));
+		}
 		assertEquals(listResponses1.getContent().size(), 1);
 		assertEquals(listResponses1.getTotalElements(), 4);
 		assertEquals(listResponses1.getTotalPages(), 4);
@@ -262,11 +284,11 @@ class AuctionRepositoryTest {
 	private FilterListRequest getFilterListRequest(Category category1, List<String> styleNames,
 		Long min, Long max) {
 		return FilterListRequest.builder()
-			.sort("마감 시간 역순")
 			.styles(styleNames)
 			.category(category1.getName())
 			.minPrice(min)
 			.maxPrice(max)
+			.sort("마감임박순")
 			.build();
 	}
 
