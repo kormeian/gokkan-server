@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.style.dto;
 
 import com.gokkan.gokkan.domain.style.domain.Style;
-import io.swagger.v3.oas.annotations.media.Schema;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

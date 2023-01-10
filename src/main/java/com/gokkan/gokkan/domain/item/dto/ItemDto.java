@@ -9,7 +9,6 @@ import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.type.State;
 import com.gokkan.gokkan.domain.style.domain.StyleItem;
 import com.querydsl.core.annotations.QueryProjection;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
