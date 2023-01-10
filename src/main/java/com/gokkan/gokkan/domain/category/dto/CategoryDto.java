@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.category.dto;
 
 import com.gokkan.gokkan.domain.category.domain.Category;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
