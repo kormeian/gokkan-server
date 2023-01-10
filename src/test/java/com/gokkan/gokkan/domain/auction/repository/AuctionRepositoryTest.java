@@ -90,41 +90,70 @@ class AuctionRepositoryTest {
 		ExpertComment expertComment3 = getExpertComment(item3);
 		ExpertComment expertComment4 = getExpertComment(item4);
 
-		getAuction(expertComment1, member, AuctionStatus.STARTED);
-		getAuction(expertComment2, member, AuctionStatus.STARTED);
-		getAuction(expertComment3, member, AuctionStatus.STARTED);
-		getAuction(expertComment4, member, AuctionStatus.STARTED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
+		getAuction(expertComment1, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment2, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment3, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment1, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment2, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment3, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment4, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
 
 		//when
 		Page<ListResponse> listResponses1 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category1, List.of(styleName1)), PageRequest.of(0, 1));
+			getFilterListRequest(category1, List.of(styleName1), null, null), PageRequest.of(0, 1));
 		Page<ListResponse> listResponses2 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category2, List.of(styleName2)), PageRequest.of(0, 1));
+			getFilterListRequest(category2, List.of(styleName2), null, null), PageRequest.of(0, 1));
 		Page<ListResponse> listResponses3 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category1, null), PageRequest.of(0, 1));
+			getFilterListRequest(category1, null, null, null), PageRequest.of(0, 1));
 		Page<ListResponse> listResponses4 = auctionRepository.searchAllFilter(
-			getFilterListRequest(category2, null), PageRequest.of(0, 1));
+			getFilterListRequest(category2, null, null, null), PageRequest.of(0, 1));
+
+		Page<ListResponse> listResponses11 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category1, List.of(styleName1), 0L, 100L), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses22 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category2, List.of(styleName2), 101L, 200L), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses33 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category1, null, null, 100L), PageRequest.of(0, 1));
+		Page<ListResponse> listResponses44 = auctionRepository.searchAllFilter(
+			getFilterListRequest(category2, null, 150L, null), PageRequest.of(0, 1));
 
 		//then
 		assertEquals(listResponses1.getContent().size(), 1);
-		assertEquals(listResponses1.getTotalElements(), 2);
-		assertEquals(listResponses1.getTotalPages(), 2);
+		assertEquals(listResponses1.getTotalElements(), 4);
+		assertEquals(listResponses1.getTotalPages(), 4);
+
+		assertEquals(listResponses11.getContent().size(), 1);
+		assertEquals(listResponses11.getTotalElements(), 2);
+		assertEquals(listResponses11.getTotalPages(), 2);
 
 		assertEquals(listResponses2.getContent().size(), 1);
-		assertEquals(listResponses2.getTotalElements(), 2);
-		assertEquals(listResponses2.getTotalPages(), 2);
+		assertEquals(listResponses2.getTotalElements(), 4);
+		assertEquals(listResponses2.getTotalPages(), 4);
+
+		assertEquals(listResponses22.getContent().size(), 1);
+		assertEquals(listResponses22.getTotalElements(), 2);
+		assertEquals(listResponses22.getTotalPages(), 2);
 
 		assertEquals(listResponses3.getContent().size(), 1);
-		assertEquals(listResponses3.getTotalElements(), 2);
-		assertEquals(listResponses3.getTotalPages(), 2);
+		assertEquals(listResponses3.getTotalElements(), 4);
+		assertEquals(listResponses3.getTotalPages(), 4);
+
+		assertEquals(listResponses33.getContent().size(), 1);
+		assertEquals(listResponses33.getTotalElements(), 2);
+		assertEquals(listResponses33.getTotalPages(), 2);
 
 		assertEquals(listResponses4.getContent().size(), 1);
-		assertEquals(listResponses4.getTotalElements(), 2);
-		assertEquals(listResponses4.getTotalPages(), 2);
+		assertEquals(listResponses4.getTotalElements(), 4);
+		assertEquals(listResponses4.getTotalPages(), 4);
+
+		assertEquals(listResponses44.getContent().size(), 1);
+		assertEquals(listResponses44.getTotalElements(), 2);
+		assertEquals(listResponses44.getTotalPages(), 2);
 	}
 
 	@DisplayName("02_00. searchAllSimilar")
@@ -161,22 +190,22 @@ class AuctionRepositoryTest {
 		ExpertComment expertComment11 = getExpertComment(item11);
 		ExpertComment expertComment12 = getExpertComment(item12);
 
-		getAuction(expertComment1, member, AuctionStatus.STARTED);
-		getAuction(expertComment2, member, AuctionStatus.STARTED);
-		getAuction(expertComment3, member, AuctionStatus.STARTED);
-		getAuction(expertComment4, member, AuctionStatus.STARTED);
-		getAuction(expertComment5, member, AuctionStatus.STARTED);
-		getAuction(expertComment6, member, AuctionStatus.STARTED);
-		getAuction(expertComment7, member, AuctionStatus.STARTED);
-		getAuction(expertComment8, member, AuctionStatus.STARTED);
-		getAuction(expertComment9, member, AuctionStatus.STARTED);
-		getAuction(expertComment10, member, AuctionStatus.STARTED);
-		getAuction(expertComment11, member, AuctionStatus.STARTED);
-		getAuction(expertComment12, member, AuctionStatus.STARTED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
-		getAuction(expertComment4, member, AuctionStatus.ENDED);
+		getAuction(expertComment1, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment2, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment3, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment5, member, AuctionStatus.STARTED, 100L);
+		getAuction(expertComment6, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment7, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment8, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment9, member, AuctionStatus.STARTED, 200L);
+		getAuction(expertComment10, member, AuctionStatus.STARTED, 300L);
+		getAuction(expertComment11, member, AuctionStatus.STARTED, 300L);
+		getAuction(expertComment12, member, AuctionStatus.STARTED, 300L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
 		System.out.println("====================================================================");
 		System.out.println("====================================================================");
 		System.out.println("====================================================================");
@@ -230,23 +259,26 @@ class AuctionRepositoryTest {
 			.build();
 	}
 
-	private FilterListRequest getFilterListRequest(Category category1, List<String> styleNames) {
+	private FilterListRequest getFilterListRequest(Category category1, List<String> styleNames,
+		Long min, Long max) {
 		return FilterListRequest.builder()
 			.sort("마감 시간 역순")
 			.styles(styleNames)
 			.category(category1.getName())
+			.minPrice(min)
+			.maxPrice(max)
 			.build();
 	}
 
 
 	private Auction getAuction(ExpertComment expertComment, Member member,
-		AuctionStatus auctionStatus) {
+		AuctionStatus auctionStatus, Long price) {
 		return auctionRepository.save(
 			Auction.builder()
 				.startDateTime(LocalDateTime.now())
 				.endDateTime(LocalDateTime.now().plus(1, ChronoUnit.DAYS))
 				.startPrice(100L)
-				.currentPrice(200L)
+				.currentPrice(price)
 				.auctionStatus(auctionStatus)
 				.expertComment(expertComment)
 				.member(member)
