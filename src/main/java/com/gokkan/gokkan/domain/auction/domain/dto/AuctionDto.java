@@ -75,6 +75,7 @@ public class AuctionDto {
 	@Getter
 	@Setter
 	@NoArgsConstructor
+	@AllArgsConstructor
 	@ToString
 	@Builder
 	@Schema(name = "경매 List filter api 주요 정보 response")
@@ -90,6 +91,7 @@ public class AuctionDto {
 		private Long currentPrice;
 
 		private String writer;
+		private String auctionState;
 
 		private LocalDateTime auctionEndDateTime;
 
@@ -101,6 +103,7 @@ public class AuctionDto {
 			String thumbnail,
 			Long currentPrice,
 			String writer,
+			AuctionStatus auctionState,
 			LocalDateTime auctionEndDateTime
 		) {
 			this.id = id;
@@ -109,6 +112,7 @@ public class AuctionDto {
 			this.currentPrice = currentPrice;
 			this.thumbnail = thumbnail;
 			this.writer = writer;
+			this.auctionState = auctionState.getDescription();
 			this.auctionEndDateTime = auctionEndDateTime;
 		}
 
@@ -128,22 +132,6 @@ public class AuctionDto {
 			this.thumbnail = thumbnail;
 			this.writer = writer;
 		}
-	}
-
-	@Getter
-	@Builder
-	@Schema(name = "낙찰된 경매 상세 정보 response")
-	public static class SuccessfulBidListResponse {
-
-		private Long id;
-		private Long itemId;
-		private String name;
-		private String thumbnail;
-		private Long currentPrice;
-		private String writer;
-		private LocalDateTime auctionEndDateTime;
-		private AuctionStatus auctionStatus;
-
 	}
 
 	@Getter
