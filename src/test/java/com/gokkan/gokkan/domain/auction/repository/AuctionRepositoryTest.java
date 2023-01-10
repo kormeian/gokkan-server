@@ -72,6 +72,7 @@ class AuctionRepositoryTest {
 		Style style1 = getStyle(this.styleName1);
 		Style style2 = getStyle(this.styleName2);
 		Member member = getMember("member", "member@test.com");
+		member.setNickName("nickName");
 
 		Item item1 = getItem(category1, member, State.COMPLETE);
 		item1.setStyleItems(
@@ -135,47 +136,70 @@ class AuctionRepositoryTest {
 		Page<ListResponse> listResponsesAllDESC = auctionRepository.searchAllFilter(desc,
 			PageRequest.of(0, 10));
 
+		FilterListRequest findNickName = getFilterListRequest(Category.builder().build(), null,
+			null, null);
+		findNickName.setMemberNickName("nickName");
+		Page<ListResponse> listResponsesNickName = auctionRepository.searchAllFilter(findNickName,
+			PageRequest.of(0, 3));
+
+		FilterListRequest findNickName2 = getFilterListRequest(Category.builder().build(), null,
+			null, null);
+		;
+		findNickName2.setMemberNickName("nickName2");
+		Page<ListResponse> listResponsesNickName2 = auctionRepository.searchAllFilter(findNickName2,
+			PageRequest.of(0, 3));
+
 		//then
+		//카테고리, 스타일 필터링 테스트1
+		assertEquals(listResponses1.getContent().size(), 1);
+		assertEquals(listResponses1.getTotalElements(), 4);
+		assertEquals(listResponses1.getTotalPages(), 4);
+		//최저가, 최대가 필터링 테스트1
+		assertEquals(listResponses11.getContent().size(), 1);
+		assertEquals(listResponses11.getTotalElements(), 2);
+		assertEquals(listResponses11.getTotalPages(), 2);
+		//카테고리, 스타일  필터링 테스트2
+		assertEquals(listResponses2.getContent().size(), 1);
+		assertEquals(listResponses2.getTotalElements(), 4);
+		assertEquals(listResponses2.getTotalPages(), 4);
+		//최저가, 최대가 필터링 테스트2
+		assertEquals(listResponses22.getContent().size(), 1);
+		assertEquals(listResponses22.getTotalElements(), 2);
+		assertEquals(listResponses22.getTotalPages(), 2);
+		//카테고리, 스타일  필터링 테스트3
+		assertEquals(listResponses3.getContent().size(), 1);
+		assertEquals(listResponses3.getTotalElements(), 4);
+		assertEquals(listResponses3.getTotalPages(), 4);
+		//최저가, 최대가 필터링 테스트2
+		assertEquals(listResponses33.getContent().size(), 1);
+		assertEquals(listResponses33.getTotalElements(), 2);
+		assertEquals(listResponses33.getTotalPages(), 2);
+		//카테고리, 스타일  필터링 테스트4
+		assertEquals(listResponses4.getContent().size(), 1);
+		assertEquals(listResponses4.getTotalElements(), 4);
+		assertEquals(listResponses4.getTotalPages(), 4);
+		//최저가, 최대가 필터링 테스트2
+		assertEquals(listResponses44.getContent().size(), 1);
+		assertEquals(listResponses44.getTotalElements(), 2);
+		assertEquals(listResponses44.getTotalPages(), 2);
+		//정렬 신규등록순 테스트
 		for (int i = 0; i < listResponsesAllASC.getContent().size() - 1; i++) {
 			assertTrue(listResponsesAllASC.getContent().get(i).getAuctionEndDateTime()
 				.isAfter(listResponsesAllASC.getContent().get(i + 1).getAuctionEndDateTime()));
 		}
-
+		//정렬 마감임박순 테스트
 		for (int i = 0; i < listResponsesAllDESC.getContent().size() - 1; i++) {
 			assertTrue(listResponsesAllDESC.getContent().get(i).getAuctionEndDateTime()
 				.isBefore(listResponsesAllDESC.getContent().get(i + 1).getAuctionEndDateTime()));
 		}
-		assertEquals(listResponses1.getContent().size(), 1);
-		assertEquals(listResponses1.getTotalElements(), 4);
-		assertEquals(listResponses1.getTotalPages(), 4);
+		// 특정 맴버 경매 테스트
+		assertEquals(listResponsesNickName.getContent().size(), 3);
+		assertEquals(listResponsesNickName.getTotalElements(), 8);
+		assertEquals(listResponsesNickName.getTotalPages(), 3);
 
-		assertEquals(listResponses11.getContent().size(), 1);
-		assertEquals(listResponses11.getTotalElements(), 2);
-		assertEquals(listResponses11.getTotalPages(), 2);
-
-		assertEquals(listResponses2.getContent().size(), 1);
-		assertEquals(listResponses2.getTotalElements(), 4);
-		assertEquals(listResponses2.getTotalPages(), 4);
-
-		assertEquals(listResponses22.getContent().size(), 1);
-		assertEquals(listResponses22.getTotalElements(), 2);
-		assertEquals(listResponses22.getTotalPages(), 2);
-
-		assertEquals(listResponses3.getContent().size(), 1);
-		assertEquals(listResponses3.getTotalElements(), 4);
-		assertEquals(listResponses3.getTotalPages(), 4);
-
-		assertEquals(listResponses33.getContent().size(), 1);
-		assertEquals(listResponses33.getTotalElements(), 2);
-		assertEquals(listResponses33.getTotalPages(), 2);
-
-		assertEquals(listResponses4.getContent().size(), 1);
-		assertEquals(listResponses4.getTotalElements(), 4);
-		assertEquals(listResponses4.getTotalPages(), 4);
-
-		assertEquals(listResponses44.getContent().size(), 1);
-		assertEquals(listResponses44.getTotalElements(), 2);
-		assertEquals(listResponses44.getTotalPages(), 2);
+		assertEquals(listResponsesNickName2.getContent().size(), 0);
+		assertEquals(listResponsesNickName2.getTotalElements(), 0);
+		assertEquals(listResponsesNickName2.getTotalPages(), 0);
 	}
 
 	@DisplayName("02_00. searchAllSimilar")
@@ -228,36 +252,16 @@ class AuctionRepositoryTest {
 		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
 		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
 		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
-		System.out.println("====================================================================");
 
 		//when
 		List<ListResponse> listResponses1 = auctionRepository.searchAllSimilar(
 			getSimilarList(categoryName1, 5L));
-		System.out.println(
-			listResponses1.stream().map(ListResponse::getId).collect(Collectors.toList()));
 		List<ListResponse> listResponses2 = auctionRepository.searchAllSimilar(
 			getSimilarList(categoryName1, 4L));
-		System.out.println(
-			listResponses2.stream().map(ListResponse::getId).collect(Collectors.toList()));
 		List<ListResponse> listResponses3 = auctionRepository.searchAllSimilar(
 			getSimilarList(categoryName2, 12L));
-		System.out.println(
-			listResponses3.stream().map(ListResponse::getId).collect(Collectors.toList()));
 		List<ListResponse> listResponses4 = auctionRepository.searchAllSimilar(
 			getSimilarList(categoryName2, 10L));
-		System.out.println(
-			listResponses4.stream().map(ListResponse::getId).collect(Collectors.toList()));
 
 		//then
 		assertEquals(listResponses1.size(), 5);

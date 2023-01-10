@@ -39,7 +39,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 					item.name,
 					item.thumbnail,
 					auction.currentPrice,
-					item.member.name,
+					item.member.nickName,
 					auction.endDateTime
 				)
 			).from(auction)
@@ -51,6 +51,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
+				eqMemberNickName(filterListRequest.getMemberNickName()),
 				auction.endDateTime.after(LocalDateTime.now())
 			)
 			.groupBy(auction)
@@ -71,6 +72,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
+				eqMemberNickName(filterListRequest.getMemberNickName()),
 				auction.endDateTime.after(LocalDateTime.now())
 			);
 
@@ -127,6 +129,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
 		return booleanBuilder;
 	}
+
+	private BooleanBuilder eqMemberNickName(String memberNickName) {
+		if (memberNickName == null) {
+			return null;
+		}
+		return new BooleanBuilder().or(auction.member.nickName.eq(memberNickName));
+	}
+
 
 	private BooleanBuilder minMaxPrice(Long minPrice, Long maxPrice) {
 		if (maxPrice == null && minPrice == null) {

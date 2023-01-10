@@ -57,13 +57,13 @@ public class AuctionController {
 	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<?> auctionListFilter(
-		@Parameter(description = "카테고리 name", required = false, example = "/filter-list?category=의자")
+		@Parameter(description = "카테고리 name", example = "/filter-list?category=의자")
 		String category,
-		@Parameter(description = "style name", required = false, example = "/filter-list?styles=Art Deco, Memphis")
+		@Parameter(description = "style name", example = "/filter-list?styles=Art Deco, Memphis")
 		List<String> styles,
-		@Parameter(description = "필터링 최저 가격", required = false, example = "/filter-list?minPrice=10")
+		@Parameter(description = "필터링 최저 가격", example = "/filter-list?minPrice=10")
 		Long minPrice,
-		@Parameter(description = "필터링 최대 가격", required = false, example = "/filter-list?maxPrice=10000")
+		@Parameter(description = "필터링 최대 가격", example = "/filter-list?maxPrice=10000")
 		Long maxPrice,
 		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
 		String sort,
@@ -90,6 +90,35 @@ public class AuctionController {
 			.category(category)
 			.auctionId(auctionId)
 			.build()));
+	}
+
+	@GetMapping("/list/member")
+	@Operation(summary = "특정 유자가 올린 경매 list", description = "해당 유저가 올린 경매 list paging 처리해서 반환")
+	@ApiResponse(description = "해당 유저가 올린 경매 list paging 처리해서 반환", content = @Content(schema = @Schema(implementation = ListResponse.class)))
+	public ResponseEntity<?> auctionListMember(
+		@Parameter(description = "카테고리 name", example = "/filter-list?category=의자")
+		String category,
+		@Parameter(description = "style name", example = "/filter-list?styles=Art Deco, Memphis")
+		List<String> styles,
+		@Parameter(description = "필터링 최저 가격", example = "/filter-list?minPrice=10")
+		Long minPrice,
+		@Parameter(description = "필터링 최대 가격", example = "/filter-list?maxPrice=10000")
+		Long maxPrice,
+		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
+		String sort,
+		@Parameter(description = "찾고 싶은 유저의 닉네임", required = true, example = "/list/member?nickName=")
+		String nickName,
+		@ParameterObject Pageable pageable) {
+
+		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
+				.category(category)
+				.styles(styles)
+				.minPrice(minPrice)
+				.maxPrice(maxPrice)
+				.sort(sort)
+				.memberNickName(nickName)
+				.build(),
+			pageable));
 	}
 
 	@GetMapping("wait-payment")
