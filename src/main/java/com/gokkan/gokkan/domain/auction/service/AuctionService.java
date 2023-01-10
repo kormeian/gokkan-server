@@ -11,7 +11,6 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
-import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionHistoryRepository;
@@ -84,23 +83,10 @@ public class AuctionService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SuccessfulBidListResponse> getWaitPaymentAuctionList(Member member) {
-		List<Auction> waitPaymentAuctions = auctionRepository.findAllByAuctionStatusEqualsAndMemberEquals(
-			AuctionStatus.WAIT_PAYMENT, member);
-		if (waitPaymentAuctions.isEmpty()) {
-			return new ArrayList<>();
-		}
-		return waitPaymentAuctions.stream()
-			.map(auction -> SuccessfulBidListResponse.builder()
-				.id(auction.getId())
-				.itemId(auction.getExpertComment().getItem().getId())
-				.name(auction.getExpertComment().getItem().getName())
-				.thumbnail(auction.getExpertComment().getItem().getThumbnail())
-				.currentPrice(auction.getCurrentPrice())
-				.writer(auction.getExpertComment().getItem().getMember().getName())
-				.auctionStatus(auction.getAuctionStatus())
-				.build())
-			.collect(Collectors.toList());
+	public Page<ListResponse> myAuctionBidList(Member member,
+		String auctionStatus,
+		Pageable pageable) {
+		return auctionRepository.searchMyBidAuction(member.getNickName(), auctionStatus, pageable);
 	}
 
 	@Transactional(readOnly = true)

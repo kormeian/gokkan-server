@@ -9,7 +9,6 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.AuctionOrderDetail
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionHistory;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.ResponseAuctionInfo;
 import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest;
-import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SuccessfulBidListResponse;
 import com.gokkan.gokkan.domain.auction.service.AuctionService;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.global.security.oauth.token.CurrentMember;
@@ -22,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -121,12 +121,16 @@ public class AuctionController {
 			pageable));
 	}
 
-	@GetMapping("wait-payment")
-	@Operation(summary = "낙찰 된 경매 조회", description = "낙찰 된 경매 조회")
-	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = SuccessfulBidListResponse.class)))
-	public ResponseEntity<List<SuccessfulBidListResponse>> waitPaymentAuctionList(
-		@Parameter(hidden = true) @CurrentMember Member member) {
-		return ResponseEntity.ok(auctionService.getWaitPaymentAuctionList(member));
+	@GetMapping("/list/bid")
+	@Operation(summary = "로그인된 유저의 낙찰, 응찰 된 경매 조회", description = "로그된 유저의 낙찰, 응찰 된 경매 조회")
+	@ApiResponse(description = "경매 주요 정보를 page 처리해서 반환", content = @Content(schema = @Schema(implementation = ListResponse.class)))
+	public ResponseEntity<Page<ListResponse>> myAuctionBidList(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(name = "경매 상태", required = true, example = "/list/wait-payment?auctionStatus=경매중, /list/wait-payment?auctionStatus=마감, /list/wait-payment?auctionStatus=결재대기")
+		@RequestParam String auctionStatus,
+		@ParameterObject Pageable pageable) {
+		return ResponseEntity.ok(
+			auctionService.myAuctionBidList(member, auctionStatus, pageable));
 	}
 
 	@GetMapping("/order/address")

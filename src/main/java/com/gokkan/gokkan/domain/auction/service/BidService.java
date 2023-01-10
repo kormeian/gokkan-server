@@ -172,7 +172,7 @@ public class BidService {
 	}
 
 
-	public List<History> getHistory(Long auctionId) {
+	private List<History> getHistory(Long auctionId) {
 		List<String> StringHistory = redisTemplate.opsForList()
 			.range(String.valueOf(auctionId), 0, -1);
 		if (StringHistory == null || StringHistory.isEmpty()) {
