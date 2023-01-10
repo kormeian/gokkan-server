@@ -16,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,8 +50,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
-				minPrice(filterListRequest.getMinPrice()),
-				maxPrice(filterListRequest.getMaxPrice()),
+				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
 				auction.endDateTime.after(LocalDateTime.now())
 			)
 			.groupBy(auction)
@@ -70,8 +70,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
 				eqCategory(filterListRequest.getCategory()),
 				eqStyle(filterListRequest.getStyles()),
-				minPrice(filterListRequest.getMinPrice()),
-				maxPrice(filterListRequest.getMaxPrice()),
+				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
 				auction.endDateTime.after(LocalDateTime.now())
 			);
 
@@ -129,17 +128,15 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 		return booleanBuilder;
 	}
 
-	private BooleanBuilder minPrice(Long minPrice) {
-		if (minPrice == null) {
+	private BooleanBuilder minMaxPrice(Long minPrice, Long maxPrice) {
+		if (maxPrice == null && minPrice == null) {
 			return null;
 		}
-		return new BooleanBuilder().or(auction.currentPrice.between(minPrice, Long.MAX_VALUE));
-	}
-
-	private BooleanBuilder maxPrice(Long maxPrice) {
-		if (maxPrice == null) {
-			return null;
-		}
-		return new BooleanBuilder().or(auction.currentPrice.between(-1, maxPrice));
+		return new BooleanBuilder()
+			.or(auction.currentPrice.between(
+					Objects.requireNonNullElse(minPrice, -1),
+					Objects.requireNonNullElse(maxPrice, Long.MAX_VALUE)
+				)
+			);
 	}
 }
