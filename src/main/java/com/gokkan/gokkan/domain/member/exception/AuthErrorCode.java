@@ -19,7 +19,9 @@ public enum AuthErrorCode implements ErrorCode {
 	TOKEN_IS_EMPTY(HttpStatus.UNAUTHORIZED, "Token is empty"),
 	REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "Refresh Token invalid"),
 	AUTHORIZATION_HEADER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Authorization header not found"),
-	MISMATCH_SORT_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 정렬타입(sort)입니다.");
+	MISMATCH_SORT_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 정렬타입(sort)입니다."),
+	MISMATCH_AUCTION_STATE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 경매 상태(auctionState)입니다.")
+	;
 
 	private final HttpStatus httpStatus;
 	private final String message;
