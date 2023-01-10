@@ -57,13 +57,13 @@ public class AuctionController {
 	@Operation(summary = "경매 list filter", description = "경매 주요정보 포함한 list")
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<?> auctionListFilter(
-		@Parameter(description = "카테고리 name", required = true, example = "/filter-list?category=의자")
+		@Parameter(description = "카테고리 name", required = false, example = "/filter-list?category=의자")
 		String category,
-		@Parameter(description = "style name", required = true, example = "/filter-list?styles=Art Deco, Memphis")
+		@Parameter(description = "style name", required = false, example = "/filter-list?styles=Art Deco, Memphis")
 		List<String> styles,
-		@Parameter(description = "필터링 최저 가격", required = true, example = "/filter-list?minPrice=10")
+		@Parameter(description = "필터링 최저 가격", required = false, example = "/filter-list?minPrice=10")
 		Long minPrice,
-		@Parameter(description = "필터링 최대 가격", required = true, example = "/filter-list?maxPrice=10000")
+		@Parameter(description = "필터링 최대 가격", required = false, example = "/filter-list?maxPrice=10000")
 		Long maxPrice,
 		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
 		String sort,

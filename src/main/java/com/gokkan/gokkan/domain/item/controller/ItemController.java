@@ -48,9 +48,9 @@ public class ItemController {
 	public ResponseEntity<?> create(
 		@Parameter(description = "상품 생성 정보", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
 		@Validated @RequestPart UpdateRequest request,
-		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
+		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = false)
 		@RequestPart List<MultipartFile> imageItemFiles,
-		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
+		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = false)
 		@RequestPart List<MultipartFile> imageCheckFiles,
 		@Parameter(hidden = true)
 		@CurrentMember Member member) {
@@ -105,9 +105,9 @@ public class ItemController {
 	public ResponseEntity<?> update(
 		@Parameter(description = "상품 수정 정보", required = true, content = @Content(schema = @Schema(implementation = UpdateRequest.class)))
 		@RequestPart UpdateRequest request,
-		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = true)
+		@Parameter(description = "상품 이미지 파일 (여러 파일 업로드 가능)", required = false)
 		@RequestPart List<MultipartFile> imageItemFiles,
-		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = true)
+		@Parameter(description = "검수 이미지 파일 (여러 파일 업로드 가능)", required = false)
 		@RequestPart List<MultipartFile> imageCheckFiles,
 		@Parameter(hidden = true)
 		@CurrentMember Member member) {
@@ -134,7 +134,7 @@ public class ItemController {
 	public ResponseEntity<?> myItems(
 		@Parameter(hidden = true)
 		@CurrentMember Member member,
-		@Parameter(description = "상품 상태 list")
+		@Parameter(description = "상품 상태 list", required = false)
 		@RequestParam List<State> states,
 		@Parameter(description = "페이징처리 요구사항, sort 는 없이 보내면 됩니다. ex) &page=1&size=3", required = true)
 		Pageable pageable) {
