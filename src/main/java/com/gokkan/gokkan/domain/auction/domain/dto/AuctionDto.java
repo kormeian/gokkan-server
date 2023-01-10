@@ -55,6 +55,7 @@ public class AuctionDto {
 		private List<String> styles;
 		private Long minPrice;
 		private Long maxPrice;
+		private String memberNickName;
 		private String sort;
 
 	}
