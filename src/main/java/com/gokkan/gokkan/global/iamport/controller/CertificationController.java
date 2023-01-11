@@ -1,4 +1,4 @@
-package com.gokkan.gokkan.domain.member.controller;
+package com.gokkan.gokkan.global.iamport.controller;
 
 import com.gokkan.gokkan.global.iamport.service.IamportService;
 import io.swagger.v3.oas.annotations.Parameter;

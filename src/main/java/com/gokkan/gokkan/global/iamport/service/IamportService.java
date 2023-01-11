@@ -7,6 +7,7 @@ import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
 import com.gokkan.gokkan.global.iamport.exception.IamportErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -20,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IamportService {
 
 	private final AuctionRepository auctionRepository;
@@ -29,7 +31,7 @@ public class IamportService {
 	private String IMP_SECRET;
 
 	public String getAccessToken() {
-
+		log.info("아임포트 엑세스 토큰 발급");
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 		formData.add("imp_key", IMP_KEY);
 		formData.add("imp_secret", IMP_SECRET);
@@ -52,11 +54,12 @@ public class IamportService {
 		if (accessToken == null) {
 			throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 		}
-
+		log.info("아임포트 엑세스 토큰 발급 완료");
 		return accessToken;
 	}
 
 	public String getPhoneNumber(String imp_uid, String accessToken) {
+		log.info("아임포트 통합인증 휴대폰 번호 조회");
 		WebClient webClient = WebClient.create("https://api.iamport.kr/certifications/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
 		String block = "";
@@ -77,12 +80,13 @@ public class IamportService {
 		} catch (ParseException e) {
 			throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 		}
-
+		log.info("아임포트 통합인증 휴대폰 번호 조회 완료");
 		return phone;
 	}
 
 	@Transactional
 	public void paymentVerify(Long auctionId, String imp_uid, String accessToken) {
+		log.info("아임포트 결제 검증");
 		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
 		String block = "";
@@ -114,9 +118,11 @@ public class IamportService {
 			throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 		}
 		auctionRepository.save(auction);
+		log.info("아임포트 결제 검증 완료");
 	}
 
 	private void paymentCancel(String imp_uid, String accessToken) {
+		log.info("아임포트 결제 취소");
 		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/cancel/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
 		String block = "";
@@ -140,5 +146,6 @@ public class IamportService {
 		} catch (ParseException e) {
 			throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 		}
+		log.info("아임포트 결제 취소 완료");
 	}
 }

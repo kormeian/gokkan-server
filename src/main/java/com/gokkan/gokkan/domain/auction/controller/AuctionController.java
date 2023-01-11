@@ -58,15 +58,15 @@ public class AuctionController {
 	@ApiResponse(description = "경매 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<?> auctionListFilter(
 		@Parameter(description = "카테고리 name", example = "/filter-list?category=의자")
-		String category,
+			String category,
 		@Parameter(description = "style name", example = "/filter-list?styles=Art Deco, Memphis")
-		List<String> styles,
+			List<String> styles,
 		@Parameter(description = "필터링 최저 가격", example = "/filter-list?minPrice=10")
-		Long minPrice,
+			Long minPrice,
 		@Parameter(description = "필터링 최대 가격", example = "/filter-list?maxPrice=10000")
-		Long maxPrice,
+			Long maxPrice,
 		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
-		String sort,
+			String sort,
 		@ParameterObject Pageable pageable) {
 		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
 				.category(category)
@@ -83,9 +83,9 @@ public class AuctionController {
 	@ApiResponse(description = "카테고리 유사 경매 list 5개 주요 정보", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<List<ListResponse>> categorySimilarAuctionList(
 		@Parameter(description = "카테고리 name", required = true)
-		String category,
+			String category,
 		@Parameter(description = "현재 경매 id -> 이 경매를 제외한 유사 경매 넘겨줌", required = true)
-		Long auctionId) {
+			Long auctionId) {
 		return ResponseEntity.ok(auctionService.similarList(SimilarListRequest.builder()
 			.category(category)
 			.auctionId(auctionId)
@@ -97,17 +97,17 @@ public class AuctionController {
 	@ApiResponse(description = "해당 유저가 올린 경매 list paging 처리해서 반환", content = @Content(schema = @Schema(implementation = ListResponse.class)))
 	public ResponseEntity<?> auctionListMember(
 		@Parameter(description = "카테고리 name", example = "/filter-list?category=의자")
-		String category,
+			String category,
 		@Parameter(description = "style name", example = "/filter-list?styles=Art Deco, Memphis")
-		List<String> styles,
+			List<String> styles,
 		@Parameter(description = "필터링 최저 가격", example = "/filter-list?minPrice=10")
-		Long minPrice,
+			Long minPrice,
 		@Parameter(description = "필터링 최대 가격", example = "/filter-list?maxPrice=10000")
-		Long maxPrice,
+			Long maxPrice,
 		@Parameter(description = "정렬 순서", required = true, example = "/filter-list?sort=마감임박순 or /filter-list?sort=신규등록순")
-		String sort,
+			String sort,
 		@Parameter(description = "찾고 싶은 유저의 닉네임", required = true, example = "/list/member?nickName=")
-		String nickName,
+			String nickName,
 		@ParameterObject Pageable pageable) {
 
 		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
