@@ -21,11 +21,10 @@ public class PaymentController {
 
 	@GetMapping
 	@Operation(summary = "결제 검증", description = "결제 검증")
-	public ResponseEntity<Void> paymentVerify(
+	public ResponseEntity<String> paymentVerify(
 		@Parameter(description = "경매 아이디") @RequestParam Long auctionId,
 		@Parameter(description = "결제 후 받아온 imp-uid") @RequestParam String impUid) {
 		String accessToken = iamportService.getAccessToken();
-		iamportService.paymentVerify(auctionId, impUid, accessToken);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(iamportService.paymentVerify(auctionId, impUid, accessToken));
 	}
 }
