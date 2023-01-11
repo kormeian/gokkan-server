@@ -84,8 +84,8 @@ public class AuctionService {
 
 	@Transactional(readOnly = true)
 	public Page<ListResponse> myAuctionBidList(Member member,
-		String auctionStatus,
-		Pageable pageable) {
+		String auctionStatus, Pageable pageable) {
+		log.info("myAuctionBidList : " + member.getNickName() + auctionStatus);
 		return auctionRepository.searchMyBidAuction(member.getNickName(), auctionStatus, pageable);
 	}
 
