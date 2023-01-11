@@ -1,6 +1,7 @@
-package com.gokkan.gokkan.domain.member.controller;
+package com.gokkan.gokkan.global.iamport.controller;
 
 import com.gokkan.gokkan.global.iamport.service.IamportService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -10,19 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "아임포트 통합인증 컨트롤러", description = "아임포트 통합인증 컨트롤러")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/v1/certification")
-public class CertificationController {
+@RequestMapping("/api/v1/payment")
+@Tag(name = "결제 검증 컨트롤러", description = "결제 검증 컨트롤러")
+public class PaymentController {
 
 	private final IamportService iamportService;
 
 	@GetMapping
-	public ResponseEntity<String> getCertification(
-		@Parameter(description = "아임포트 imp_uid")
-		@RequestParam String imp_uid) {
+	@Operation(summary = "결제 검증", description = "결제 검증")
+	public ResponseEntity<Void> paymentVerify(
+		@Parameter(description = "경매 아이디") @RequestParam Long auctionId,
+		@Parameter(description = "결제 후 받아온 imp-uid") @RequestParam String impUid) {
 		String accessToken = iamportService.getAccessToken();
-		return ResponseEntity.ok(iamportService.getPhoneNumber(imp_uid, accessToken));
+		iamportService.paymentVerify(auctionId, impUid, accessToken);
+		return ResponseEntity.ok().build();
 	}
 }
