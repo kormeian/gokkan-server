@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.auction.repository;
 
 import static com.gokkan.gokkan.domain.auction.domain.QAuction.auction;
 import static com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus.WAIT_PAYMENT;
+import static com.gokkan.gokkan.domain.category.domain.QCategory.category;
 import static com.gokkan.gokkan.domain.expertComment.domain.QExpertComment.expertComment;
 import static com.gokkan.gokkan.domain.item.domain.QItem.item;
 import static com.gokkan.gokkan.domain.style.domain.QStyleItem.styleItem;
@@ -12,10 +13,12 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest
 import com.gokkan.gokkan.domain.auction.domain.dto.QAuctionDto_ListResponse;
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.domain.type.SortType;
+import com.gokkan.gokkan.domain.category.domain.Category;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -148,11 +151,33 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 	}
 
 
-	private BooleanBuilder eqCategory(String category) {
-		if (category == null) {
+	private BooleanBuilder eqCategory(String categoryName) {
+		if (categoryName == null) {
 			return null;
 		}
-		return new BooleanBuilder().or(item.category.name.eq(category));
+		BooleanBuilder booleanBuilder = new BooleanBuilder();
+		List<String> children = getCategoryChildren(categoryName);
+
+		for (String c : children) {
+			booleanBuilder.or(item.category.name.eq(c));
+		}
+
+		return booleanBuilder;
+	}
+
+	private List<String> getCategoryChildren(String categoryName) {
+		Category category1 = jpaQueryFactory.selectFrom(category)
+			.where(category.name.eq(categoryName))
+			.fetchOne();
+		List<String> children = new ArrayList<>();
+		children.add(categoryName);
+		if (category1 != null) {
+			for (Category c : category1.getChildren()) {
+				children.addAll(getCategoryChildren(c.getName()));
+			}
+		}
+
+		return children;
 	}
 
 

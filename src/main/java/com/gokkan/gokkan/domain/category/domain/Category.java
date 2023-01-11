@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
@@ -44,6 +45,7 @@ public class Category {
 	@JoinColumn(name = "par_category_id")
 	private Category parent;
 
+	@BatchSize(size = 10)
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parent", cascade = CascadeType.ALL)
 	private List<Category> children;
 

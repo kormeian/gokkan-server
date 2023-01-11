@@ -68,7 +68,14 @@ class AuctionRepositoryTest {
 	public void test_01_00() {
 		//given
 		Category category1 = getCategory(categoryName1);
+		Category category11 = getCategory(categoryName1 + "1");
+		category11.setParent(category1);
+		category1.setChildren(new ArrayList<>(List.of(category11)));
 		Category category2 = getCategory(categoryName2);
+		Category category21 = getCategory(categoryName2 + "1");
+		category21.setParent(category2);
+		category2.setChildren(new ArrayList<>(List.of(category21)));
+
 		Style style1 = getStyle(this.styleName1);
 		Style style2 = getStyle(this.styleName2);
 		Member member = getMember("member", "member@test.com");
@@ -80,10 +87,10 @@ class AuctionRepositoryTest {
 		Item item2 = getItem(category2, member, State.COMPLETE);
 		item2.setStyleItems(
 			new ArrayList<>(List.of(getStyleItem(style2, item2))));
-		Item item3 = getItem(category1, member, State.COMPLETE);
+		Item item3 = getItem(category11, member, State.COMPLETE);
 		item3.setStyleItems(
 			new ArrayList<>(List.of(getStyleItem(style1, item3), getStyleItem(style2, item3))));
-		Item item4 = getItem(category2, member, State.COMPLETE);
+		Item item4 = getItem(category21, member, State.COMPLETE);
 		item4.setStyleItems(
 			new ArrayList<>(List.of(getStyleItem(style1, item4), getStyleItem(style2, item4))));
 
