@@ -85,7 +85,8 @@ public class IamportService {
 	}
 
 	@Transactional
-	public void paymentVerify(Long auctionId, String imp_uid, String accessToken) {
+	public String paymentVerify(Long auctionId, String imp_uid,
+		String accessToken) {
 		log.info("아임포트 결제 검증");
 		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/" + imp_uid);
 		JSONParser jsonParser = new JSONParser();
@@ -102,13 +103,17 @@ public class IamportService {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(
 				AuctionErrorCode.AUCTION_NOT_FOUND));
+		String address;
 		try {
 			JSONObject object = (JSONObject) jsonParser.parse(block);
 			JSONObject searchResponse = (JSONObject) object.get("response");
 			Long amount = (Long) searchResponse.get("amount");
 			String status = (String) searchResponse.get("status");
+			address = (String) searchResponse.get("buyer_addr");
 			if (status.equals("failed")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
+			} else if (status.equals("ready")) {
+				throw new RestApiException(IamportErrorCode.IAMPORT_PAYMENT_STATUS_IS_READY);
 			} else if (!auction.getCurrentPrice().equals(amount)) {
 				paymentCancel(imp_uid, accessToken);
 				throw new RestApiException(IamportErrorCode.IAMPORT_NOT_MATCH_AMOUNT);
@@ -119,6 +124,7 @@ public class IamportService {
 		}
 		auctionRepository.save(auction);
 		log.info("아임포트 결제 검증 완료");
+		return address;
 	}
 
 	private void paymentCancel(String imp_uid, String accessToken) {
