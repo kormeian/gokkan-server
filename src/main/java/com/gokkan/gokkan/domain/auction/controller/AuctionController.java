@@ -109,7 +109,6 @@ public class AuctionController {
 		@Parameter(description = "찾고 싶은 유저의 닉네임", required = true, example = "/list/member?nickName=")
 		@RequestParam(required = true) String nickName,
 		@ParameterObject Pageable pageable) {
-
 		return ResponseEntity.ok(auctionService.readList(FilterListRequest.builder()
 				.category(category)
 				.styles(styles)

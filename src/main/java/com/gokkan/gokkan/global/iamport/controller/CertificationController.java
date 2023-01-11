@@ -1,6 +1,6 @@
-package com.gokkan.gokkan.domain.member.controller;
+package com.gokkan.gokkan.global.iamport.controller;
 
-import com.gokkan.gokkan.domain.member.service.CertificationService;
+import com.gokkan.gokkan.global.iamport.service.IamportService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/certification")
 public class CertificationController {
 
-	private final CertificationService certificationService;
+	private final IamportService iamportService;
 
 	@GetMapping
 	public ResponseEntity<String> getCertification(
 		@Parameter(description = "아임포트 imp_uid")
 		@RequestParam String imp_uid) {
-		String accessToken = certificationService.getAccessToken();
-		return ResponseEntity.ok(certificationService.getPhoneNumber(imp_uid, accessToken));
+		String accessToken = iamportService.getAccessToken();
+		return ResponseEntity.ok(iamportService.getPhoneNumber(imp_uid, accessToken));
 	}
 }
