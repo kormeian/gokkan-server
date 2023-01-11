@@ -182,6 +182,7 @@ public class ItemService {
 
 	private void itemSaveCompleteStyleCheck(int styleItems) {
 		if (styleItems == 0) {
+			log.error("itemSaveCompleteStyleCheck styleItems count : " + styleItems);
 			throw new RestApiException(ItemErrorCode.STYLE_NOT_NULL);
 		}
 	}
