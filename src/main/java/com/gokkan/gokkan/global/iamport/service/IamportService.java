@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.global.iamport.service;
 
 import com.gokkan.gokkan.domain.auction.domain.Auction;
-import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
@@ -128,7 +127,8 @@ public class IamportService {
 				paymentCancel(imp_uid, accessToken);
 				throw new RestApiException(IamportErrorCode.IAMPORT_NOT_MATCH_AMOUNT);
 			}
-			auction.setAuctionStatus(AuctionStatus.ENDED);
+			//TODO: 결제 완료 처리
+			//auction.setAuctionStatus(AuctionStatus.ENDED);
 		} catch (ParseException e) {
 			throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 		}
