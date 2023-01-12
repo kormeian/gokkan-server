@@ -1,5 +1,7 @@
 package com.gokkan.gokkan.global.iamport.controller;
 
+import com.gokkan.gokkan.global.iamport.dto.PaymentDto;
+import com.gokkan.gokkan.global.iamport.dto.PaymentDto.PaymentVerifyResponse;
 import com.gokkan.gokkan.global.iamport.service.IamportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +23,7 @@ public class PaymentController {
 
 	@GetMapping
 	@Operation(summary = "결제 검증", description = "결제 검증")
-	public ResponseEntity<String> paymentVerify(
+	public ResponseEntity<PaymentVerifyResponse> paymentVerify(
 		@Parameter(description = "경매 아이디") @RequestParam Long auctionId,
 		@Parameter(description = "결제 후 받아온 imp-uid") @RequestParam String impUid) {
 		String accessToken = iamportService.getAccessToken();

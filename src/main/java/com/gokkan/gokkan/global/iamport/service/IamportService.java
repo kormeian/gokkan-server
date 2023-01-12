@@ -5,6 +5,7 @@ import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.auction.exception.AuctionErrorCode;
 import com.gokkan.gokkan.domain.auction.repository.AuctionRepository;
 import com.gokkan.gokkan.global.exception.exception.RestApiException;
+import com.gokkan.gokkan.global.iamport.dto.PaymentDto.PaymentVerifyResponse;
 import com.gokkan.gokkan.global.iamport.exception.IamportErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +86,7 @@ public class IamportService {
 	}
 
 	@Transactional
-	public String paymentVerify(Long auctionId, String imp_uid,
+	public PaymentVerifyResponse paymentVerify(Long auctionId, String imp_uid,
 		String accessToken) {
 		log.info("아임포트 결제 검증");
 		WebClient webClient = WebClient.create("https://api.iamport.kr/payments/" + imp_uid);
@@ -103,6 +104,8 @@ public class IamportService {
 		Auction auction = auctionRepository.findById(auctionId)
 			.orElseThrow(() -> new RestApiException(
 				AuctionErrorCode.AUCTION_NOT_FOUND));
+		String name;
+		String phoneNumber;
 		String address;
 		try {
 			JSONObject object = (JSONObject) jsonParser.parse(block);
@@ -114,6 +117,8 @@ public class IamportService {
 			log.info("결제 금액 : " + amount);
 			log.info("경매 금액 : " + currentPrice + ", 수수료 : " + currentPrice / 10);
 			log.info("필요 결제 금액 : " + (currentPrice + currentPrice / 10));
+			name = (String) searchResponse.get("buyer_name");
+			phoneNumber = (String) searchResponse.get("buyer_tel");
 			address = (String) searchResponse.get("buyer_addr");
 			if (status.equals("failed")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
@@ -129,8 +134,14 @@ public class IamportService {
 		}
 		auctionRepository.save(auction);
 		log.info("아임포트 결제 검증 완료");
+		log.info("주문자 명 : " + name);
+		log.info("주문자 전화번호 : " + phoneNumber);
 		log.info("배송지 : " + address);
-		return address;
+		return PaymentVerifyResponse.builder()
+			.name(name)
+			.phoneNumber(phoneNumber)
+			.address(address)
+			.build();
 	}
 
 	private void paymentCancel(String imp_uid, String accessToken) {
