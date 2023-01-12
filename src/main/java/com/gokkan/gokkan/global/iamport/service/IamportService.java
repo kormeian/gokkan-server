@@ -114,7 +114,7 @@ public class IamportService {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 			} else if (status.equals("ready")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_PAYMENT_STATUS_IS_READY);
-			} else if (!auction.getCurrentPrice().equals(amount)) {
+			} else if (!amount.equals(auction.getCurrentPrice() + auction.getCurrentPrice()/10)) {
 				paymentCancel(imp_uid, accessToken);
 				throw new RestApiException(IamportErrorCode.IAMPORT_NOT_MATCH_AMOUNT);
 			}
