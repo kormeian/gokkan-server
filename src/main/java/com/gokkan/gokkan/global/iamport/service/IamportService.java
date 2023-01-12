@@ -109,12 +109,17 @@ public class IamportService {
 			JSONObject searchResponse = (JSONObject) object.get("response");
 			Long amount = (Long) searchResponse.get("amount");
 			String status = (String) searchResponse.get("status");
+			Long currentPrice = auction.getCurrentPrice();
+			log.info("결제 상태 : " + status);
+			log.info("결제 금액 : " + amount);
+			log.info("경매 금액 : " + currentPrice + ", 수수료 : " + currentPrice / 10);
+			log.info("필요 결제 금액 : " + (currentPrice + currentPrice / 10));
 			address = (String) searchResponse.get("buyer_addr");
 			if (status.equals("failed")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 			} else if (status.equals("ready")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_PAYMENT_STATUS_IS_READY);
-			} else if (!amount.equals(auction.getCurrentPrice() + auction.getCurrentPrice()/10)) {
+			} else if (!amount.equals(currentPrice + currentPrice / 10)) {
 				paymentCancel(imp_uid, accessToken);
 				throw new RestApiException(IamportErrorCode.IAMPORT_NOT_MATCH_AMOUNT);
 			}
@@ -124,6 +129,7 @@ public class IamportService {
 		}
 		auctionRepository.save(auction);
 		log.info("아임포트 결제 검증 완료");
+		log.info("배송지 : " + address);
 		return address;
 	}
 
@@ -145,7 +151,9 @@ public class IamportService {
 			JSONObject object = (JSONObject) jsonParser.parse(block);
 			JSONObject searchResponse = (JSONObject) object.get("response");
 			String status = (String) searchResponse.get("status");
+			log.info("결제 취소 상태 : " + status);
 			if (status.equals("failed") || status.equals("ready") || status.equals("paid")) {
+				log.info("결제 취소 안됨");
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 			}
 
