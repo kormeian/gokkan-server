@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.auction.domain;
 
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
+import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.member.domain.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -47,10 +48,15 @@ public class Auction {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Member member;
 
+	@JoinColumn(name = "item_id")
+	@OneToOne(fetch = FetchType.LAZY)
+	private Item item;
+
+
 	@Builder
 	public Auction(LocalDateTime startDateTime, LocalDateTime endDateTime, Long startPrice,
 		Long currentPrice,
-		AuctionStatus auctionStatus, ExpertComment expertComment, Member member) {
+		AuctionStatus auctionStatus, ExpertComment expertComment, Member member, Item item) {
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 		this.startPrice = startPrice;
@@ -58,6 +64,7 @@ public class Auction {
 		this.auctionStatus = auctionStatus;
 		this.expertComment = expertComment;
 		this.member = member;
+		this.item = item;
 	}
 
 	public void setCurrentPrice(Long price) {
