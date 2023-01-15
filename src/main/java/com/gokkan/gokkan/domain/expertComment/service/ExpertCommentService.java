@@ -116,6 +116,7 @@ public class ExpertCommentService {
 			.currentPrice(item.getStartPrice())
 			.auctionStatus(AuctionStatus.STARTED)
 			.expertComment(expertComment)
+			.item(item)
 			.build();
 	}
 
