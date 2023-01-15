@@ -36,6 +36,15 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 	@Override
 	public Page<ListResponse> searchAllFilter(FilterListRequest filterListRequest,
 		Pageable pageable) {
+		//TODO
+		// 1. item table relation on auction one to one for join reduce
+		// 		-> expertComment join can remove
+		// 2. auction table index (auction_state, current_price, end_date_time)
+		// 		auction_state -> range scan
+		// 		endDateTime -> for order by
+		// 3. item table index(member_id, category_id)
+		// 		member_id -> range scan??
+		// 		category_id ->
 		List<ListResponse> content = jpaQueryFactory
 			.select(new QAuctionDto_ListResponse(
 					auction.id,
@@ -53,10 +62,10 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			.innerJoin(item.styleItems, styleItem)
 			.where(
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
-				eqCategory(filterListRequest.getCategory()),
-				eqStyle(filterListRequest.getStyles()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
 				eqMemberNickName(filterListRequest.getMemberNickName(), false),
+				eqCategory(filterListRequest.getCategory()),
+				eqStyle(filterListRequest.getStyles()),
 				auction.endDateTime.after(LocalDateTime.now())
 			)
 			.groupBy(auction)

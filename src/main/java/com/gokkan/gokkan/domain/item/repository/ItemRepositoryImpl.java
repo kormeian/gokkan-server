@@ -39,9 +39,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 		// 3. 가져온 id 묶음으로 상품 list 불러오기
 		// 전문가 스탕일로 필터링 된 item list 불러오기
 
+		//TODO
+		// 1. item table index (state, updated)
+		// 		state range scan
+		// 		updated for order by
 		List<ListResponse> content = jpaQueryFactory
 			.select(
-				new QItemDto_ListResponse(item.id,
+				new QItemDto_ListResponse(
+					item.id,
 					item.name,
 					item.thumbnail,
 					item.member.nickName,
@@ -51,9 +56,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 					item.updated))
 			.from(item)
 			.innerJoin(item.styleItems, styleItem)
-			.where(eqStyle(expertStyleNames), item.state.eq(State.ASSESSING))
+			.where(
+				item.state.eq(State.ASSESSING),
+				eqStyle(expertStyleNames))
 			.groupBy(item)
-			.orderBy(item.created.desc())
+			.orderBy(item.updated.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -61,7 +68,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 		JPAQuery<Long> countQuery = jpaQueryFactory.select(item.countDistinct())
 			.from(item)
 			.innerJoin(item.styleItems, styleItem)
-			.where(eqStyle(expertStyleNames), item.state.eq(State.ASSESSING));
+			.where(item.state.eq(State.ASSESSING), eqStyle(expertStyleNames));
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 	}
@@ -69,20 +76,28 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	@Override
 	public Page<ListResponse> searchAllMyItem(List<State> states, Member member,
 		Pageable pageable) {
-		List<ListResponse> content = jpaQueryFactory.select(new QItemDto_ListResponse(item.id,
-				item.name,
-				item.thumbnail,
-				item.member.nickName,
-				item.state,
-				item.startPrice,
-				item.created,
-				item.updated))
+
+		//TODO
+		// 1. item table index (member_id, state, updated)
+		// 		member_id -> range scan
+		// 		state ->  range scan
+		// 		updated -> order by
+		List<ListResponse> content = jpaQueryFactory.select(
+				new QItemDto_ListResponse(
+					item.id,
+					item.name,
+					item.thumbnail,
+					item.member.nickName,
+					item.state,
+					item.startPrice,
+					item.created,
+					item.updated))
 			.from(item)
 			.where(
 				item.member.eq(member),
 				(eqState(states))
 			)
-			.orderBy(item.created.desc())
+			.orderBy(item.updated.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
