@@ -3,7 +3,6 @@ package com.gokkan.gokkan.domain.auction.repository;
 import static com.gokkan.gokkan.domain.auction.domain.QAuction.auction;
 import static com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus.WAIT_PAYMENT;
 import static com.gokkan.gokkan.domain.category.domain.QCategory.category;
-import static com.gokkan.gokkan.domain.expertComment.domain.QExpertComment.expertComment;
 import static com.gokkan.gokkan.domain.item.domain.QItem.item;
 import static com.gokkan.gokkan.domain.style.domain.QStyleItem.styleItem;
 
@@ -57,8 +56,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 					auction.endDateTime
 				)
 			).from(auction)
-			.innerJoin(auction.expertComment, expertComment)
-			.innerJoin(expertComment.item, item)
+			.innerJoin(auction.item, item)
 			.innerJoin(item.styleItems, styleItem)
 			.where(
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
@@ -78,8 +76,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 
 		JPAQuery<Long> countQuery = jpaQueryFactory
 			.select(auction.countDistinct()).from(auction)
-			.innerJoin(auction.expertComment, expertComment)
-			.innerJoin(expertComment.item, item)
+			.innerJoin(auction.item, item)
 			.innerJoin(item.styleItems, styleItem)
 			.where(
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
@@ -107,8 +104,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 					auction.endDateTime
 				)
 			).from(auction)
-			.innerJoin(auction.expertComment, expertComment)
-			.innerJoin(expertComment.item, item)
+			.innerJoin(auction.item, item)
 			.where(
 				auction.auctionStatus.eq(AuctionStatus.STARTED),
 				eqCategory(similarListRequest.getCategory()),
@@ -136,8 +132,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 					auction.endDateTime
 				)
 			).from(auction)
-			.innerJoin(auction.expertComment, expertComment)
-			.innerJoin(expertComment.item, item)
+			.innerJoin(auction.item, item)
 			.where(
 				eqMemberNickName(nickName, true),
 				eqAuctionStatus(auctionStatus)
@@ -149,8 +144,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 		JPAQuery<Long> countQuery = jpaQueryFactory
 			.select(auction.count())
 			.from(auction)
-			.innerJoin(auction.expertComment, expertComment)
-			.innerJoin(expertComment.item, item)
+			.innerJoin(auction.item, item)
 			.where(
 				eqMemberNickName(nickName, true),
 				auction.auctionStatus.eq(WAIT_PAYMENT)
