@@ -1,9 +1,11 @@
 package com.gokkan.gokkan.domain.member.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Schema(description = "토큰 정보")
 public class TokenDto {
 
 	private final String accessToken;
