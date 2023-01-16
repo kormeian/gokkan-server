@@ -61,7 +61,7 @@ public class BidService {
 		} else {
 			History lastHistory = history.get(0);
 			if (lastHistory.getMemberId().equals(member.getId())) {
-//				throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
+				throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
 			}
 			currentPrice = lastHistory.getPrice();
 		}
@@ -150,7 +150,10 @@ public class BidService {
 				throw new RestApiException(
 					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
 			}
+		} else {
+			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
 		}
+
 		AutoBidding autoBidding = autoBiddingRepository.findByAuctionAndMember(auction, member);
 		if (autoBidding == null) {
 			autoBiddingRepository.save(AutoBidding.builder()
