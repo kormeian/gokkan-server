@@ -14,7 +14,7 @@ public interface AuctionRepositoryCustom {
 
 	Page<ListResponse> searchAllFilter(FilterListRequest filterListRequest, Pageable pageable);
 
-	Page<ListResponse> searchMyBidAuction(String nickName, String auctionStatus, Pageable pageable);
+//	Page<ListResponse> searchMyBidAuction(String nickName, String auctionStatus, Pageable pageable);
 
 	List<ListResponse> searchAllSimilar(SimilarListRequest similarListRequest);
 }
