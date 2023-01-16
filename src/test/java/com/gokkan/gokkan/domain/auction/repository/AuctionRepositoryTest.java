@@ -11,8 +11,6 @@ import com.gokkan.gokkan.domain.auction.domain.dto.AuctionDto.SimilarListRequest
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
 import com.gokkan.gokkan.domain.category.domain.Category;
 import com.gokkan.gokkan.domain.category.repository.CategoryRepository;
-import com.gokkan.gokkan.domain.expertComment.domain.ExpertComment;
-import com.gokkan.gokkan.domain.expertComment.repository.ExpertCommentRepository;
 import com.gokkan.gokkan.domain.item.domain.Item;
 import com.gokkan.gokkan.domain.item.repository.ItemRepository;
 import com.gokkan.gokkan.domain.item.type.State;
@@ -49,8 +47,6 @@ class AuctionRepositoryTest {
 
 	@Autowired
 	private AuctionRepository auctionRepository;
-	@Autowired
-	private ExpertCommentRepository expertCommentRepository;
 	@Autowired
 	private ItemRepository itemRepository;
 	@Autowired
@@ -94,23 +90,18 @@ class AuctionRepositoryTest {
 		item4.setStyleItems(
 			new ArrayList<>(List.of(getStyleItem(style1, item4), getStyleItem(style2, item4))));
 
-		ExpertComment expertComment1 = getExpertComment(item1);
-		ExpertComment expertComment2 = getExpertComment(item2);
-		ExpertComment expertComment3 = getExpertComment(item3);
-		ExpertComment expertComment4 = getExpertComment(item4);
-
-		getAuction(expertComment1, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment2, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment3, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment1, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment2, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment3, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment4, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item1, member, AuctionStatus.STARTED, 100L);
+		getAuction(item2, member, AuctionStatus.STARTED, 100L);
+		getAuction(item3, member, AuctionStatus.STARTED, 100L);
+		getAuction(item4, member, AuctionStatus.STARTED, 100L);
+		getAuction(item1, member, AuctionStatus.STARTED, 200L);
+		getAuction(item2, member, AuctionStatus.STARTED, 200L);
+		getAuction(item3, member, AuctionStatus.STARTED, 200L);
+		getAuction(item4, member, AuctionStatus.STARTED, 200L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
 
 		//when
 		Page<ListResponse> listResponses1 = auctionRepository.searchAllFilter(
@@ -230,35 +221,22 @@ class AuctionRepositoryTest {
 		Item item11 = getItem(category2, member, State.COMPLETE);
 		Item item12 = getItem(category2, member, State.COMPLETE);
 
-		ExpertComment expertComment1 = getExpertComment(item1);
-		ExpertComment expertComment2 = getExpertComment(item2);
-		ExpertComment expertComment3 = getExpertComment(item3);
-		ExpertComment expertComment4 = getExpertComment(item4);
-		ExpertComment expertComment5 = getExpertComment(item5);
-		ExpertComment expertComment6 = getExpertComment(item6);
-		ExpertComment expertComment7 = getExpertComment(item7);
-		ExpertComment expertComment8 = getExpertComment(item8);
-		ExpertComment expertComment9 = getExpertComment(item9);
-		ExpertComment expertComment10 = getExpertComment(item10);
-		ExpertComment expertComment11 = getExpertComment(item11);
-		ExpertComment expertComment12 = getExpertComment(item12);
-
-		getAuction(expertComment1, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment2, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment3, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment5, member, AuctionStatus.STARTED, 100L);
-		getAuction(expertComment6, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment7, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment8, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment9, member, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment10, member, AuctionStatus.STARTED, 300L);
-		getAuction(expertComment11, member, AuctionStatus.STARTED, 300L);
-		getAuction(expertComment12, member, AuctionStatus.STARTED, 300L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
-		getAuction(expertComment4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item1, member, AuctionStatus.STARTED, 100L);
+		getAuction(item2, member, AuctionStatus.STARTED, 100L);
+		getAuction(item3, member, AuctionStatus.STARTED, 100L);
+		getAuction(item4, member, AuctionStatus.STARTED, 100L);
+		getAuction(item5, member, AuctionStatus.STARTED, 100L);
+		getAuction(item6, member, AuctionStatus.STARTED, 200L);
+		getAuction(item7, member, AuctionStatus.STARTED, 200L);
+		getAuction(item8, member, AuctionStatus.STARTED, 200L);
+		getAuction(item9, member, AuctionStatus.STARTED, 200L);
+		getAuction(item10, member, AuctionStatus.STARTED, 300L);
+		getAuction(item11, member, AuctionStatus.STARTED, 300L);
+		getAuction(item12, member, AuctionStatus.STARTED, 300L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
+		getAuction(item4, member, AuctionStatus.ENDED, 100L);
 
 		//when
 		List<ListResponse> listResponses1 = auctionRepository.searchAllSimilar(
@@ -315,19 +293,14 @@ class AuctionRepositoryTest {
 		item4.setStyleItems(
 			new ArrayList<>(List.of(getStyleItem(style1, item4), getStyleItem(style2, item4))));
 
-		ExpertComment expertComment1 = getExpertComment(item1);
-		ExpertComment expertComment2 = getExpertComment(item2);
-		ExpertComment expertComment3 = getExpertComment(item3);
-		ExpertComment expertComment4 = getExpertComment(item4);
-
-		getAuction(expertComment1, member1, AuctionStatus.WAIT_PAYMENT, 100L);
-		getAuction(expertComment2, member1, AuctionStatus.WAIT_PAYMENT, 100L);
-		getAuction(expertComment3, member1, AuctionStatus.WAIT_PAYMENT, 100L);
-		getAuction(expertComment4, member2, AuctionStatus.WAIT_PAYMENT, 100L);
-		getAuction(expertComment1, member2, AuctionStatus.WAIT_PAYMENT, 200L);
-		getAuction(expertComment2, member3, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment3, member3, AuctionStatus.STARTED, 200L);
-		getAuction(expertComment4, member3, AuctionStatus.STARTED, 200L);
+		getAuction(item1, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(item2, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(item3, member1, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(item4, member2, AuctionStatus.WAIT_PAYMENT, 100L);
+		getAuction(item1, member2, AuctionStatus.WAIT_PAYMENT, 200L);
+		getAuction(item2, member3, AuctionStatus.STARTED, 200L);
+		getAuction(item3, member3, AuctionStatus.STARTED, 200L);
+		getAuction(item4, member3, AuctionStatus.STARTED, 200L);
 
 		//when
 		Page<ListResponse> myBidAuctionList1 = auctionRepository
@@ -372,28 +345,17 @@ class AuctionRepositoryTest {
 	}
 
 
-	private Auction getAuction(ExpertComment expertComment, Member member,
+	private void getAuction(Item item, Member member,
 		AuctionStatus auctionStatus, Long price) {
-		return auctionRepository.save(
+		auctionRepository.save(
 			Auction.builder()
 				.startDateTime(LocalDateTime.now())
 				.endDateTime(LocalDateTime.now().plus(1, ChronoUnit.DAYS))
 				.startPrice(100L)
 				.currentPrice(price)
 				.auctionStatus(auctionStatus)
-				.expertComment(expertComment)
-				.member(member)
-				.build());
-	}
-
-	private ExpertComment getExpertComment(Item item) {
-		return expertCommentRepository.save(
-			ExpertComment.builder()
-				.comment("test comment")
-				.minPrice(100L)
-				.maxPrice(400L)
-				.expertInfo(null)
 				.item(item)
+				.member(member)
 				.build());
 	}
 
@@ -427,7 +389,6 @@ class AuctionRepositoryTest {
 			.conditionGrade("test CG")
 			.conditionDescription("test CD")
 			.text("test text")
-//			.madeIn("test madeIn")
 			.designer("test designer")
 			.brand("test brand")
 			.productionYear(2023)
