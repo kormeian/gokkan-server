@@ -62,7 +62,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				eqMemberNickNameForBid(
 					filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
-				auction.endDateTime.after(LocalDateTime.now()),
+				endTimeBeforeOrAfter(filterListRequest.getAuctionStatus()),
 				eqCategory(filterListRequest.getCategory()),
 				eqMemberNickName(filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				eqStyle(filterListRequest.getStyles())
@@ -84,7 +84,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 				eqMemberNickNameForBid(
 					filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
-				auction.endDateTime.after(LocalDateTime.now()),
+				endTimeBeforeOrAfter(filterListRequest.getAuctionStatus()),
 				eqCategory(filterListRequest.getCategory()),
 				eqMemberNickName(filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				eqStyle(filterListRequest.getStyles())
@@ -156,6 +156,13 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 //		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 //	}
 
+	public BooleanBuilder endTimeBeforeOrAfter(AuctionStatus auctionStatus) {
+		if (auctionStatus.equals(AuctionStatus.STARTED)) {
+			return new BooleanBuilder().and(auction.endDateTime.after(LocalDateTime.now()));
+		} else {
+			return new BooleanBuilder().and(auction.endDateTime.before(LocalDateTime.now()));
+		}
+	}
 
 	private BooleanBuilder eqCategory(String categoryName) {
 		if (categoryName == null) {
