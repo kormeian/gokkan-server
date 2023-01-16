@@ -2,6 +2,7 @@ package com.gokkan.gokkan.domain.member.service;
 
 import com.gokkan.gokkan.domain.member.domain.Member;
 import com.gokkan.gokkan.domain.member.domain.MemberRefreshToken;
+import com.gokkan.gokkan.domain.member.domain.dto.TokenDto;
 import com.gokkan.gokkan.domain.member.exception.AuthErrorCode;
 import com.gokkan.gokkan.domain.member.exception.MemberErrorCode;
 import com.gokkan.gokkan.domain.member.repository.MemberRefreshTokenRepository;
@@ -28,7 +29,7 @@ public class AuthService {
 	private final MemberRefreshTokenRepository memberRefreshTokenRepository;
 	private final MemberRepository memberRepository;
 
-	public String newAccessToken(String refreshToken) {
+	public TokenDto newAccessToken(String refreshToken) {
 		log.info("엑세스 토큰 재발급 시작");
 		// refresh token 으로 DB 확인
 		MemberRefreshToken memberRefreshToken = memberRefreshTokenRepository.findByRefreshToken(
@@ -71,6 +72,9 @@ public class AuthService {
 			memberRefreshTokenRepository.save(memberRefreshToken);
 		}
 		log.info("엑세스 토큰 재발급 완료");
-		return newAccessToken.getToken();
+		return TokenDto.builder()
+			.accessToken(newAccessToken.getToken())
+			.refreshToken(authRefreshToken.getToken())
+			.build();
 	}
 }

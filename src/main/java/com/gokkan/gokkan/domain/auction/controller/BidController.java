@@ -33,4 +33,5 @@ public class BidController {
 		Member member = stompChannelInterceptor.getMember();
 		bidService.registrationAutoBid(member, auctionId, price);
 	}
+
 }

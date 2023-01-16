@@ -1,5 +1,6 @@
 package com.gokkan.gokkan.domain.member.controller;
 
+import com.gokkan.gokkan.domain.member.domain.dto.TokenDto;
 import com.gokkan.gokkan.domain.member.service.AuthService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +21,7 @@ public class AuthController {
 
 
 	@GetMapping("/refresh")
-	public ResponseEntity<String> newAccessToken(
+	public ResponseEntity<TokenDto> newAccessToken(
 		@Parameter(description = "리프레시 토큰")
 		@RequestParam String refreshToken) {
 
