@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 public class PaymentDto {
+
 	@Getter
 	@Builder
-	public static class PaymentVerifyResponse{
+	public static class PaymentVerifyResponse {
+
 		String name;
 		String phoneNumber;
 		String address;

@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.global.iamport.controller;
 
-import com.gokkan.gokkan.global.iamport.dto.PaymentDto;
 import com.gokkan.gokkan.global.iamport.dto.PaymentDto.PaymentVerifyResponse;
 import com.gokkan.gokkan.global.iamport.service.IamportService;
 import io.swagger.v3.oas.annotations.Operation;

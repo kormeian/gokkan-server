@@ -1,7 +1,6 @@
 package com.gokkan.gokkan.domain.auction.repository;
 
 import static com.gokkan.gokkan.domain.auction.domain.QAuction.auction;
-import static com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus.WAIT_PAYMENT;
 import static com.gokkan.gokkan.domain.category.domain.QCategory.category;
 import static com.gokkan.gokkan.domain.item.domain.QItem.item;
 import static com.gokkan.gokkan.domain.style.domain.QStyleItem.styleItem;
@@ -36,14 +35,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 	public Page<ListResponse> searchAllFilter(FilterListRequest filterListRequest,
 		Pageable pageable) {
 		//TODO
-		// 1. item table relation on auction one to one for join reduce
-		// 		-> expertComment join can remove
-		// 2. auction table index (auction_state, current_price, end_date_time)
+		// 2. auction table index (auction_state, member_id, current_price, end_date_time)
 		// 		auction_state -> range scan
+		// 		member-id -> range scan
+		// 		current-price -> range scan
 		// 		endDateTime -> for order by
-		// 3. item table index(member_id, category_id)
-		// 		member_id -> range scan??
-		// 		category_id ->
+		// 3. item table index(category_id, member_id)
+		// 		category_id -> range scan
+		// 		member_id -> range scan
 		List<ListResponse> content = jpaQueryFactory
 			.select(new QAuctionDto_ListResponse(
 					auction.id,
@@ -59,16 +58,18 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			.innerJoin(auction.item, item)
 			.innerJoin(item.styleItems, styleItem)
 			.where(
-				auction.auctionStatus.eq(AuctionStatus.STARTED),
+				eqAuctionStatus(filterListRequest.getAuctionStatus()),
+				eqMemberNickNameForBid(
+					filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
-				eqMemberNickName(filterListRequest.getMemberNickName(), false),
+				auction.endDateTime.after(LocalDateTime.now()),
 				eqCategory(filterListRequest.getCategory()),
-				eqStyle(filterListRequest.getStyles()),
-				auction.endDateTime.after(LocalDateTime.now())
+				eqMemberNickName(filterListRequest.getMemberNickName(), filterListRequest.isBid()),
+				eqStyle(filterListRequest.getStyles())
 			)
 			.groupBy(auction)
 			.orderBy(
-				SortType.getSortType(filterListRequest.getSort()).equals(SortType.DESC) ?
+				filterListRequest.getSort().equals(SortType.DESC) ?
 					auction.endDateTime.desc() : auction.endDateTime.asc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -79,12 +80,14 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			.innerJoin(auction.item, item)
 			.innerJoin(item.styleItems, styleItem)
 			.where(
-				auction.auctionStatus.eq(AuctionStatus.STARTED),
-				eqCategory(filterListRequest.getCategory()),
-				eqStyle(filterListRequest.getStyles()),
+				eqAuctionStatus(filterListRequest.getAuctionStatus()),
+				eqMemberNickNameForBid(
+					filterListRequest.getMemberNickName(), filterListRequest.isBid()),
 				minMaxPrice(filterListRequest.getMinPrice(), filterListRequest.getMaxPrice()),
-				eqMemberNickName(filterListRequest.getMemberNickName(), false),
-				auction.endDateTime.after(LocalDateTime.now())
+				auction.endDateTime.after(LocalDateTime.now()),
+				eqCategory(filterListRequest.getCategory()),
+				eqMemberNickName(filterListRequest.getMemberNickName(), filterListRequest.isBid()),
+				eqStyle(filterListRequest.getStyles())
 			);
 
 		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -106,7 +109,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			).from(auction)
 			.innerJoin(auction.item, item)
 			.where(
-				auction.auctionStatus.eq(AuctionStatus.STARTED),
+				eqAuctionStatus(AuctionStatus.STARTED),
 				eqCategory(similarListRequest.getCategory()),
 				auction.endDateTime.after(LocalDateTime.now()),
 				auction.id.eq(similarListRequest.getAuctionId()).not()
@@ -117,41 +120,41 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 			.fetch();
 	}
 
-	@Override
-	public Page<ListResponse> searchMyBidAuction(String nickName, String auctionStatus,
-		Pageable pageable) {
-		List<ListResponse> content = jpaQueryFactory
-			.select(new QAuctionDto_ListResponse(
-					auction.id,
-					item.id,
-					item.name,
-					item.thumbnail,
-					auction.currentPrice,
-					item.member.nickName,
-					auction.auctionStatus,
-					auction.endDateTime
-				)
-			).from(auction)
-			.innerJoin(auction.item, item)
-			.where(
-				eqMemberNickName(nickName, true),
-				eqAuctionStatus(auctionStatus)
-			)
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
-			.fetch();
-
-		JPAQuery<Long> countQuery = jpaQueryFactory
-			.select(auction.count())
-			.from(auction)
-			.innerJoin(auction.item, item)
-			.where(
-				eqMemberNickName(nickName, true),
-				auction.auctionStatus.eq(WAIT_PAYMENT)
-			);
-
-		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-	}
+//	@Override
+//	public Page<ListResponse> searchMyBidAuction(String nickName, String auctionStatus,
+//		Pageable pageable) {
+//		List<ListResponse> content = jpaQueryFactory
+//			.select(new QAuctionDto_ListResponse(
+//					auction.id,
+//					item.id,
+//					item.name,
+//					item.thumbnail,
+//					auction.currentPrice,
+//					item.member.nickName,
+//					auction.auctionStatus,
+//					auction.endDateTime
+//				)
+//			).from(auction)
+//			.innerJoin(auction.item, item)
+//			.where(
+//				eqMemberNickName(nickName, true),
+//				eqAuctionStatus(auctionStatus)
+//			)
+//			.offset(pageable.getOffset())
+//			.limit(pageable.getPageSize())
+//			.fetch();
+//
+//		JPAQuery<Long> countQuery = jpaQueryFactory
+//			.select(auction.count())
+//			.from(auction)
+//			.innerJoin(auction.item, item)
+//			.where(
+//				eqMemberNickName(nickName, true),
+//				auction.auctionStatus.eq(WAIT_PAYMENT)
+//			);
+//
+//		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+//	}
 
 
 	private BooleanBuilder eqCategory(String categoryName) {
@@ -203,19 +206,30 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
 		if (memberNickName == null) {
 			return null;
 		}
-		if (bidMember) {
-			return new BooleanBuilder().or(auction.member.nickName.eq(memberNickName));
-		} else {
+		if (!bidMember) {
 			return new BooleanBuilder().or(item.member.nickName.eq(memberNickName));
 		}
+
+		return null;
 	}
 
-	private BooleanBuilder eqAuctionStatus(String auctionStatus) {
+	private BooleanBuilder eqMemberNickNameForBid(String memberNickName, boolean bidMember) {
+		if (memberNickName == null) {
+			return null;
+		}
+		if (bidMember) {
+			return new BooleanBuilder().or(auction.member.nickName.eq(memberNickName));
+		}
+
+		return null;
+	}
+
+	private BooleanBuilder eqAuctionStatus(AuctionStatus auctionStatus) {
 		if (auctionStatus == null) {
 			return null;
 		}
 		return new BooleanBuilder().or(
-			auction.auctionStatus.eq(AuctionStatus.getAuctionStatus(auctionStatus)));
+			auction.auctionStatus.eq(auctionStatus));
 	}
 
 

@@ -72,7 +72,6 @@ public class AuctionService {
 		if (auctionHistories.isEmpty()) {
 			return new ArrayList<>();
 		}
-		LocalDateTime bidDateTime = auction.getStartDateTime();
 		List<ResponseAuctionHistory> responseAuctionHistories = new ArrayList<>();
 		for (History h : auctionHistories) {
 			responseAuctionHistories.add(
@@ -82,12 +81,12 @@ public class AuctionService {
 		return responseAuctionHistories;
 	}
 
-	@Transactional(readOnly = true)
-	public Page<ListResponse> myAuctionBidList(Member member,
-		String auctionStatus, Pageable pageable) {
-		log.info("myAuctionBidList : " + member.getNickName() + auctionStatus);
-		return auctionRepository.searchMyBidAuction(member.getNickName(), auctionStatus, pageable);
-	}
+//	@Transactional(readOnly = true)
+//	public Page<ListResponse> myAuctionBidList(Member member,
+//		String auctionStatus, Pageable pageable) {
+//		log.info("myAuctionBidList : " + member.getNickName() + auctionStatus);
+//		return auctionRepository.searchMyBidAuction(member.getNickName(), auctionStatus, pageable);
+//	}
 
 	@Transactional(readOnly = true)
 	public Page<ListResponse> readList(FilterListRequest filterListRequest, Pageable pageable) {

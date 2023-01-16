@@ -1,6 +1,7 @@
 package com.gokkan.gokkan.domain.auction.domain.dto;
 
 import com.gokkan.gokkan.domain.auction.domain.type.AuctionStatus;
+import com.gokkan.gokkan.domain.auction.domain.type.SortType;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -56,7 +57,9 @@ public class AuctionDto {
 		private Long minPrice;
 		private Long maxPrice;
 		private String memberNickName;
-		private String sort;
+		private SortType sort;
+		private AuctionStatus auctionStatus;
+		private boolean bid;
 
 	}
 
