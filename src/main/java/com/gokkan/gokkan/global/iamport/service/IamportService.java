@@ -106,6 +106,7 @@ public class IamportService {
 		String name;
 		String phoneNumber;
 		String address;
+		String pay_method;
 		try {
 			JSONObject object = (JSONObject) jsonParser.parse(block);
 			JSONObject searchResponse = (JSONObject) object.get("response");
@@ -119,6 +120,7 @@ public class IamportService {
 			name = (String) searchResponse.get("buyer_name");
 			phoneNumber = (String) searchResponse.get("buyer_tel");
 			address = (String) searchResponse.get("buyer_addr");
+			pay_method = (String) searchResponse.get("pay_method");
 			if (status.equals("failed")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 			} else if (status.equals("ready")) {
@@ -141,6 +143,7 @@ public class IamportService {
 			.name(name)
 			.phoneNumber(phoneNumber)
 			.address(address)
+			.pay_method(pay_method)
 			.build();
 	}
 

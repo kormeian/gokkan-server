@@ -12,5 +12,6 @@ public class PaymentDto {
 		String name;
 		String phoneNumber;
 		String address;
+		String pay_method;
 	}
 }
