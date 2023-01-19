@@ -120,7 +120,8 @@ public class IamportService {
 			name = (String) searchResponse.get("buyer_name");
 			phoneNumber = (String) searchResponse.get("buyer_tel");
 			address = (String) searchResponse.get("buyer_addr");
-			pay_method = (String) searchResponse.get("pay_method");
+			pay_method = (String) searchResponse.get("pg_provider");
+			log.info("결제 PG사 : " + pay_method);
 			if (status.equals("failed")) {
 				throw new RestApiException(IamportErrorCode.IAMPORT_FAILED);
 			} else if (status.equals("ready")) {
