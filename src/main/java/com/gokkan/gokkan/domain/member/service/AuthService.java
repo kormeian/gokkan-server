@@ -59,6 +59,7 @@ public class AuthService {
 
 		// refresh 토큰 기간이 3일 이하로 남은 경우, refresh 토큰 갱신
 		if (validTime <= THREE_DAYS_MSEC) {
+			log.info("리프레시 토큰 재발급 시작");
 			// refresh 토큰 설정
 			long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
 
@@ -70,6 +71,7 @@ public class AuthService {
 			// DB에 refresh 토큰 업데이트
 			memberRefreshToken.setRefreshToken(authRefreshToken.getToken());
 			memberRefreshTokenRepository.save(memberRefreshToken);
+			log.info("리프레시 토큰 재발급 완료");
 		}
 		log.info("엑세스 토큰 재발급 완료");
 		return TokenDto.builder()

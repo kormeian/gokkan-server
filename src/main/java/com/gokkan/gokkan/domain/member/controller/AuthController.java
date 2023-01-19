@@ -1,6 +1,5 @@
 package com.gokkan.gokkan.domain.member.controller;
 
-import com.gokkan.gokkan.domain.member.domain.dto.MemberDto.ResponseDto;
 import com.gokkan.gokkan.domain.member.domain.dto.TokenDto;
 import com.gokkan.gokkan.domain.member.service.AuthService;
 import io.swagger.v3.oas.annotations.Parameter;

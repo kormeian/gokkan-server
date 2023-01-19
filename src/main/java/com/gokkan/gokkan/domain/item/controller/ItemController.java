@@ -138,7 +138,7 @@ public class ItemController {
 		@Parameter(description = "상품 상태 list")
 		@RequestParam(required = false) List<State> states,
 		@ParameterObject
-		Pageable pageable) {
+			Pageable pageable) {
 		return ResponseEntity.ok(itemService.myItems(member, states, pageable));
 	}
 
@@ -149,7 +149,7 @@ public class ItemController {
 		@Parameter(hidden = true)
 		@CurrentMember Member member,
 		@ParameterObject
-		Pageable pageable) {
+			Pageable pageable) {
 		return ResponseEntity.ok(itemService.itemsForExport(member, pageable));
 	}
 }
