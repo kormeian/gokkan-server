@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -65,11 +66,7 @@ public class BidService {
 			}
 			currentPrice = lastHistory.getPrice();
 		}
-
-		if (currentPrice >= bidPrice) {
-			throw new RestApiException(
-				AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
-		}
+		checkBidPrice(currentPrice, auction);
 
 		LocalDateTime currentEndDateTime = auction.getEndDateTime();
 		if (Duration.between(LocalDateTime.now(), currentEndDateTime).getSeconds() < 60) {
@@ -141,15 +138,8 @@ public class BidService {
 		log.info("최대 입찰가 : " + price);
 		log.info("자동 입찰 등록");
 		Auction auction = auctionFindById(auctionId);
-		Long currentPrice = auction.getCurrentPrice();
 		if (!auction.getMember().getId().equals(member.getId())) {
-			if (currentPrice >= price) {
-				throw new RestApiException(
-					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
-			} else if (currentPrice + 10000L > price) {
-				throw new RestApiException(
-					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
-			}
+			checkBidPrice(price, auction);
 		} else {
 			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
 		}
@@ -167,7 +157,7 @@ public class BidService {
 			autoBiddingRepository.save(autoBidding);
 			log.info("자동 입찰 수정 성공");
 		}
-		bidding(member, auctionId, currentPrice + 10000L);
+		bidding(member, auctionId, auction.getCurrentPrice() + 10000L);
 	}
 
 	private void saveRedisHistory(Long auctionId, History currentHistory) {
@@ -212,6 +202,25 @@ public class BidService {
 		if (lock.isLocked()) {
 			lock.unlock();
 			log.info("lock released");
+		}
+	}
+
+	private void checkBidPrice(Long bidPrice, Auction auction) {
+		Long currentPrice = auction.getCurrentPrice();
+		Long startPrice = auction.getStartPrice();
+		if (!Objects.equals(currentPrice, startPrice)) {
+			if (currentPrice >= bidPrice) {
+				throw new RestApiException(
+					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
+			} else if (currentPrice + 10000L > bidPrice) {
+				throw new RestApiException(
+					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_BID_INCREMENT);
+			}
+		} else {
+			if (currentPrice > bidPrice) {
+				throw new RestApiException(
+					AuctionErrorCode.AUCTION_PRICE_IS_LOWER_THAN_CURRENT_PRICE);
+			}
 		}
 	}
 }
