@@ -66,7 +66,7 @@ public class BidService {
 			}
 			currentPrice = lastHistory.getPrice();
 		}
-		checkBidPrice(currentPrice, auction);
+		checkBidPrice(bidPrice, auction);
 
 		LocalDateTime currentEndDateTime = auction.getEndDateTime();
 		if (Duration.between(LocalDateTime.now(), currentEndDateTime).getSeconds() < 60) {
