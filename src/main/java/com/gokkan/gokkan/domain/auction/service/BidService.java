@@ -138,11 +138,7 @@ public class BidService {
 		log.info("최대 입찰가 : " + price);
 		log.info("자동 입찰 등록");
 		Auction auction = auctionFindById(auctionId);
-		if (!auction.getMember().getId().equals(member.getId())) {
-			checkBidPrice(price, auction);
-		} else {
-			throw new RestApiException(AuctionErrorCode.AUCTION_ALREADY_BID);
-		}
+		checkBidPrice(price, auction);
 
 		AutoBidding autoBidding = autoBiddingRepository.findByAuctionAndMember(auction, member);
 		if (autoBidding == null) {
@@ -157,7 +153,10 @@ public class BidService {
 			autoBiddingRepository.save(autoBidding);
 			log.info("자동 입찰 수정 성공");
 		}
-		bidding(member, auctionId, auction.getCurrentPrice() + 10000L);
+
+		if (!auction.getMember().getId().equals(member.getId())) {
+			bidding(member, auctionId, auction.getCurrentPrice() + 10000L);
+		}
 	}
 
 	private void saveRedisHistory(Long auctionId, History currentHistory) {
