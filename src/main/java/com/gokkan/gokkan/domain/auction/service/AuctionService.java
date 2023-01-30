@@ -86,9 +86,9 @@ public class AuctionService {
 		log.info("readList : " + filterListRequest);
 
 		Page<ListResponse> result = auctionRepository.searchAllFilter(filterListRequest, pageable);
-		log.debug("readList : getTotalElements : " + result.getTotalElements());
-		log.debug("readList : getTotalPages : " + result.getTotalPages());
-		log.debug("readList : getContent.size : " + result.getContent().size());
+		log.info("readList : getTotalElements : " + result.getTotalElements());
+		log.info("readList : getTotalPages : " + result.getTotalPages());
+		log.info("readList : getContent.size : " + result.getContent().size());
 		return result;
 	}
 
@@ -96,7 +96,7 @@ public class AuctionService {
 	public List<ListResponse> similarList(SimilarListRequest similarListRequest) {
 		log.info("similarList : " + similarListRequest);
 		List<ListResponse> result = auctionRepository.searchAllSimilar(similarListRequest);
-		log.debug("similarList : size : " + result.size());
+		log.info("similarList : size : " + result.size());
 		return result;
 	}
 

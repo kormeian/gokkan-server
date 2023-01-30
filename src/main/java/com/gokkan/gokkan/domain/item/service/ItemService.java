@@ -146,9 +146,9 @@ public class ItemService {
 		log.info("myItems member id : " + member.getUserId());
 
 		Page<ListResponse> result = itemRepository.searchAllMyItem(states, member, pageable);
-		log.debug("myItems : getTotalElements : " + result.getTotalElements());
-		log.debug("myItems : getTotalPages : " + result.getTotalPages());
-		log.debug("myItems : getContent.size : " + result.getContent().size());
+		log.info("myItems : getTotalElements : " + result.getTotalElements());
+		log.info("myItems : getTotalPages : " + result.getTotalPages());
+		log.info("myItems : getContent.size : " + result.getContent().size());
 		return result;
 	}
 
@@ -159,9 +159,9 @@ public class ItemService {
 			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
 		}
 		Page<ListResponse> result = itemRepository.searchAllItemForExport(member, pageable);
-		log.debug("itemsForExport : getTotalElements : " + result.getTotalElements());
-		log.debug("itemsForExport : getTotalPages : " + result.getTotalPages());
-		log.debug("itemsForExport : getContent.size : " + result.getContent().size());
+		log.info("itemsForExport : getTotalElements : " + result.getTotalElements());
+		log.info("itemsForExport : getTotalPages : " + result.getTotalPages());
+		log.info("itemsForExport : getContent.size : " + result.getContent().size());
 		return result;
 	}
 
