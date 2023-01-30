@@ -144,7 +144,12 @@ public class ItemService {
 	@Transactional(readOnly = true)
 	public Page<ListResponse> myItems(Member member, List<State> states, Pageable pageable) {
 		log.info("myItems member id : " + member.getUserId());
-		return itemRepository.searchAllMyItem(states, member, pageable);
+
+		Page<ListResponse> result = itemRepository.searchAllMyItem(states, member, pageable);
+		log.debug("myItems : getTotalElements : " + result.getTotalElements());
+		log.debug("myItems : getTotalPages : " + result.getTotalPages());
+		log.debug("myItems : getContent.size : " + result.getContent().size());
+		return result;
 	}
 
 	@Transactional(readOnly = true)
@@ -153,7 +158,11 @@ public class ItemService {
 		if (!member.getRole().equals(Role.ADMIN)) {
 			throw new RestApiException(MemberErrorCode.MEMBER_FORBIDDEN);
 		}
-		return itemRepository.searchAllItemForExport(member, pageable);
+		Page<ListResponse> result = itemRepository.searchAllItemForExport(member, pageable);
+		log.debug("itemsForExport : getTotalElements : " + result.getTotalElements());
+		log.debug("itemsForExport : getTotalPages : " + result.getTotalPages());
+		log.debug("itemsForExport : getContent.size : " + result.getContent().size());
+		return result;
 	}
 
 	private void memberMatchCheck(String memberId, String itemMemberId) {

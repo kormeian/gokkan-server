@@ -81,23 +81,23 @@ public class AuctionService {
 		return responseAuctionHistories;
 	}
 
-//	@Transactional(readOnly = true)
-//	public Page<ListResponse> myAuctionBidList(Member member,
-//		String auctionStatus, Pageable pageable) {
-//		log.info("myAuctionBidList : " + member.getNickName() + auctionStatus);
-//		return auctionRepository.searchMyBidAuction(member.getNickName(), auctionStatus, pageable);
-//	}
-
 	@Transactional(readOnly = true)
 	public Page<ListResponse> readList(FilterListRequest filterListRequest, Pageable pageable) {
 		log.info("readList : " + filterListRequest);
-		return auctionRepository.searchAllFilter(filterListRequest, pageable);
+
+		Page<ListResponse> result = auctionRepository.searchAllFilter(filterListRequest, pageable);
+		log.debug("readList : getTotalElements : " + result.getTotalElements());
+		log.debug("readList : getTotalPages : " + result.getTotalPages());
+		log.debug("readList : getContent.size : " + result.getContent().size());
+		return result;
 	}
 
 	@Transactional(readOnly = true)
 	public List<ListResponse> similarList(SimilarListRequest similarListRequest) {
 		log.info("similarList : " + similarListRequest);
-		return auctionRepository.searchAllSimilar(similarListRequest);
+		List<ListResponse> result = auctionRepository.searchAllSimilar(similarListRequest);
+		log.debug("similarList : size : " + result.size());
+		return result;
 	}
 
 	@Transactional
